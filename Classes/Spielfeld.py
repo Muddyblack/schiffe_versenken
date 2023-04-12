@@ -12,14 +12,13 @@ class Spielfeld:
 
     def show_field(self, fieldtype):
 
-        print(" " * (len(str(self.__fsize))+1), end = "")
+        print(" " * (len(str(self.__fsize))+2), end = "")
         for a in range(self.__fsize):
             print(f"{ascii_uppercase[a]}", end = " ")
-
-        print("")
+        print("\n")
 
         for num, l in enumerate(fieldtype, 1):
-            print(f"{num}", end="  ")
+            print(f"{num}", end="   ")
 
             if(len(str(num)) > 1):
                 print("\b"*(len(str(num))-1), end = "")
