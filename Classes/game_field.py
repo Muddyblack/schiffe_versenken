@@ -148,6 +148,12 @@ class GameField:
 
             placed = True
 
+    def attack_enemy(self, target):
+        if self.__bot == True:
+            pass
+        else:
+            pass
+
 
 if __name__ == "__main__":
     s1 = GameField(True)
