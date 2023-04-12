@@ -6,7 +6,7 @@ from tkinter import filedialog
 import pylint
 
 sys.path.append(".")
-from Library.file_helper import read_file
+from library.file_helper import read_file
 
 work_path = os.path.dirname(os.path.realpath(__file__))
 save_path = f"{work_path}\\savePath.txt"
