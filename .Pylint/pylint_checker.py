@@ -13,7 +13,7 @@ save_path = f"{work_path}\\savePath.txt"
 
 try:
     work_path = read_file(save_path)
-except FileExistsError:
+except FileNotFoundError:
     pass
 
 filepaths = filedialog.askopenfilenames(
