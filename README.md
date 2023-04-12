@@ -10,7 +10,7 @@
 
 - Create requirements.txt:
 
-```python
+```bash
 pip install pipreqs
 
 pipreqs /path/to/project
