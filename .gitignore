@@ -1,5 +1,6 @@
 # Project
 start_in_console.bat
+savePath.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
