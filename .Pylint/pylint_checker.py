@@ -5,7 +5,7 @@ import os
 from tkinter import filedialog
 import pylint
 
-sys.path.append(".")
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from Library.file_helper import read_file
 
 work_path = os.path.dirname(os.path.realpath(__file__))
@@ -29,4 +29,6 @@ with open(save_path, "w", encoding="utf8") as f:
         pass
 
 for file in filepaths:
-    pylint.run_pylint(argv=[file])  # after first one it just kills the program...
+    pylint.run_pylint(
+        argv=[file, "--output-format=colorized", "--max-line-length=160"]
+    )  # after first one it just kills the program...
