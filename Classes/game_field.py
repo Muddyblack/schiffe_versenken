@@ -50,7 +50,7 @@ class GameField:
 
     # setter
     def set_ship(self, shiplength):
-        # ask startlocation and direction via arrows
+        # asks startlocation and direction via arrows
         # check not over field size and not already set
 
         placed = False
