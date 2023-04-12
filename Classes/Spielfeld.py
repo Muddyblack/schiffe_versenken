@@ -10,7 +10,9 @@ class Spielfeld:
         self.__bot = bot
         self.__ships = 10
 
+    # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
     def show_field(self, fieldtype):
+        
 
         print(" " * (len(str(self.__fsize))+2), end = "")
         for a in range(self.__fsize):
@@ -33,6 +35,7 @@ class Spielfeld:
     def show_hitfield(self):
         self.show_field(self.__hitfield)
 
+    # getter
     def get_ships(self):
         return self.__ships
     
@@ -45,6 +48,7 @@ class Spielfeld:
     def get_hitfield(self):
         return self.__hitfield
 
+    # setter
     def set_ship(self, shiplength):
         # ask startlocation and direction via arrows
         # check not over field size and not already set
