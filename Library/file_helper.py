@@ -1,31 +1,30 @@
 def read_file(file_path):
-    with open(file_path, "r") as f:
-        txt_lines = f.readlines()
+    with open(file_path, "r", encoding="utf8") as file:
+        txt_lines = file.readlines()
 
-        for r in range(len(txt_lines)):
-            txt_lines[r]= txt_lines[r].replace('\n','')
+        for elem in enumerate(txt_lines):
+            txt_lines[elem[0]] = txt_lines[elem[0]].replace("\n", "")
 
     return txt_lines
 
+
 # how to use : file_text_replacer(path_of_file, [stringtext], [inline_as_integer_number])
 def file_line_replacer(file, change_input, line):
-    
     data = read_file(file)
 
-    for pointing,x in enumerate(change_input):
+    for pointing in enumerate(change_input):
         try:
-            data[line[pointing]-1] = change_input[pointing]
+            data[line[pointing[0]] - 1] = change_input[pointing[0]]
         except:
             data.append("")
 
-
-    with open(file, 'w', encoding="utf8") as file_to_replace:
+    with open(file, "w", encoding="utf8") as file_to_replace:
         data_len = len(data)
 
-        for x in data:
+        for elem in data:
             if data_len > 1:
-                file_to_replace.writelines(f"{x}\n")
+                file_to_replace.writelines(f"{elem}\n")
             else:
-                file_to_replace.writelines(f"{x}")
-            
-            data_len-=1
+                file_to_replace.writelines(f"{elem}")
+
+            data_len -= 1
