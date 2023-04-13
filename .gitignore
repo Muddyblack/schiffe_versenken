@@ -1,6 +1,8 @@
 # Project
 start_in_console.bat
 savePath.txt
+uuff.bat
+Ships.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

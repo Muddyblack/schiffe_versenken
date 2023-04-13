@@ -1,8 +1,7 @@
 from string import ascii_uppercase
 from datetime import datetime
 import random
-import msvcrt
-import time
+import keyboard
 
 
 class GameField:
@@ -74,38 +73,31 @@ class GameField:
 
             print("Enter the direction for your ship. Use your arrow Keys!")
             while True:
-                arrow = ""
+                if keyboard.is_pressed("up"):
+                    direction = "up"
+                    end_col = start_col
+                    end_row = start_row - (shiplength - 1)
 
-                if msvcrt.kbhit():
-                    key = msvcrt.getch()
+                elif keyboard.is_pressed("down"):
+                    direction = "down"
+                    end_col = start_col
+                    end_row = start_row + (shiplength - 1)
 
-                    if key == b"\x00":
-                        arrow = msvcrt.getch()
-                    if arrow == b"H":
-                        direction = "up"
-                        end_col = start_col
-                        end_row = start_row - (shiplength - 1)
+                elif keyboard.is_pressed("left"):
+                    direction = "left"
+                    end_col = start_col - (shiplength - 1)
+                    end_row = start_row
 
-                    elif arrow == b"P":
-                        direction = "down"
-                        end_col = start_col
-                        end_row = start_row + (shiplength - 1)
+                elif keyboard.is_pressed("right"):
+                    direction = "right"
+                    end_col = start_col + (shiplength - 1)
+                    end_row = start_row
 
-                    elif arrow == b"K":
-                        direction = "left"
-                        end_col = start_col - (shiplength - 1)
-                        end_row = start_row
-
-                    elif arrow == b"M":
-                        direction = "right"
-                        end_col = start_col + (shiplength - 1)
-                        end_row = start_row
-
-                    else:
-                        print("Invalid direction")
-                        continue
-                    print(f"{direction} arrow key pressed")
-                    break
+                else:
+                    print("Invalid direction")
+                    continue
+                print(f"{direction} arrow key pressed")
+                break
 
             # check if ship fits on the board
             if (
@@ -164,12 +156,13 @@ class GameField:
         else:
             while not placed:
                 # ask start location
-                pos = input("Enter the start position for your ship (e.g. A1): ")
+                pos = input("Enter the atttacking position for your ship (e.g. A1): ")
                 try:
                     col = ascii_uppercase.index(pos[0])
                     row = int(pos[1:]) - 1
                 except Exception:
                     continue
+                placed = True
 
         print(target.get_boatfield())
         print(row, col)
@@ -177,7 +170,7 @@ class GameField:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
             target.set_boatfield(row, col, "X")
-            self.attack_enemy(target)
+            # self.attack_enemy(target)
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
@@ -185,14 +178,13 @@ class GameField:
 
 
 if __name__ == "__main__":
-    s1 = GameField(True)
-    s1.show_boatfield()
-    s1.show_boatfield()
+    s1 = GameField(False)
 
     s2 = GameField()
     s2.set_ship(5)
+    s2.show_boatfield()
+
     while True:
         s1.attack_enemy(s2)
         s1.show_hitfield()
         s2.show_boatfield()
-        time.sleep(1)
