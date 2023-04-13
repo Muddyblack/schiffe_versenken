@@ -93,7 +93,7 @@ class GameField:
                     end_col = start_col + (shiplength - 1)
                     end_row = start_row
 
-                else:
+                elif keyboard.read_key() != "":
                     print("Invalid direction")
                     continue
                 print(f"{direction} arrow key pressed")
@@ -164,8 +164,6 @@ class GameField:
                     continue
                 placed = True
 
-        print(target.get_boatfield())
-        print(row, col)
         if target.get_boatfield()[row][col] == 1:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
