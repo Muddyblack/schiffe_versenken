@@ -2,6 +2,7 @@ from string import ascii_uppercase
 from datetime import datetime
 import random
 import msvcrt
+import time
 
 
 class GameField:
@@ -153,8 +154,8 @@ class GameField:
 
         if self.__bot is True:
             while True:
-                col = random.randint(0, self.__fsize)
-                row = random.randint(0, self.__fsize)
+                col = random.randint(0, self.__fsize - 1)
+                row = random.randint(0, self.__fsize - 1)
 
                 if [col, row] not in self.__botcache:
                     self.__botcache.append([col, row])
@@ -170,10 +171,13 @@ class GameField:
                 except Exception:
                     continue
 
+        print(target.get_boatfield())
+        print(row, col)
         if target.get_boatfield()[row][col] == 1:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
             target.set_boatfield(row, col, "X")
+            self.attack_enemy(target)
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
@@ -183,5 +187,12 @@ class GameField:
 if __name__ == "__main__":
     s1 = GameField(True)
     s1.show_boatfield()
-    s1.set_ship(3)
     s1.show_boatfield()
+
+    s2 = GameField()
+    s2.set_ship(5)
+    while True:
+        s1.attack_enemy(s2)
+        s1.show_hitfield()
+        s2.show_boatfield()
+        time.sleep(5)
