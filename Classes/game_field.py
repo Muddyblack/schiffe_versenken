@@ -195,4 +195,4 @@ if __name__ == "__main__":
         s1.attack_enemy(s2)
         s1.show_hitfield()
         s2.show_boatfield()
-        time.sleep(5)
+        time.sleep(1)
