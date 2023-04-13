@@ -1,9 +1,13 @@
 from string import ascii_uppercase
+from datetime import datetime
+import random
 import msvcrt
 
 
 class GameField:
     def __init__(self, bot=False):
+        random.seed(datetime.now().timestamp())
+
         self.__fsize = 10
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
@@ -11,6 +15,7 @@ class GameField:
         self.__boatfield = self.__hitfield
 
         self.__bot = bot
+        self.__botcache = []
         self.__ships = 10
 
     # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
@@ -49,6 +54,9 @@ class GameField:
         return self.__hitfield
 
     # setter
+    def set_boatfield(self, row, col, value=0):
+        self.__boatfield[row][col] = value
+
     def set_ship(self, shiplength):
         # asks startlocation and direction via arrows
         # check not over field size and not already set
@@ -57,8 +65,11 @@ class GameField:
         while not placed:
             # ask start location
             start_pos = input("Enter the start position for your ship (e.g. A1): ")
-            start_col = ascii_uppercase.index(start_pos[0])
-            start_row = int(start_pos[1:]) - 1
+            try:
+                start_col = ascii_uppercase.index(start_pos[0])
+                start_row = int(start_pos[1:]) - 1
+            except Exception:
+                continue
 
             print("Enter the direction for your ship. Use your arrow Keys!")
             while True:
@@ -141,10 +152,32 @@ class GameField:
         placed = False
 
         if self.__bot is True:
-            pass
+            while True:
+                col = random.randint(0, self.__fsize)
+                row = random.randint(0, self.__fsize)
+
+                if [col, row] not in self.__botcache:
+                    self.__botcache.append([col, row])
+                    break
+
         else:
             while not placed:
-                pass
+                # ask start location
+                pos = input("Enter the start position for your ship (e.g. A1): ")
+                try:
+                    col = ascii_uppercase.index(pos[0])
+                    row = int(pos[1:]) - 1
+                except Exception:
+                    continue
+
+        if target.get_boatfield()[row][col] == 1:
+            print("Sir, we hitted an enemy target!")
+            self.__hitfield[row][col] = 1
+            target.set_boatfield(row, col, "X")
+        elif target.get_boatfield()[row][col] == "X":
+            print("We already hit this Part")
+        else:
+            print("Sir we've hit the bull's eye!")
 
 
 if __name__ == "__main__":
