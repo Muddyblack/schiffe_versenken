@@ -97,9 +97,9 @@ class GameField:
 
             # check if ship fits on the board
             if (
-                end_col > self.__fsize
+                end_col >= self.__fsize
                 or end_col < 0
-                or end_row > self.__fsize
+                or end_row >= self.__fsize
                 or end_row < 0
             ):
                 print(
@@ -122,7 +122,7 @@ class GameField:
                     if self.__boatfield[start_row][start_col - i] == 0:
                         temp_boatfield[start_row][start_col - i] = 1
                 elif direction == "right":
-                    if self.__boatfield[start_row][start_col + i] != 0:
+                    if self.__boatfield[start_row][start_col + i] == 0:
                         temp_boatfield[start_row][start_col + i] = 1
                 else:
                     overlap = True
@@ -138,10 +138,13 @@ class GameField:
             placed = True
 
     def attack_enemy(self, target):
+        placed = False
+
         if self.__bot is True:
             pass
         else:
-            pass
+            while not placed:
+                pass
 
 
 if __name__ == "__main__":
