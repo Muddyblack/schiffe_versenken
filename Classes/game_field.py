@@ -62,36 +62,38 @@ class GameField:
 
             print("Enter the direction for your ship. Use your arrow Keys!")
             while True:
+                arrow = ""
+
                 if msvcrt.kbhit():
                     key = msvcrt.getch()
 
                     if key == b"\x00":
                         arrow = msvcrt.getch()
-                        if arrow == b"H":
-                            direction = "up"
-                            end_col = start_col
-                            end_row = start_row - (shiplength - 1)
+                    if arrow == b"H":
+                        direction = "up"
+                        end_col = start_col
+                        end_row = start_row - (shiplength - 1)
 
-                        elif arrow == b"P":
-                            direction = "down"
-                            end_col = start_col
-                            end_row = start_row + (shiplength - 1)
+                    elif arrow == b"P":
+                        direction = "down"
+                        end_col = start_col
+                        end_row = start_row + (shiplength - 1)
 
-                        elif arrow == b"K":
-                            direction = "left"
-                            end_col = start_col - (shiplength - 1)
-                            end_row = start_row
+                    elif arrow == b"K":
+                        direction = "left"
+                        end_col = start_col - (shiplength - 1)
+                        end_row = start_row
 
-                        elif arrow == b"M":
-                            direction = "right"
-                            end_col = start_col + (shiplength - 1)
-                            end_row = start_row
+                    elif arrow == b"M":
+                        direction = "right"
+                        end_col = start_col + (shiplength - 1)
+                        end_row = start_row
 
-                        else:
-                            print("Invalid direction")
-                            continue
-                        print(f"{direction} arrow key pressed")
-                        break
+                    else:
+                        print("Invalid direction")
+                        continue
+                    print(f"{direction} arrow key pressed")
+                    break
 
             # check if ship fits on the board
             if (
@@ -105,26 +107,26 @@ class GameField:
                 )
                 continue
 
-            # check if ship overlaps with other ships
+            # check if ship overlaps with other ships and place ship on board
             overlap = False
+            temp_boatfield = self.__boatfield
 
             for i in range(shiplength):
                 if direction == "up":
-                    if self.__boatfield[start_row - i][start_col] != 0:
-                        overlap = True
-                        break
-                if direction == "down":
-                    if self.__boatfield[start_row + i][start_col] != 0:
-                        overlap = True
-                        break
+                    if self.__boatfield[start_row - i][start_col] == 0:
+                        temp_boatfield[start_row - i][start_col] = 1
+                elif direction == "down":
+                    if self.__boatfield[start_row + i][start_col] == 0:
+                        temp_boatfield[start_row + i][start_col] = 1
                 elif direction == "left":
-                    if self.__boatfield[start_row][start_col - i] != 0:
-                        overlap = True
-                        break
+                    if self.__boatfield[start_row][start_col - i] == 0:
+                        temp_boatfield[start_row][start_col - i] = 1
                 elif direction == "right":
                     if self.__boatfield[start_row][start_col + i] != 0:
-                        overlap = True
-                        break
+                        temp_boatfield[start_row][start_col + i] = 1
+                else:
+                    overlap = True
+                    break
 
             if overlap:
                 print(
@@ -132,24 +134,11 @@ class GameField:
                 )
                 continue
 
-            print(start_col, start_row)
-            print(end_col, end_row)
-
-            # place ship on board
-            for i in range(shiplength):
-                if direction == "up":
-                    self.__boatfield[start_row - i][start_col] = 1
-                elif direction == "down":
-                    self.__boatfield[start_row + i][start_col] = 1
-                elif direction == "left":
-                    self.__boatfield[start_row][start_col - i] = 1
-                elif direction == "right":
-                    self.__boatfield[start_row][start_col + i] = 1
-
+            self.__boatfield = temp_boatfield
             placed = True
 
     def attack_enemy(self, target):
-        if self.__bot == True:
+        if self.__bot is True:
             pass
         else:
             pass
