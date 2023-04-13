@@ -1,9 +1,14 @@
 from string import ascii_uppercase
+from datetime import datetime
+import random
 import msvcrt
+import time
 
 
 class GameField:
     def __init__(self, bot=False):
+        random.seed(datetime.now().timestamp())
+
         self.__fsize = 10
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
@@ -11,6 +16,7 @@ class GameField:
         self.__boatfield = self.__hitfield
 
         self.__bot = bot
+        self.__botcache = []
         self.__ships = 10
 
     # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
@@ -49,6 +55,9 @@ class GameField:
         return self.__hitfield
 
     # setter
+    def set_boatfield(self, row, col, value=0):
+        self.__boatfield[row][col] = value
+
     def set_ship(self, shiplength):
         # asks startlocation and direction via arrows
         # check not over field size and not already set
@@ -57,47 +66,52 @@ class GameField:
         while not placed:
             # ask start location
             start_pos = input("Enter the start position for your ship (e.g. A1): ")
-            start_col = ascii_uppercase.index(start_pos[0])
-            start_row = int(start_pos[1:]) - 1
+            try:
+                start_col = ascii_uppercase.index(start_pos[0])
+                start_row = int(start_pos[1:]) - 1
+            except Exception:
+                continue
 
             print("Enter the direction for your ship. Use your arrow Keys!")
             while True:
+                arrow = ""
+
                 if msvcrt.kbhit():
                     key = msvcrt.getch()
 
                     if key == b"\x00":
                         arrow = msvcrt.getch()
-                        if arrow == b"H":
-                            direction = "up"
-                            end_col = start_col
-                            end_row = start_row - (shiplength - 1)
+                    if arrow == b"H":
+                        direction = "up"
+                        end_col = start_col
+                        end_row = start_row - (shiplength - 1)
 
-                        elif arrow == b"P":
-                            direction = "down"
-                            end_col = start_col
-                            end_row = start_row + (shiplength - 1)
+                    elif arrow == b"P":
+                        direction = "down"
+                        end_col = start_col
+                        end_row = start_row + (shiplength - 1)
 
-                        elif arrow == b"K":
-                            direction = "left"
-                            end_col = start_col - (shiplength - 1)
-                            end_row = start_row
+                    elif arrow == b"K":
+                        direction = "left"
+                        end_col = start_col - (shiplength - 1)
+                        end_row = start_row
 
-                        elif arrow == b"M":
-                            direction = "right"
-                            end_col = start_col + (shiplength - 1)
-                            end_row = start_row
+                    elif arrow == b"M":
+                        direction = "right"
+                        end_col = start_col + (shiplength - 1)
+                        end_row = start_row
 
-                        else:
-                            print("Invalid direction")
-                            continue
-                        print(f"{direction} arrow key pressed")
-                        break
+                    else:
+                        print("Invalid direction")
+                        continue
+                    print(f"{direction} arrow key pressed")
+                    break
 
             # check if ship fits on the board
             if (
-                end_col > self.__fsize
+                end_col >= self.__fsize
                 or end_col < 0
-                or end_row > self.__fsize
+                or end_row >= self.__fsize
                 or end_row < 0
             ):
                 print(
@@ -105,26 +119,26 @@ class GameField:
                 )
                 continue
 
-            # check if ship overlaps with other ships
+            # check if ship overlaps with other ships and place ship on board
             overlap = False
+            temp_boatfield = self.__boatfield
 
             for i in range(shiplength):
                 if direction == "up":
-                    if self.__boatfield[start_row - i][start_col] != 0:
-                        overlap = True
-                        break
-                if direction == "down":
-                    if self.__boatfield[start_row + i][start_col] != 0:
-                        overlap = True
-                        break
+                    if self.__boatfield[start_row - i][start_col] == 0:
+                        temp_boatfield[start_row - i][start_col] = 1
+                elif direction == "down":
+                    if self.__boatfield[start_row + i][start_col] == 0:
+                        temp_boatfield[start_row + i][start_col] = 1
                 elif direction == "left":
-                    if self.__boatfield[start_row][start_col - i] != 0:
-                        overlap = True
-                        break
+                    if self.__boatfield[start_row][start_col - i] == 0:
+                        temp_boatfield[start_row][start_col - i] = 1
                 elif direction == "right":
-                    if self.__boatfield[start_row][start_col + i] != 0:
-                        overlap = True
-                        break
+                    if self.__boatfield[start_row][start_col + i] == 0:
+                        temp_boatfield[start_row][start_col + i] = 1
+                else:
+                    overlap = True
+                    break
 
             if overlap:
                 print(
@@ -132,25 +146,53 @@ class GameField:
                 )
                 continue
 
-            print(start_col, start_row)
-            print(end_col, end_row)
-
-            # place ship on board
-            for i in range(shiplength):
-                if direction == "up":
-                    self.__boatfield[start_row - i][start_col] = 1
-                elif direction == "down":
-                    self.__boatfield[start_row + i][start_col] = 1
-                elif direction == "left":
-                    self.__boatfield[start_row][start_col - i] = 1
-                elif direction == "right":
-                    self.__boatfield[start_row][start_col + i] = 1
-
+            self.__boatfield = temp_boatfield
             placed = True
+
+    def attack_enemy(self, target):
+        placed = False
+
+        if self.__bot is True:
+            while True:
+                col = random.randint(0, self.__fsize - 1)
+                row = random.randint(0, self.__fsize - 1)
+
+                if [col, row] not in self.__botcache:
+                    self.__botcache.append([col, row])
+                    break
+
+        else:
+            while not placed:
+                # ask start location
+                pos = input("Enter the start position for your ship (e.g. A1): ")
+                try:
+                    col = ascii_uppercase.index(pos[0])
+                    row = int(pos[1:]) - 1
+                except Exception:
+                    continue
+
+        print(target.get_boatfield())
+        print(row, col)
+        if target.get_boatfield()[row][col] == 1:
+            print("Sir, we hitted an enemy target!")
+            self.__hitfield[row][col] = 1
+            target.set_boatfield(row, col, "X")
+            self.attack_enemy(target)
+        elif target.get_boatfield()[row][col] == "X":
+            print("We already hit this Part")
+        else:
+            print("Sir we've hit the bull's eye!")
 
 
 if __name__ == "__main__":
     s1 = GameField(True)
     s1.show_boatfield()
-    s1.set_ship(3)
     s1.show_boatfield()
+
+    s2 = GameField()
+    s2.set_ship(5)
+    while True:
+        s1.attack_enemy(s2)
+        s1.show_hitfield()
+        s2.show_boatfield()
+        time.sleep(1)
