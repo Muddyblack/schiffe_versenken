@@ -5,7 +5,11 @@ import os
 from tkinter import filedialog
 import pylint
 
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
+    )
+)
 from Library.file_helper import read_file
 
 work_path = os.path.dirname(os.path.realpath(__file__))
