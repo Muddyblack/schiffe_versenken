@@ -1,5 +1,5 @@
 import os
-import Classes.game_field as game_field
+from Classes import game_field
 
 project_path = f"{os.path.dirname(os.path.abspath(__file__))}"
 
