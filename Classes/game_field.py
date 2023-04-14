@@ -4,6 +4,7 @@ import random
 import keyboard
 
 
+
 class GameField:
     def __init__(self, bot=False):
         random.seed(datetime.now().timestamp())
