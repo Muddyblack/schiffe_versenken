@@ -4,7 +4,6 @@ import gc
 import pickle
 import keyboard
 from Classes import game_field
-from Library.anicodes import *
 
 
 project_path = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
