@@ -3,12 +3,18 @@ from datetime import datetime
 import random
 import keyboard
 
+# anicode
+BLUE = "\033[0;34m"
+RED = "\033[0;31m"
+RESET = "\033[0m"
+
 
 class GameField:
-    def __init__(self, bot=False):
+    def __init__(self, bot=False, name="Player"):
         random.seed(datetime.now().timestamp())
 
         self.__fsize = 10
+        self.__ships = 10
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
@@ -16,7 +22,10 @@ class GameField:
 
         self.__bot = bot
         self.__botcache = []
-        self.__ships = 10
+        if bot is True:
+            self.__player_name = "bot"
+        else:
+            self.__player_name = name
 
     # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
     def show_field(self, fieldtype):
@@ -31,8 +40,15 @@ class GameField:
             if len(str(num)) > 1:
                 print("\b" * (len(str(num)) - 1), end="")
             for row in line:
-                print(row, end=" ")
+                if row == 1:
+                    color = BLUE
+                elif row == "X":
+                    color = RED
+                else:
+                    color = RESET
+                print(color + str(row), end=" ")
             print("")
+        print("\n")
 
     def show_boatfield(self):
         self.show_field(self.__boatfield)
@@ -54,8 +70,20 @@ class GameField:
         return self.__hitfield
 
     # setter
-    def set_boatfield(self, row, col, value=0):
+    def set_boatfield(self, field):
+        self.__boatfield = field
+
+    def set_hitfield(self, field):
+        self.__hitfield = field
+
+    def set_boatfield_cell(self, row, col, value=0):
         self.__boatfield[row][col] = value
+
+    def set_hitfield_cell(self, row, col, value=1):
+        self.__hitfield[row][col] = value
+
+    def get_player_name(self):
+        return self.__player_name
 
     def set_ship(self, shiplength):
         # asks startlocation and direction via arrows
@@ -64,7 +92,9 @@ class GameField:
         placed = False
         while not placed:
             # ask start location
-            start_pos = input(f"Enter the start position for your ship {shiplength} long ship (e.g. A1): ")
+            start_pos = input(
+                f"Enter the start position for your ship {shiplength} long ship (e.g. A1): "
+            )
             try:
                 start_col = ascii_uppercase.index(start_pos[0])
                 start_row = int(start_pos[1:]) - 1
@@ -77,31 +107,45 @@ class GameField:
                     direction = "up"
                     end_col = start_col
                     end_row = start_row - (shiplength - 1)
+                    while keyboard.is_pressed("up"):
+                        pass
 
                 elif keyboard.is_pressed("down"):
                     direction = "down"
                     end_col = start_col
                     end_row = start_row + (shiplength - 1)
+                    while keyboard.is_pressed("down"):
+                        pass
 
                 elif keyboard.is_pressed("left"):
                     direction = "left"
                     end_col = start_col - (shiplength - 1)
                     end_row = start_row
+                    while keyboard.is_pressed("left"):
+                        pass
 
                 elif keyboard.is_pressed("right"):
                     direction = "right"
                     end_col = start_col + (shiplength - 1)
                     end_row = start_row
+                    while keyboard.is_pressed("right"):
+                        pass
 
                 elif keyboard.read_key() != "":
                     print("Invalid direction")
                     continue
-                print(f"{direction} arrow key pressed")
                 break
 
             # check if ship fits on the board
-            if end_col >= self.__fsize or end_col < 0 or end_row >= self.__fsize or end_row < 0:
-                print("Ship does not fit on the board. Please choose a different start position or direction.")
+            if (
+                end_col >= self.__fsize
+                or end_col < 0
+                or end_row >= self.__fsize
+                or end_row < 0
+            ):
+                print(
+                    "Ship does not fit on the board. Please choose a different start position or direction."
+                )
                 continue
 
             # Bei up und down ist start und end_col gleich
@@ -109,22 +153,18 @@ class GameField:
             if direction == "up":
                 boat_column = start_col
                 boat_row_top = end_row
-                boat_row_bottom = start_row
                 orientation = "vertical"
             elif direction == "down":
                 boat_column = start_col
                 boat_row_top = start_row
-                boat_row_bottom = end_row
                 orientation = "vertical"
             elif direction == "right":
                 boat_row = start_row
                 boat_column_left = start_col
-                boat_column_right = end_col
                 orientation = "horizontal"
             elif direction == "left":
                 boat_row = start_row
                 boat_column_left = end_col
-                boat_column_right = start_col
                 orientation = "horizontal"
             else:
                 print("Direction Error!")
@@ -134,17 +174,24 @@ class GameField:
             if orientation == "vertical":
                 for i in range(-1, 1):
                     for j in range(shiplength + 2):
-                        checkfield = self.__boatfield[boat_row_top - 1 + j][boat_column + i]
+                        checkfield = self.__boatfield[boat_row_top - 1 + j][
+                            boat_column + i
+                        ]
                         if checkfield == 1 and valid:
-                            print("Not an allowed position. Your wantedBoat is too close or crossing another one!")
+                            print(
+                                "Not an allowed position. Your wantedBoat is too close or crossing another one!"
+                            )
                             valid = False
             elif orientation == "horizontal":
                 for i in range(-1, 1):
                     for j in range(shiplength + 2):
-                        checkfield = self.__boatfield[boat_row + i][boat_column_left - 1 + j]
+                        checkfield = self.__boatfield[boat_row + i][
+                            boat_column_left - 1 + j
+                        ]
                         if checkfield == 1 and valid:
-
-                            print("Not an allowed position. Your wanted Boat is too close or crossing another one!")
+                            print(
+                                "Not an allowed position. Your wanted Boat is too close or crossing another one!"
+                            )
                             valid = False
 
             if valid:
@@ -183,7 +230,7 @@ class GameField:
         if target.get_boatfield()[row][col] == 1:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
-            target.set_boatfield(row, col, "X")
+            target.set_boatfield_cell(row, col, "X")
             self.show_hitfield()
             print("You can attack a second time")
             self.attack_enemy(target)
