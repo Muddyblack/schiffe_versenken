@@ -5,10 +5,11 @@ import keyboard
 
 
 class GameField:
-    def __init__(self, bot=False):
+    def __init__(self, bot=False, name="Player"):
         random.seed(datetime.now().timestamp())
 
         self.__fsize = 10
+        self.__ships = 10
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
@@ -16,7 +17,10 @@ class GameField:
 
         self.__bot = bot
         self.__botcache = []
-        self.__ships = 10
+        if bot is True:
+            self.__player_name = "bot"
+        else:
+            self.__player_name = name
 
     # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
     def show_field(self, fieldtype):
@@ -57,6 +61,9 @@ class GameField:
     def set_boatfield(self, row, col, value=0):
         self.__boatfield[row][col] = value
 
+    def get_player_name(self):
+        return self.__player_name
+
     def set_ship(self, shiplength):
         # asks startlocation and direction via arrows
         # check not over field size and not already set
@@ -64,7 +71,9 @@ class GameField:
         placed = False
         while not placed:
             # ask start location
-            start_pos = input(f"Enter the start position for your ship {shiplength} long ship (e.g. A1): ")
+            start_pos = input(
+                f"Enter the start position for your ship {shiplength} long ship (e.g. A1): "
+            )
             try:
                 start_col = ascii_uppercase.index(start_pos[0])
                 start_row = int(start_pos[1:]) - 1
