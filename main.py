@@ -2,8 +2,10 @@ import os
 import gc
 import pickle
 from Classes import game_field
+import keyboard
 
-project_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+project_path = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
+save_game_path = f"{project_path}\\Saving"
 
 
 def clear_previous_console_output():
@@ -69,19 +71,76 @@ def save_game():
         if isinstance(player, game_field.GameField):
             player_info = {
                 "name": player.get_player_name(),
+                "bot": player.get_bot(),
                 "boatfield": player.get_boatfield(),
                 "hitfield": player.get_hitfield(),
             }
             player_list.append(player_info)
 
-    with open(f"{project_path}\\Saving\\game_save.pkl", "wb") as playerpickle:
+    with open(f"{save_game_path}\game_save.pkl", "wb") as playerpickle:
         pickle.dump(player_list, playerpickle)
 
 
+def select_savegame(save_games):
+    # Set up the initial selected save game index to 0
+    selected_save_game_index = 0
+
+    # Display the list of save games with the currently selected save game highlighted
+    def display_save_games():
+        for i, j in enumerate(save_games):
+            if i == selected_save_game_index:
+                print(f"> {save_games[i]}")
+            else:
+                print(f"  {save_games[i]}")
+
+    display_save_games()
+
+    while True:
+        # Handle arrow key presses to move the selected save game index up or down
+        if keyboard.is_pressed("up") and selected_save_game_index > 0:
+            selected_save_game_index -= 1
+            display_save_games()
+            while keyboard.is_pressed("up"):
+                pass
+        elif (
+            keyboard.is_pressed("down")
+            and selected_save_game_index < len(save_games) - 1
+        ):
+            selected_save_game_index += 1
+            display_save_games()
+            while keyboard.is_pressed("down"):
+                pass
+
+        # Handle enter key press to select the currently highlighted save game
+        elif keyboard.is_pressed("enter"):
+            break
+
+    # The selected save game index can now be used to load the corresponding save game
+    print("Selected save game index:", selected_save_game_index)
+
+
 def start_up():
-    with open(f"{project_path}\\Saving\\game_save.pkl", "rb") as playerpickle:
-        player_list = pickle.load(playerpickle)
-        print(player_list)
+    what_to_load = ""
+    exist_game_saves = []
+
+    for file in os.listdir(f"{save_game_path}"):
+        if file.endswith(".pkl"):
+            exist_game_saves.append(os.path.join(save_game_path, file))
+
+    if len(exist_game_saves) != 0:
+        what_to_load = "n"
+
+    while what_to_load != ("y" or "n"):
+        what_to_load = input("Do you want to load an old save? [y/n]: ").lower()
+
+    if what_to_load == "y":
+        select_savegame(exist_game_saves)
+
+        with open(f"{project_path}\\Saving\\game_save.pkl", "rb") as playerpickle:
+            player_list = pickle.load(playerpickle)
+            print(player_list)
+    else:
+        pass
 
 
 if __name__ == "__main__":
