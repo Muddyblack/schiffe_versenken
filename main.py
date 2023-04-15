@@ -5,7 +5,7 @@ project_path = f"{os.path.dirname(os.path.abspath(__file__))}"
 
 
 def clear_previous_console_output():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 if __name__ == "__main__":

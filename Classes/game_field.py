@@ -169,7 +169,9 @@ class GameField:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
             target.set_boatfield(row, col, "X")
-            # self.attack_enemy(target)
+            self.show_hitfield()
+            print("You can attack a second time")
+            self.attack_enemy(target)
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
