@@ -196,13 +196,13 @@ def start_screen():
     )
 
 
-if __name__ == "__main__":
+def start_up():
     start_screen()
-    P1 = None
-    P2 = None
+    p_1 = None
+    p_2 = None
     save_name = ""
 
-    LOAD = ""
+    load = ""
     exist_game_saves = []
 
     for file in os.listdir(f"{save_game_path}"):
@@ -210,12 +210,12 @@ if __name__ == "__main__":
             exist_game_saves.append(os.path.join(save_game_path, file))
 
     if len(exist_game_saves) == 0:
-        LOAD = "n"
+        load = "n"
 
-    while LOAD not in ("y", "n"):
-        LOAD = input("Do you want to load an old save? [y/n]: ").lower().strip()
+    while load not in ("y", "n"):
+        load = input("Do you want to load an old save? [y/n]: ").lower().strip()
 
-    if LOAD == "y":
+    if load == "y":
         save_name = select_savegame(exist_game_saves)
 
         with open(save_name, "rb") as playerpickle:
@@ -224,22 +224,22 @@ if __name__ == "__main__":
         player_1 = player_list[0]
         player_2 = player_list[1]
 
-        P1 = game_field.GameField(player_1["name"], player_1["bot"])
-        P1.set_boatfield(player_1["boatfield"])
-        P1.set_hitfield(player_1["hitfield"])
+        p_1 = game_field.GameField(player_1["name"], player_1["bot"])
+        p_1.set_boatfield(player_1["boatfield"])
+        p_1.set_hitfield(player_1["hitfield"])
 
-        P2 = game_field.GameField(player_2["name"], player_2["bot"])
-        P2.set_boatfield(player_2["boatfield"])
-        P2.set_hitfield(player_2["hitfield"])
+        p_2 = game_field.GameField(player_2["name"], player_2["bot"])
+        p_2.set_boatfield(player_2["boatfield"])
+        p_2.set_hitfield(player_2["hitfield"])
 
     else:
         print("Hello you decided to create a new Save-game")
         save_name = f'{save_game_path}\\{input("    Enter the save-name you wish here: ").replace(" ", "_")}'
-        OPPENENT = ""
+        opponent = ""
 
         p1_name = input("\nNice, so what is your name: ")
-        while OPPENENT not in ("y", "n"):
-            OPPENENT = (
+        while opponent not in ("y", "n"):
+            opponent = (
                 input(
                     f"Hello, {p1_name} would you like to play against a real person? [y/n]"
                 )
@@ -247,23 +247,34 @@ if __name__ == "__main__":
                 .strip()
             )
 
-        P1 = game_field.GameField(name=p1_name)
+        p_1 = game_field.GameField(name=p1_name)
 
-        if OPPENENT == "y":
-            OPPENENT = input("Hey what is your name?")
-            P2 = game_field.GameField(name=OPPENENT)
+        if opponent == "y":
+            opponent = input("Hey what is your name?")
+            p_2 = game_field.GameField(name=opponent)
         else:
-            P2 = game_field.GameField(bot=True)
+            p_2 = game_field.GameField(bot=True)
 
-    save_game(save_name)
-    place_all_ships(P1)
-    place_all_ships(P2)
+    return p_1, p_2, save_name
 
-    P1.show_boatfield()
-    P2.show_boatfield()
 
-    while P1.get_ships_left() != 0 | P2.get_ships_left() != 0:
-        P1.attack_enemy(P2)
-        P1.show_hitfield()
-        P2.show_boatfield()
-    save_game(save_name)
+if __name__ == "__main__":
+    # start = start_up()
+
+    # p_1 = start[0]
+    # p_2 = start[1]
+    # save_name = start[2]
+
+    # save_game(save_name)
+    p_1 = game_field.GameField("Pette", False)
+    place_all_ships(p_1)
+    # place_all_ships(p_2)
+
+    # p_1.show_boatfield()
+    # p_2.show_boatfield()
+
+    # while p_1.get_ships_left() != 0 | p_2.get_ships_left() != 0:
+    #    p_1.attack_enemy(p_2)
+    #    p_1.show_hitfield()
+    #    p_2.show_boatfield()
+    # save_game(save_name)
