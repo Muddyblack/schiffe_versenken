@@ -14,7 +14,7 @@ def place_all_ships(player):
     cruiser = 2
     destroyer = 3
     uboat = 4
-    while battleship and cruiser and destroyer and uboat != 0:
+    while (battleship + cruiser + destroyer + uboat) != 0:
         player.show_boatfield()
         print(f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
               f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?")
@@ -47,6 +47,7 @@ def place_all_ships(player):
                 else:
                     print("You already placed your Battleship!")
             case _:
+                clear_previous_console_output()
                 print("Unknown Boat-Type.")
 
     input("You placed all your Boats! Your final Field looks like this. Press Enter to Continue!")
@@ -57,6 +58,7 @@ if __name__ == "__main__":
     s1 = game_field.GameField(False)
     s2 = game_field.GameField(True)
 
+    clear_previous_console_output()
     # Player 1 place ships.
     place_all_ships(s1)
 

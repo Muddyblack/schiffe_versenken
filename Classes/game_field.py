@@ -100,46 +100,62 @@ class GameField:
                 break
 
             # check if ship fits on the board
-            if (
-                end_col >= self.__fsize
-                or end_col < 0
-                or end_row >= self.__fsize
-                or end_row < 0
-            ):
-                print(
-                    "Ship does not fit on the board. Please choose a different start position or direction."
-                )
+            if end_col >= self.__fsize or end_col < 0 or end_row >= self.__fsize or end_row < 0:
+                print("Ship does not fit on the board. Please choose a different start position or direction.")
                 continue
 
-            # check if ship overlaps with other ships and place ship on board
-            overlap = False
-            temp_boatfield = self.__boatfield
+            # Bei up und down ist start und end_col gleich
+            # Bei right and left ist start und end_row gleich
+            if direction == "up":
+                boat_column = start_col
+                boat_row_top = end_row
+                boat_row_bottom = start_row
+                orientation = "vertical"
+            elif direction == "down":
+                boat_column = start_col
+                boat_row_top = start_row
+                boat_row_bottom = end_row
+                orientation = "vertical"
+            elif direction == "right":
+                boat_row = start_row
+                boat_column_left = start_col
+                boat_column_right = end_col
+                orientation = "horizontal"
+            elif direction == "left":
+                boat_row = start_row
+                boat_column_left = end_col
+                boat_column_right = start_col
+                orientation = "horizontal"
+            else:
+                print("Direction Error!")
 
-            for i in range(shiplength):
-                if direction == "up":
-                    if self.__boatfield[start_row - i][start_col] == 0:
-                        temp_boatfield[start_row - i][start_col] = 1
-                elif direction == "down":
-                    if self.__boatfield[start_row + i][start_col] == 0:
-                        temp_boatfield[start_row + i][start_col] = 1
-                elif direction == "left":
-                    if self.__boatfield[start_row][start_col - i] == 0:
-                        temp_boatfield[start_row][start_col - i] = 1
-                elif direction == "right":
-                    if self.__boatfield[start_row][start_col + i] == 0:
-                        temp_boatfield[start_row][start_col + i] = 1
-                else:
-                    overlap = True
-                    break
+            valid = True
+            # Check for neighboring ships
+            if orientation == "vertical":
+                for i in range(-1, 1):
+                    for j in range(shiplength + 2):
+                        checkfield = self.__boatfield[boat_row_top - 1 + j][boat_column + i]
+                        if checkfield == 1 and valid:
+                            print("Not an allowed position. Your wantedBoat is too close or crossing another one!")
+                            valid = False
+            elif orientation == "horizontal":
+                for i in range(-1, 1):
+                    for j in range(shiplength + 2):
+                        checkfield = self.__boatfield[boat_row + i][boat_column_left - 1 + j]
+                        if checkfield == 1 and valid:
 
-            if overlap:
-                print(
-                    "Ship overlaps with another ship. Please choose a different start position or direction."
-                )
-                continue
+                            print("Not an allowed position. Your wanted Boat is too close or crossing another one!")
+                            valid = False
 
-            self.__boatfield = temp_boatfield
-            placed = True
+            if valid:
+                # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach recht
+                if orientation == "vertical":
+                    for i in range(shiplength):
+                        self.__boatfield[boat_row_top + i][boat_column] = 1
+                elif orientation == "horizontal":
+                    for i in range(shiplength):
+                        self.__boatfield[boat_row][boat_column_left + i] = 1
+                placed = True
 
     def attack_enemy(self, target):
         placed = False
