@@ -41,7 +41,7 @@ class GameField:
         self.show_field(self.__hitfield)
 
     # getter
-    def get_ships(self):
+    def get_ships_left(self):
         return self.__ships
 
     def get_bot(self):
@@ -64,7 +64,7 @@ class GameField:
         placed = False
         while not placed:
             # ask start location
-            start_pos = input("Enter the start position for your ship (e.g. A1): ")
+            start_pos = input(f"Enter the start position for your ship {shiplength} long ship (e.g. A1): ")
             try:
                 start_col = ascii_uppercase.index(start_pos[0])
                 start_row = int(start_pos[1:]) - 1
