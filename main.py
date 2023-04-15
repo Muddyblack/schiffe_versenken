@@ -168,7 +168,7 @@ def select_savegame(save_games):
 
 def start_screen():
     print(
-        f"""{MAGENTA}
+        rf"""{MAGENTA}
     _           _   _   _           _     _       
    | |         | | | | | |         | |   (_)      
    | |__   __ _| |_| |_| | ___  ___| |__  _ _ __  
@@ -259,6 +259,7 @@ def start_up():
 
 
 if __name__ == "__main__":
+    start_screen()
     # start = start_up()
 
     # p_1 = start[0]
