@@ -1,11 +1,42 @@
 import os
+import sys
 import gc
 import pickle
-from Classes import game_field
 import keyboard
+from Classes import game_field
+from Library.anicodes import *
+
 
 project_path = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
 save_game_path = f"{project_path}\\Saving"
+
+# enables ansi escape characters in terminal
+os.system("")
+# Define color codes for ANSI escape sequences
+BLACK = "\033[0;30m"
+RED = "\033[0;31m"
+GREEN = "\033[0;32m"
+BROWN = "\033[0;33m"
+BLUE = "\033[0;34m"
+MAGENTA = "\033[35m"
+CYAN = "\033[0;36m"
+LIGHT_GRAY = "\033[0;37m"
+DARK_GRAY = "\033[1;30m"
+LIGHT_RED = "\033[1;31m"
+LIGHT_GREEN = "\033[1;32m"
+YELLOW = "\033[1;33m"
+LIGHT_BLUE = "\033[1;34m"
+LIGHT_PURPLE = "\033[1;35m"
+LIGHT_CYAN = "\033[1;36m"
+LIGHT_WHITE = "\033[1;37m"
+BOLD = "\033[1m"
+FAINT = "\033[2m"
+ITALIC = "\033[3m"
+UNDERLINE = "\033[4m"
+BLINK = "\033[5m"
+NEGATIVE = "\033[7m"
+CROSSED = "\033[9m"
+RESET = "\033[0m"
 
 
 def clear_previous_console_output():
@@ -56,7 +87,7 @@ def place_all_ships(player):
                     print("You already placed your Battleship!")
             case _:
                 clear_previous_console_output()
-                print("Unknown Boat-Type.")
+                print(f"{BOLD}{RED}Unknown Boat-Type.{RESET}")
 
     input(
         "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!"
@@ -64,7 +95,7 @@ def place_all_ships(player):
     player.show_boatfield()
 
 
-def save_game():
+def save_game(save_name):
     player_list = []
 
     for player in gc.get_objects():
@@ -77,85 +108,162 @@ def save_game():
             }
             player_list.append(player_info)
 
-    with open(f"{save_game_path}\game_save.pkl", "wb") as playerpickle:
+    with open(f"{save_name.replace('.pkl', '')}.pkl", "wb") as playerpickle:
         pickle.dump(player_list, playerpickle)
 
 
+def refresh_console_lines(lines):
+    sys.stdout.write("\033[K" * lines)
+    sys.stdout.write("\033[F" * lines)
+
+
+def display_save_games(save_games, selected_save_game_index):
+    # Display the list of save games with the currently selected save game highlighter
+
+    for i in enumerate(save_games):
+        game_name = os.path.basename(save_games[i[0]])
+        if i[0] == selected_save_game_index:
+            print(f"{CYAN}> {game_name}{RESET}")
+        else:
+            print(f"  {game_name}")
+
+
 def select_savegame(save_games):
-    # Set up the initial selected save game index to 0
+    # Selecting Savegame with arrow-keys and with hitting enter
+    # returns the selected game directory
     selected_save_game_index = 0
+    save_games_len = len(save_games)
 
-    # Display the list of save games with the currently selected save game highlighted
-    def display_save_games():
-        for i, j in enumerate(save_games):
-            if i == selected_save_game_index:
-                print(f"> {save_games[i]}")
-            else:
-                print(f"  {save_games[i]}")
-
-    display_save_games()
+    display_save_games(save_games, selected_save_game_index)
 
     while True:
         # Handle arrow key presses to move the selected save game index up or down
+
         if keyboard.is_pressed("up") and selected_save_game_index > 0:
             selected_save_game_index -= 1
-            display_save_games()
+            refresh_console_lines(save_games_len)
+            display_save_games(save_games, selected_save_game_index)
+
             while keyboard.is_pressed("up"):
                 pass
+
         elif (
             keyboard.is_pressed("down")
             and selected_save_game_index < len(save_games) - 1
         ):
             selected_save_game_index += 1
-            display_save_games()
+            refresh_console_lines(save_games_len)
+            display_save_games(save_games, selected_save_game_index)
+
             while keyboard.is_pressed("down"):
                 pass
 
-        # Handle enter key press to select the currently highlighted save game
         elif keyboard.is_pressed("enter"):
             break
 
-    # The selected save game index can now be used to load the corresponding save game
-    print("Selected save game index:", selected_save_game_index)
+    selected = save_games[selected_save_game_index]
+    print(f"Selected save game: {os.path.basename(selected)}\n")
+    return selected
 
 
-def start_up():
-    what_to_load = ""
+def start_screen():
+    print(
+        f"""{MAGENTA}
+    _           _   _   _           _     _       
+   | |         | | | | | |         | |   (_)      
+   | |__   __ _| |_| |_| | ___  ___| |__  _ _ __  
+   | '_ \ / _` | __| __| |/ _ \/ __| '_ \| | '_ \ 
+   | |_) | (_| | |_| |_| |  __/\__ \ | | | | |_) |
+   |_.__/ \__,_|\__|\__|_|\___||___/_| |_|_| .__/ 
+                                        | |    
+                                        |_|    {BROWN}
+                                        """
+        + f"{LIGHT_GRAY}"
+        + """
+                       _  _                 |-._
+                    -         - _           |-._|
+                 O                 (). _    |
+                                     '(_) __|__
+                                     [__|__|_|_]
+  ~~ _|_ _|_ _|_  ~~     ~~~          |__|__|_|
+   __ |   |   |       ~~      ~~~     |_|__|__|
+   HH_|___|___|__.--"  ~~~ ~~        /|__|__|_|
+  |__________.-"     ~~~~    ~~~    / |_|__|__|
+  ~     ~~ ~      ~~       ~~      /  |_| |___|
+     ~~~~    ~~~   ~~~~   ~   ~~  /    
+    jrei{RESET}
+    """
+    )
+
+
+if __name__ == "__main__":
+    start_screen()
+    P1 = None
+    P2 = None
+    save_name = ""
+
+    LOAD = ""
     exist_game_saves = []
 
     for file in os.listdir(f"{save_game_path}"):
         if file.endswith(".pkl"):
             exist_game_saves.append(os.path.join(save_game_path, file))
 
-    if len(exist_game_saves) != 0:
-        what_to_load = "n"
+    if len(exist_game_saves) == 0:
+        LOAD = "n"
 
-    while what_to_load != ("y" or "n"):
-        what_to_load = input("Do you want to load an old save? [y/n]: ").lower()
+    while LOAD not in ("y", "n"):
+        LOAD = input("Do you want to load an old save? [y/n]: ").lower().strip()
 
-    if what_to_load == "y":
-        select_savegame(exist_game_saves)
+    if LOAD == "y":
+        save_name = select_savegame(exist_game_saves)
 
-        with open(f"{project_path}\\Saving\\game_save.pkl", "rb") as playerpickle:
+        with open(save_name, "rb") as playerpickle:
             player_list = pickle.load(playerpickle)
-            print(player_list)
+
+        player_1 = player_list[0]
+        player_2 = player_list[1]
+
+        P1 = game_field.GameField(player_1["name"], player_1["bot"])
+        P1.set_boatfield(player_1["boatfield"])
+        P1.set_hitfield(player_1["hitfield"])
+
+        P2 = game_field.GameField(player_2["name"], player_2["bot"])
+        P2.set_boatfield(player_2["boatfield"])
+        P2.set_hitfield(player_2["hitfield"])
+
     else:
-        pass
+        print("Hello you decided to create a new Save-game")
+        save_name = f'{save_game_path}\\{input("    Enter the save-name you wish here: ").replace(" ", "_")}'
+        OPPENENT = ""
 
+        p1_name = input("\nNice, so what is your name: ")
+        while OPPENENT not in ("y", "n"):
+            OPPENENT = (
+                input(
+                    f"Hello, {p1_name} would you like to play against a real person? [y/n]"
+                )
+                .lower()
+                .strip()
+            )
 
-if __name__ == "__main__":
-    s1 = game_field.GameField(name="Buckki")
-    s2 = game_field.GameField(bot=True)
+        P1 = game_field.GameField(name=p1_name)
 
-    clear_previous_console_output()
-    # Player 1 place ships.
-    start_up()
-    place_all_ships(s1)
-    # save_game()
-    """
+        if OPPENENT == "y":
+            OPPENENT = input("Hey what is your name?")
+            P2 = game_field.GameField(name=OPPENENT)
+        else:
+            P2 = game_field.GameField(bot=True)
 
-    while s1.get_ships_left() != 0 | s2.get_ships_left() != 0:
-        s1.attack_enemy(s2)
-        s1.show_hitfield()
-        s2.show_boatfield()
-    """
+    save_game(save_name)
+    place_all_ships(P1)
+    place_all_ships(P2)
+
+    P1.show_boatfield()
+    P2.show_boatfield()
+
+    while P1.get_ships_left() != 0 | P2.get_ships_left() != 0:
+        P1.attack_enemy(P2)
+        P1.show_hitfield()
+        P2.show_boatfield()
+    save_game(save_name)

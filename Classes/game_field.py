@@ -3,6 +3,11 @@ from datetime import datetime
 import random
 import keyboard
 
+# anicode
+BLUE = "\033[0;34m"
+RED = "\033[0;31m"
+RESET = "\033[0m"
+
 
 class GameField:
     def __init__(self, bot=False, name="Player"):
@@ -35,8 +40,15 @@ class GameField:
             if len(str(num)) > 1:
                 print("\b" * (len(str(num)) - 1), end="")
             for row in line:
-                print(row, end=" ")
+                if row == 1:
+                    color = BLUE
+                elif row == "X":
+                    color = RED
+                else:
+                    color = RESET
+                print(color + str(row), end=" ")
             print("")
+        print("\n")
 
     def show_boatfield(self):
         self.show_field(self.__boatfield)
@@ -58,8 +70,17 @@ class GameField:
         return self.__hitfield
 
     # setter
-    def set_boatfield(self, row, col, value=0):
+    def set_boatfield(self, field):
+        self.__boatfield = field
+
+    def set_hitfield(self, field):
+        self.__hitfield = field
+
+    def set_boatfield_cell(self, row, col, value=0):
         self.__boatfield[row][col] = value
+
+    def set_hitfield_cell(self, row, col, value=1):
+        self.__hitfield[row][col] = value
 
     def get_player_name(self):
         return self.__player_name
@@ -209,7 +230,7 @@ class GameField:
         if target.get_boatfield()[row][col] == 1:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
-            target.set_boatfield(row, col, "X")
+            target.set_boatfield_cell(row, col, "X")
             self.show_hitfield()
             print("You can attack a second time")
             self.attack_enemy(target)
