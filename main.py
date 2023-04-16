@@ -294,4 +294,3 @@ if __name__ == "__main__":
     #    p_1.show_hitfield()
     #    p_2.show_boatfield()
     # save_game(save_name)
-3
