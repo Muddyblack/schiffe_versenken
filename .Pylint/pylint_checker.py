@@ -1,38 +1,47 @@
-"""This Allows you to select a file to get the pylint results fast"""
+"""Allows you to select a file via Explorer to get the pylint results fast."""
 
 import sys
 import os
 from tkinter import filedialog
-import pylint
+import subprocess
+
+os.environ[
+    "PYTHONPATH"
+] = f"{os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))}"
 
 sys.path.append(
     os.path.abspath(
         os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
     )
 )
+
 from Library.file_helper import read_file
 
-work_path = os.path.dirname(os.path.realpath(__file__))
-save_path = f"{work_path}/savePath.txt"
+WORK_PATH = os.path.dirname(os.path.realpath(__file__))
+SAVE_PATH = f"{WORK_PATH}/savePath.txt"
 
 try:
-    work_path = read_file(save_path)
+    WORK_PATH = read_file(SAVE_PATH)
 except FileNotFoundError:
     pass
 
-filepaths = filedialog.askopenfilenames(
-    initialdir=f"{work_path}",
+FILEPATHS = filedialog.askopenfilenames(
+    initialdir=f"{WORK_PATH}",
     title="Select Files",
     filetypes=(("Python files", "*.py"), ("all files", "*.*")),
 )
 
-with open(save_path, "w", encoding="utf8") as f:
+with open(SAVE_PATH, "w", encoding="utf8") as f:
     try:
-        f.write(f"{filepaths[0]}")
+        f.write(f"{FILEPATHS [0]}")
     except IndexError:
         pass
 
-for file in filepaths:
-    pylint.run_pylint(
-        argv=[file, "--output-format=colorized", "--max-line-length=160"]
-    )  # after first one it just kills the program...
+for file in FILEPATHS:
+    try:
+        subprocess.run(
+            ["pylint", file, "--output-format=colorized", "--max-line-length=160"],
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error processing file '{file}': {e}")

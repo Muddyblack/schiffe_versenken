@@ -1,4 +1,16 @@
+""" Functions helping reading and replacing text from and in files """
+
+
 def read_file(file_path):
+    """
+    Read content of a file and return it as a list of lines (newline characters removed)
+
+    Args:
+        file_path (str): Path to the file to read.
+
+    Returns:
+        list: A list of strings, with each string representing a line of the file (newline characters removed)
+    """
     with open(file_path, "r", encoding="utf8") as file:
         txt_lines = file.readlines()
 
@@ -8,14 +20,21 @@ def read_file(file_path):
     return txt_lines
 
 
-# how to use : file_text_replacer(path_of_file, [stringtext], [inline_as_integer_number])
 def file_line_replacer(file, change_input, line):
+    """
+    Replace specified lines in a file with a given replacement text.
+
+    Args:
+        file (str): The path to the file to modify.
+        change_input (list): A list of strings representing the replacement text to use.
+        line (list): A list of integers representing the line numbers to replace with the corresponding string in change_input.
+    """
     data = read_file(file)
 
     for pointing in enumerate(change_input):
         try:
             data[line[pointing[0]] - 1] = change_input[pointing[0]]
-        except:
+        except (IndentationError, IndexError, InterruptedError):
             data.append("")
 
     with open(file, "w", encoding="utf8") as file_to_replace:
