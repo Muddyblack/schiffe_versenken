@@ -1,3 +1,4 @@
+"""This is the main module where the entire game logic gets merged"""
 import os
 import sys
 import gc
@@ -6,15 +7,16 @@ import random
 import keyboard
 from Classes import game_field
 
+#
+PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
+GAME_DATA_PATH = f"{PROJECT_PATH}/GameData"
+SAVE_GAMES_PATH = f"{GAME_DATA_PATH}/saves"
 
-project_path = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
-game_data_path = f"{project_path}/GameData"
-save_games_path = f"{game_data_path}/saves"
-
-os.makedirs(save_games_path, exist_ok=True)
+os.makedirs(SAVE_GAMES_PATH, exist_ok=True)
 
 # enables ansi escape characters in terminal
 os.system("")
+
 # Define color codes for ANSI escape sequences
 BLACK = "\033[0;30m"
 RED = "\033[0;31m"
@@ -42,18 +44,19 @@ CROSSED = "\033[9m"
 RESET = "\033[0m"
 
 
-def clear_previous_console_output():
+def clear_console():
+    """clearing the console"""
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def place_all_ships(player):
-    # Regelt das plazieren aller Boote.
+def place_all_ships(obj):
+    """Regelt das plazieren aller Boote."""
     battleship = 1
     cruiser = 2
     destroyer = 3
     uboat = 4
     while (battleship + cruiser + destroyer + uboat) != 0:
-        player.show_boatfield()
+        obj.show_boatfield()
         print(
             f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
             f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
@@ -66,53 +69,54 @@ def place_all_ships(player):
         match current_boat_to_place:
             case "2" | "u-boat" | "uboat":
                 if uboat > 0:
-                    player.set_ship(2)
+                    obj.set_ship(2)
                     uboat -= 1
                 else:
                     print("You already placed all your U-Boats!")
             case "3" | "destroyer":
                 if destroyer > 0:
-                    player.set_ship(3)
+                    obj.set_ship(3)
                     destroyer -= 1
                 else:
                     print("You already placed all your Destroyers!")
             case "4" | "cruiser":
                 if cruiser > 0:
-                    player.set_ship(4)
+                    obj.set_ship(4)
                     cruiser -= 1
                 else:
                     print("You already placed all your Cruisers!")
             case "5" | "battleship":
                 if battleship > 0:
-                    player.set_ship(5)
+                    obj.set_ship(5)
                     battleship -= 1
                 else:
                     print("You already placed your Battleship!")
             case _:
-                clear_previous_console_output()
+                clear_console()
                 print(f"{BOLD}{RED}Unknown Boat-Type.{RESET}")
 
     input(
         "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!"
     )
-    player.show_boatfield()
+    obj.show_boatfield()
 
 
 def save_game(save_name):
+    """Saves the current state of the game in a binary file format."""
     player_list = []
 
-    for player in gc.get_objects():
-        if isinstance(player, game_field.GameField):
+    for obj in gc.get_objects():
+        if isinstance(obj, game_field.GameField):
             player_info = {
-                "name": player.get_player_name(),
-                "bot": player.get_bot(),
-                "boatfield": player.get_boatfield(),
-                "hitfield": player.get_hitfield(),
-                "current_turn": player.get_current_turn(),
+                "name": obj.get_player_name(),
+                "bot": obj.get_bot(),
+                "boatfield": obj.get_boatfield(),
+                "hitfield": obj.get_hitfield(),
+                "current_turn": obj.get_current_turn(),
             }
             player_list.append(player_info)
 
-    save_dir = f"{save_games_path}/{save_name}"
+    save_dir = f"{SAVE_GAMES_PATH}/{save_name}"
     os.makedirs(save_dir, exist_ok=True)
 
     with open(f"{save_dir}/players.obj", "wb") as obj:
@@ -120,12 +124,14 @@ def save_game(save_name):
 
 
 def refresh_console_lines(lines):
+    """Clears the specified number of lines from the console output."""
+
     sys.stdout.write("\033[K" * lines)
     sys.stdout.write("\033[F" * lines)
 
 
 def display_save_games(save_games, selected_save_game_index):
-    # Display the list of save games with the currently selected save game highlighter
+    """DisplayS the list of save games with the currently selected save game highlighted"""
 
     for i in enumerate(save_games):
         game_name = os.path.basename(save_games[i[0]])
@@ -136,8 +142,13 @@ def display_save_games(save_games, selected_save_game_index):
 
 
 def select_savegame(save_games):
-    # Selecting Savegame with arrow-keys and with hitting enter
-    # returns the selected game directory
+    """
+    Allows the user to select a saved game from a list of saved game directories displayed on the console.
+    The user uses arrow-keys and the enter-key
+
+    Returns:
+        - (str): The selected game directory.
+    """
     selected_save_game_index = 0
     save_games_len = len(save_games)
 
@@ -174,6 +185,7 @@ def select_savegame(save_games):
 
 
 def start_screen():
+    """Prints a beautiful ASCII-Logo for the game to the console"""
     print(
         rf"""{MAGENTA}
     _           _   _   _           _     _       
@@ -203,6 +215,16 @@ def start_screen():
 
 
 def start_up():
+    """
+    Sets up the initial game environment
+    If the user chooses to load an old save, it loads the save game and returns the GameField instances for both players.
+    Otherwise, it asks for the player's name, whether they want to play against a real person or a bot, and starts the game
+    by randomly choosing which player goes first.
+
+    Returns:
+        A dictionary with keys "players" and "save_name". The value for the key "players" is a list of two GameField instances
+        representing the players. The value for the key "save_name" is a string representing the name of the save game.
+    """
     start_screen()
     p_1 = None
     p_2 = None
@@ -211,7 +233,7 @@ def start_up():
     load = ""
     exist_game_saves = [
         f.name
-        for f in os.scandir(save_games_path)
+        for f in os.scandir(SAVE_GAMES_PATH)
         if f.is_dir() and not f.is_file() and "_save" in f.name
     ]
 
@@ -224,7 +246,7 @@ def start_up():
     if load == "y":
         save_name = select_savegame(exist_game_saves)
 
-        with open(f"{save_games_path}/{save_name}/players.obj", "rb") as playerpickle:
+        with open(f"{SAVE_GAMES_PATH}/{save_name}/players.obj", "rb") as playerpickle:
             player_list = pickle.load(playerpickle)
 
         player_1 = player_list[0]

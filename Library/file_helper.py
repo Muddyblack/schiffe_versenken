@@ -3,10 +3,7 @@
 
 def read_file(file_path):
     """
-    Read content of a file and return it as a list of lines (newline characters removed)
-
-    Args:
-        file_path (str): Path to the file to read.
+    Reads content of a file and return it as a list of lines (newline characters removed)
 
     Returns:
         list: A list of strings, with each string representing a line of the file (newline characters removed)
@@ -22,12 +19,7 @@ def read_file(file_path):
 
 def file_line_replacer(file, change_input, line):
     """
-    Replace specified lines in a file with a given replacement text.
-
-    Args:
-        file (str): The path to the file to modify.
-        change_input (list): A list of strings representing the replacement text to use.
-        line (list): A list of integers representing the line numbers to replace with the corresponding string in change_input.
+    Replaces specified lines in a file with a given replacement text.
     """
     data = read_file(file)
 

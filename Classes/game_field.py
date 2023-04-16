@@ -2,7 +2,7 @@
 The GameField class represents the game board and handles all game logic.
 
 This module requires the following external libraries to be installed:
-- keyboard
+    - keyboard
 
 """
 import sys
@@ -48,8 +48,54 @@ class GameField:
         else:
             self.__player_name = name
 
+    # getter
+    def get_bot(self):
+        """Returns the bot instance."""
+        return self.__bot
+
+    def get_boatfield(self):
+        """Returns the boatfield matrix."""
+        return self.__boatfield
+
+    def get_hitfield(self):
+        """Returns the hitfield matrix."""
+        return self.__hitfield
+
+    def get_player_name(self):
+        """Returns the player's name."""
+        return self.__player_name
+
+    def get_current_turn(self):
+        """Returns the current turn boolean."""
+        return self.__current_turn
+
+    # setter
+    def set_boatfield(self, field):
+        """Sets the boatfield matrix."""
+        self.__boatfield = field
+
+    def set_hitfield(self, field):
+        """Sets the hitfield matrix."""
+        self.__hitfield = field
+
+    def set_boatfield_cell(self, row, col, value=0):
+        """Sets the value of a cell in the boatfield matrix."""
+        self.__boatfield[row][col] = value
+
+    def set_hitfield_cell(self, row, col, value=1):
+        """Sets the value of a cell in the hitfield matrix."""
+        self.__hitfield[row][col] = value
+
+    def set_current_turn(self, value):
+        """Sets the current turn boolean."""
+        self.__current_turn = value
+
+    # Show Field Functions
     def show_field(self, fieldtype):
-        # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
+        """
+        Prints Field with Postion Indictaros at the top and left, like A1, B10, etc.
+        """
+
         print(" " * (len(str(self.__fsize)) + 2), end="")
         for elem in range(self.__fsize):
             print(f"{ascii_uppercase[elem]}", end=" ")
@@ -72,44 +118,22 @@ class GameField:
         print("\n")
 
     def show_boatfield(self):
+        """Prints the boatfield matrix."""
         self.show_field(self.__boatfield)
 
     def show_hitfield(self):
+        """Prints the hitfield matrix."""
         self.show_field(self.__hitfield)
 
-    # getter
-    def get_bot(self):
-        return self.__bot
-
-    def get_boatfield(self):
-        return self.__boatfield
-
-    def get_hitfield(self):
-        return self.__hitfield
-
-    def get_player_name(self):
-        return self.__player_name
-
-    def get_current_turn(self):
-        return self.__current_turn
-
-    # setter
-    def set_boatfield(self, field):
-        self.__boatfield = field
-
-    def set_hitfield(self, field):
-        self.__hitfield = field
-
-    def set_boatfield_cell(self, row, col, value=0):
-        self.__boatfield[row][col] = value
-
-    def set_hitfield_cell(self, row, col, value=1):
-        self.__hitfield[row][col] = value
-
-    def set_current_turn(self, value):
-        self.__current_turn = value
-
+    # Ship placement functions
     def __check_ship_surrounding(self, orientation, shiplength, boat_row, boat_column):
+        """
+        Checks if the position of a new boat to be placed in the game field is valid:
+            - boat is not too close to or crossing another boat,
+        It examines the surrounding positions
+        Returns:
+            bool: True if the position is valid
+        """
         for i in range(-1, shiplength + 1):
             if orientation == "horizontal":
                 row = boat_row + i
@@ -132,8 +156,9 @@ class GameField:
         return True
 
     def set_ship(self, shiplength):
-        # asks startlocation and direction via arrows
-        # check not over field size and not already set
+        """
+        Asks the player for the start location and direction of a ship of the given length and sets it on the game field.
+        """
 
         while True:
             # ask start location
@@ -198,8 +223,11 @@ class GameField:
                 break
 
     def attack_enemy(self, target):
-        placed = False
+        """
+        Attacks the enemy's boat at the specified position.
+        """
 
+        # If the player is a bot, randomly choose a position that has not been used before to attack
         if self.__bot is True:
             while True:
                 col = random.randint(0, self.__fsize - 1)
@@ -209,17 +237,19 @@ class GameField:
                     self.__botcache.append([col, row])
                     break
 
+        # Otherwise, prompt the player to choose a position to attack
         else:
-            while not placed:
-                # ask start location
+            while True:
                 pos = input("Enter the atttacking position for your ship (e.g. A1): ")
                 try:
                     col = ascii_uppercase.index(pos[0])
                     row = int(pos[1:]) - 1
                 except (IndexError, InterruptedError, ValueError):
                     continue
-                placed = True
+                break
 
+        # Check if the attack hits a ship or not
+        # And if it hits a ship, the player gets to attack again
         if target.get_boatfield()[row][col] == 1:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1

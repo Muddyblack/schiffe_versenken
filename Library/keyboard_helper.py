@@ -1,16 +1,27 @@
+"""
+This module provides a function for detecting which arrow key is pressed on the keyboard.
+"""
 import keyboard
 
 
 def get_arrow_key():
+    """
+    Detects which arrow key is pressed on the keyboard and returns the corresponding direction.
+
+    Returns:
+        str: The direction of the arrow key that is pressed on the keyboard. It can be one of the following:
+             "up", "down", "left", or "right".
+    """
+
     while True:
         if keyboard.is_pressed("up"):
             return "up"
 
-        elif keyboard.is_pressed("down"):
+        if keyboard.is_pressed("down"):
             return "down"
 
-        elif keyboard.is_pressed("left"):
+        if keyboard.is_pressed("left"):
             return "left"
 
-        elif keyboard.is_pressed("right"):
+        if keyboard.is_pressed("right"):
             return "right"
