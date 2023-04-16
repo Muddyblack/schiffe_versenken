@@ -4,12 +4,15 @@ import sys
 import gc
 import pickle
 import keyboard
+import random
 from Classes import game_field
 
 
 project_path = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
 game_data_path = f"{project_path}/GameData"
 save_games_path = f"{game_data_path}/saves"
+
+os.makedirs(save_games_path, exist_ok=True)
 
 # enables ansi escape characters in terminal
 os.system("")
@@ -225,14 +228,18 @@ def start_up():
         with open(f"{save_games_path}/{save_name}/players.obj", "rb") as playerpickle:
             player_list = pickle.load(playerpickle)
 
+        print(player_list)
+
         player_1 = player_list[0]
         player_2 = player_list[1]
 
-        p_1 = game_field.GameField(player_1["name"], player_1["bot"])
+        p_1 = game_field.GameField(name=player_1["name"], bot=player_1["bot"])
+        p_1.set_current_Turn(player_1["current_turn"])
         p_1.set_boatfield(player_1["boatfield"])
         p_1.set_hitfield(player_1["hitfield"])
 
-        p_2 = game_field.GameField(player_2["name"], player_2["bot"])
+        p_2 = game_field.GameField(name=player_2["name"], bot=player_2["bot"])
+        p_2.set_current_Turn(player_2["current_turn"])
         p_2.set_boatfield(player_2["boatfield"])
         p_2.set_hitfield(player_2["hitfield"])
 
@@ -254,13 +261,19 @@ def start_up():
             )
 
         p_1 = game_field.GameField(name=p1_name)
-        p_1.set_current_Turn(True)
 
         if opponent == "y":
             opponent = input("Hey what is your name?")
             p_2 = game_field.GameField(name=opponent)
         else:
             p_2 = game_field.GameField(bot=True)
+
+        # Coin flipping who will start the Game
+        starter = random.randint(0, 1)
+        if starter == 0:
+            p_1.set_current_Turn(True)
+        else:
+            p_2.set_current_Turn(True)
 
     return {"players": [p_1, p_2], "save_name": save_name}
 
@@ -274,7 +287,7 @@ if __name__ == "__main__":
         if player.get_current_Turn() is False:
             continue
 
-        print(f"Hello {player.get_player_name()}")
+        print(f"TEST: HELLO {player.get_player_name()} it should be your turn")
         break
 
     # p_1 = start[0]
