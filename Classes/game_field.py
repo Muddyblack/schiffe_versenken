@@ -5,31 +5,24 @@ This module requires the following external libraries to be installed:
 - keyboard
 
 """
-
+import sys
+import os
 from string import ascii_uppercase
 from datetime import datetime
 import random
-import keyboard
+
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
+    )
+)
+# pylint: disable=wrong-import-position
+from Library.keyboard_helper import get_arrow_key
 
 # anicode
 BLUE = "\033[0;34m"
 RED = "\033[0;31m"
 RESET = "\033[0m"
-
-
-def get_arrow_key():
-    while True:
-        if keyboard.is_pressed("up"):
-            return "up"
-
-        elif keyboard.is_pressed("down"):
-            return "down"
-
-        elif keyboard.is_pressed("left"):
-            return "left"
-
-        elif keyboard.is_pressed("right"):
-            return "right"
 
 
 class GameField:
@@ -116,6 +109,28 @@ class GameField:
     def set_current_turn(self, value):
         self.__current_turn = value
 
+    def __check_ship_surrounding(self, orientation, shiplength, boat_row, boat_column):
+        for i in range(-1, shiplength + 1):
+            if orientation == "horizontal":
+                row = boat_row + i
+                col = boat_column - 1 + i
+            else:
+                row = boat_row - 1 + i
+                col = boat_column + i
+            if (
+                row < 0
+                or row >= len(self.__boatfield)
+                or col < 0
+                or col >= len(self.__boatfield[row])
+            ):
+                continue
+            if self.__boatfield[row][col] == 1:
+                print(
+                    "Not an allowed position. Your wanted Boat is too close or crossing another one!"
+                )
+                return False
+        return True
+
     def set_ship(self, shiplength):
         # asks startlocation and direction via arrows
         # check not over field size and not already set
@@ -128,94 +143,58 @@ class GameField:
             try:
                 start_col = ascii_uppercase.index(start_pos[0])
                 start_row = int(start_pos[1:]) - 1
-            except (IndexError, InterruptedError):
+            except (IndexError, InterruptedError, ValueError):
                 continue
 
             print("Enter the direction for your ship. Use your arrow Keys!")
             direction = get_arrow_key()
+            # Bei up und down ist start und end_col gleich
+            # Bei right and left ist start und end_row gleich
             if direction == "up":
-                end_col = start_col
-                end_row = start_row - (shiplength - 1)
+                boat_column = start_col
+                boat_row = start_row - (shiplength - 1)
+                orientation = "vertical"
             elif direction == "down":
-                end_col = start_col
-                end_row = start_row + (shiplength - 1)
+                boat_column = start_col
+                boat_row = start_row
+                orientation = "vertical"
             elif direction == "left":
-                end_col = start_col - (shiplength - 1)
-                end_row = start_row
+                boat_column = start_col - (shiplength - 1)
+                boat_row = start_row
+                orientation = "horizontal"
             elif direction == "right":
-                end_col = start_col + (shiplength - 1)
-                end_row = start_row
+                boat_column = start_col
+                boat_row = start_row
+                orientation = "horizontal"
             else:
-                print("Invalid direction")
+                print("Invalid direction!")
                 continue
             print(direction)
 
             # check if ship fits on the board
             if (
-                end_col >= self.__fsize
-                or end_col < 0
-                or end_row >= self.__fsize
-                or end_row < 0
+                boat_column >= self.__fsize
+                or boat_column < 0
+                or boat_row >= self.__fsize
+                or boat_row < 0
             ):
                 print(
                     "Ship does not fit on the board. Please choose a different start position or direction."
                 )
                 continue
 
-            # Bei up und down ist start und end_col gleich
-            # Bei right and left ist start und end_row gleich
-            if direction == "up":
-                boat_column = start_col
-                boat_row_top = end_row
-                orientation = "vertical"
-            elif direction == "down":
-                boat_column = start_col
-                boat_row_top = start_row
-                orientation = "vertical"
-            elif direction == "right":
-                boat_row = start_row
-                boat_column_left = start_col
-                orientation = "horizontal"
-            elif direction == "left":
-                boat_row = start_row
-                boat_column_left = end_col
-                orientation = "horizontal"
-            else:
-                print("Direction Error!")
-
-            valid = True
-            # Check for neighboring ships
-            if orientation == "vertical":
-                for i in range(-1, 1):
-                    for j in range(shiplength + 2):
-                        checkfield = self.__boatfield[boat_row_top - 1 + j][
-                            boat_column + i
-                        ]
-                        if checkfield == 1 and valid:
-                            print(
-                                "Not an allowed position. Your wantedBoat is too close or crossing another one!"
-                            )
-                            valid = False
-            elif orientation == "horizontal":
-                for i in range(-1, 1):
-                    for j in range(shiplength + 2):
-                        checkfield = self.__boatfield[boat_row + i][
-                            boat_column_left - 1 + j
-                        ]
-                        if checkfield == 1 and valid:
-                            print(
-                                "Not an allowed position. Your wanted Boat is too close or crossing another one!"
-                            )
-                            valid = False
+            valid = self.__check_ship_surrounding(
+                orientation, shiplength, boat_row, boat_column
+            )
 
             if valid:
-                # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach recht
+                # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach rechts
                 if orientation == "vertical":
-                    for i in range(shiplength):
-                        self.__boatfield[boat_row_top + i][boat_column] = 1
-                elif orientation == "horizontal":
-                    for i in range(shiplength):
-                        self.__boatfield[boat_row][boat_column_left + i] = 1
+                    self.__boatfield[boat_row : boat_row + shiplength, boat_column] = 1
+                else:
+                    self.__boatfield[
+                        boat_row, boat_column : boat_column + shiplength
+                    ] = 1
                 break
 
     def attack_enemy(self, target):
@@ -237,7 +216,7 @@ class GameField:
                 try:
                     col = ascii_uppercase.index(pos[0])
                     row = int(pos[1:]) - 1
-                except [IndexError]:
+                except (IndexError, InterruptedError, ValueError):
                     continue
                 placed = True
 
@@ -257,3 +236,5 @@ class GameField:
 if __name__ == "__main__":
     x1 = GameField(name="Petra", bot=False)
     x1.set_ship(5)
+    x1.set_ship(5)
+    x1.show_boatfield()
