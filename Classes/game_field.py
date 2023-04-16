@@ -15,6 +15,7 @@ class GameField:
 
         self.__fsize = 10
         self.__ships = 10
+        self.__current_turn = False
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
@@ -69,6 +70,12 @@ class GameField:
     def get_hitfield(self):
         return self.__hitfield
 
+    def get_player_name(self):
+        return self.__player_name
+
+    def get_current_Turn(self):
+        return self.__current_turn
+
     # setter
     def set_boatfield(self, field):
         self.__boatfield = field
@@ -82,8 +89,8 @@ class GameField:
     def set_hitfield_cell(self, row, col, value=1):
         self.__hitfield[row][col] = value
 
-    def get_player_name(self):
-        return self.__player_name
+    def set_current_Turn(self, value):
+        self.__current_turn = value
 
     def set_ship(self, shiplength):
         # asks startlocation and direction via arrows

@@ -7,7 +7,8 @@ from Classes import game_field
 
 
 project_path = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
-save_game_path = f"{project_path}\\Saving"
+game_data_path = f"{project_path}\\GameData"
+save_games_path = f"{game_data_path}\\saves"
 
 # enables ansi escape characters in terminal
 os.system("")
@@ -104,11 +105,15 @@ def save_game(save_name):
                 "bot": player.get_bot(),
                 "boatfield": player.get_boatfield(),
                 "hitfield": player.get_hitfield(),
+                "current_turn": player.get_current_Turn(),
             }
             player_list.append(player_info)
 
-    with open(f"{save_name.replace('.pkl', '')}.pkl", "wb") as playerpickle:
-        pickle.dump(player_list, playerpickle)
+    save_dir = f"{save_games_path}\\{save_name}"
+    os.makedirs(save_dir, exist_ok=True)
+
+    with open(f"{save_dir}\\players.obj", "wb") as obj:
+        pickle.dump(player_list, obj)
 
 
 def refresh_console_lines(lines):
@@ -175,8 +180,8 @@ def start_screen():
    | |_) | (_| | |_| |_| |  __/\__ \ | | | | |_) |
    |_.__/ \__,_|\__|\__|_|\___||___/_| |_|_| .__/ 
                                            | |    
-                                           |_|    {BROWN}
-                                        
+                                           |_|    
+                                   {BROWN}
     {LIGHT_GRAY}
                        _  _                 |-._
                     -         - _           |-._|
@@ -201,11 +206,11 @@ def start_up():
     save_name = ""
 
     load = ""
-    exist_game_saves = []
-
-    for file in os.listdir(f"{save_game_path}"):
-        if file.endswith(".pkl"):
-            exist_game_saves.append(os.path.join(save_game_path, file))
+    exist_game_saves = [
+        f.name
+        for f in os.scandir(save_games_path)
+        if f.is_dir() and not f.is_file() and "_save" in f.name
+    ]
 
     if len(exist_game_saves) == 0:
         load = "n"
@@ -216,7 +221,7 @@ def start_up():
     if load == "y":
         save_name = select_savegame(exist_game_saves)
 
-        with open(save_name, "rb") as playerpickle:
+        with open(f"{save_games_path}\\{save_name}\\players.obj", "rb") as playerpickle:
             player_list = pickle.load(playerpickle)
 
         player_1 = player_list[0]
@@ -232,7 +237,9 @@ def start_up():
 
     else:
         print("Hello you decided to create a new Save-game")
-        save_name = f'{save_game_path}\\{input("    Enter the save-name you wish here: ").replace(" ", "_")}'
+        save_name = (
+            f'{input("    Enter the save-name you wish here: ").replace(" ", "_")}_save'
+        )
         opponent = ""
 
         p1_name = input("\nNice, so what is your name: ")
@@ -246,6 +253,7 @@ def start_up():
             )
 
         p_1 = game_field.GameField(name=p1_name)
+        p_1.set_current_Turn(True)
 
         if opponent == "y":
             opponent = input("Hey what is your name?")
@@ -253,20 +261,29 @@ def start_up():
         else:
             p_2 = game_field.GameField(bot=True)
 
-    return p_1, p_2, save_name
+    return {"players": [p_1, p_2], "save_name": save_name}
 
 
 if __name__ == "__main__":
     start_screen()
-    # start = start_up()
+    start = start_up()
+    players = start["players"]
+    save = start["save_name"]
+
+    for player in players:
+        if player.get_current_Turn() is False:
+            continue
+
+        print(f"Hello {player.get_player_name()}")
+        break
 
     # p_1 = start[0]
     # p_2 = start[1]
-    # save_name = start[2]
+    # save = "salbana"  # start[2]
+    # p_1 = game_field.GameField("Pette", False)
+    save_game(save)
 
-    # save_game(save_name)
-    p_1 = game_field.GameField("Pette", False)
-    place_all_ships(p_1)
+    # place_all_ships(p_1)
     # place_all_ships(p_2)
 
     # p_1.show_boatfield()
@@ -277,3 +294,4 @@ if __name__ == "__main__":
     #    p_1.show_hitfield()
     #    p_2.show_boatfield()
     # save_game(save_name)
+3
