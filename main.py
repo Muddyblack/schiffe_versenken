@@ -1,10 +1,9 @@
-#!/usr/bin/env python3.11.1
 import os
 import sys
 import gc
 import pickle
-import keyboard
 import random
+import keyboard
 from Classes import game_field
 
 
@@ -227,8 +226,6 @@ def start_up():
 
         with open(f"{save_games_path}/{save_name}/players.obj", "rb") as playerpickle:
             player_list = pickle.load(playerpickle)
-
-        print(player_list)
 
         player_1 = player_list[0]
         player_2 = player_list[1]
