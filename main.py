@@ -214,6 +214,32 @@ def start_screen():
     )
 
 
+def ask_name():
+    """
+    Asks the user to enter his name and checks if it is not empty or longer than 15 characters
+    Returns:
+        -(str): name
+    """
+    min_name_len = 3
+    max_name_len = 15
+
+    while True:
+        name = input("\nNice, so what is your name: ").strip()
+
+        if name == "":
+            msg = "This is just an empty String!"
+        elif len(name) > max_name_len:
+            msg = "The name is too long it has: {len(name)} character allowed: {max_name_len}"
+        elif len(name) <= min_name_len:
+            msg = "The name is too short it has: {len(name)} min length: {min_name_len}"
+        else:
+            break
+
+        print(msg)
+
+    return name
+
+
 def start_up():
     """
     Sets up the initial game environment
@@ -269,7 +295,7 @@ def start_up():
         )
         opponent = ""
 
-        p1_name = input("\nNice, so what is your name: ")
+        p1_name = ask_name()
         while opponent not in ("y", "n"):
             opponent = (
                 input(
@@ -282,8 +308,12 @@ def start_up():
         p_1 = game_field.GameField(name=p1_name)
 
         if opponent == "y":
-            opponent = input("Hey what is your name?")
-            p_2 = game_field.GameField(name=opponent)
+            while True:
+                p2_name = ask_name()
+                if p2_name != p1_name:
+                    break
+                print("The other player has already this name!")
+            p_2 = game_field.GameField(name=p2_name)
         else:
             p_2 = game_field.GameField(bot=True)
 
