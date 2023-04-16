@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.11.1
 import os
 import sys
 import gc
@@ -7,8 +8,8 @@ from Classes import game_field
 
 
 project_path = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
-game_data_path = f"{project_path}\\GameData"
-save_games_path = f"{game_data_path}\\saves"
+game_data_path = f"{project_path}/GameData"
+save_games_path = f"{game_data_path}/saves"
 
 # enables ansi escape characters in terminal
 os.system("")
@@ -109,10 +110,10 @@ def save_game(save_name):
             }
             player_list.append(player_info)
 
-    save_dir = f"{save_games_path}\\{save_name}"
+    save_dir = f"{save_games_path}/{save_name}"
     os.makedirs(save_dir, exist_ok=True)
 
-    with open(f"{save_dir}\\players.obj", "wb") as obj:
+    with open(f"{save_dir}/players.obj", "wb") as obj:
         pickle.dump(player_list, obj)
 
 
@@ -221,7 +222,7 @@ def start_up():
     if load == "y":
         save_name = select_savegame(exist_game_saves)
 
-        with open(f"{save_games_path}\\{save_name}\\players.obj", "rb") as playerpickle:
+        with open(f"{save_games_path}/{save_name}/players.obj", "rb") as playerpickle:
             player_list = pickle.load(playerpickle)
 
         player_1 = player_list[0]
@@ -265,7 +266,6 @@ def start_up():
 
 
 if __name__ == "__main__":
-    start_screen()
     start = start_up()
     players = start["players"]
     save = start["save_name"]
