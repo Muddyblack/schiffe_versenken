@@ -1,7 +1,23 @@
+"""
+The GameField class represents the game board and handles all game logic.
+
+This module requires the following external libraries to be installed:
+    - keyboard
+
+"""
+import sys
+import os
 from string import ascii_uppercase
 from datetime import datetime
 import random
-import keyboard
+
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
+    )
+)
+# pylint: disable=wrong-import-position
+from Library.keyboard_helper import get_arrow_key
 
 # anicode
 BLUE = "\033[0;34m"
@@ -10,11 +26,15 @@ RESET = "\033[0m"
 
 
 class GameField:
+    """
+    This class defines the game field, which holds information about the player, positions of ships and shots in the game.
+    It has several methods to display the field and modify the field with the addition of ships and shots.
+    """
+
     def __init__(self, bot=False, name="Player"):
         random.seed(datetime.now().timestamp())
 
         self.__fsize = 10
-        self.__ships = 10
         self.__current_turn = False
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
@@ -28,8 +48,54 @@ class GameField:
         else:
             self.__player_name = name
 
-    # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
+    # getter
+    def get_bot(self):
+        """Returns the bot instance."""
+        return self.__bot
+
+    def get_boatfield(self):
+        """Returns the boatfield matrix."""
+        return self.__boatfield
+
+    def get_hitfield(self):
+        """Returns the hitfield matrix."""
+        return self.__hitfield
+
+    def get_player_name(self):
+        """Returns the player's name."""
+        return self.__player_name
+
+    def get_current_turn(self):
+        """Returns the current turn boolean."""
+        return self.__current_turn
+
+    # setter
+    def set_boatfield(self, field):
+        """Sets the boatfield matrix."""
+        self.__boatfield = field
+
+    def set_hitfield(self, field):
+        """Sets the hitfield matrix."""
+        self.__hitfield = field
+
+    def set_boatfield_cell(self, row, col, value=0):
+        """Sets the value of a cell in the boatfield matrix."""
+        self.__boatfield[row][col] = value
+
+    def set_hitfield_cell(self, row, col, value=1):
+        """Sets the value of a cell in the hitfield matrix."""
+        self.__hitfield[row][col] = value
+
+    def set_current_turn(self, value):
+        """Sets the current turn boolean."""
+        self.__current_turn = value
+
+    # Show Field Functions
     def show_field(self, fieldtype):
+        """
+        Prints Field with Postion Indictaros at the top and left, like A1, B10, etc.
+        """
+
         print(" " * (len(str(self.__fsize)) + 2), end="")
         for elem in range(self.__fsize):
             print(f"{ascii_uppercase[elem]}", end=" ")
@@ -52,52 +118,49 @@ class GameField:
         print("\n")
 
     def show_boatfield(self):
+        """Prints the boatfield matrix."""
         self.show_field(self.__boatfield)
 
     def show_hitfield(self):
+        """Prints the hitfield matrix."""
         self.show_field(self.__hitfield)
 
-    # getter
-    def get_ships_left(self):
-        return self.__ships
-
-    def get_bot(self):
-        return self.__bot
-
-    def get_boatfield(self):
-        return self.__boatfield
-
-    def get_hitfield(self):
-        return self.__hitfield
-
-    def get_player_name(self):
-        return self.__player_name
-
-    def get_current_Turn(self):
-        return self.__current_turn
-
-    # setter
-    def set_boatfield(self, field):
-        self.__boatfield = field
-
-    def set_hitfield(self, field):
-        self.__hitfield = field
-
-    def set_boatfield_cell(self, row, col, value=0):
-        self.__boatfield[row][col] = value
-
-    def set_hitfield_cell(self, row, col, value=1):
-        self.__hitfield[row][col] = value
-
-    def set_current_Turn(self, value):
-        self.__current_turn = value
+    # Ship placement functions
+    def __check_ship_surrounding(self, orientation, shiplength, boat_row, boat_column):
+        """
+        Checks if the position of a new boat to be placed in the game field is valid:
+            - boat is not too close to or crossing another boat,
+        It examines the surrounding positions
+        Returns:
+            bool: True if the position is valid
+        """
+        for i in range(-1, shiplength + 1):
+            if orientation == "horizontal":
+                row = boat_row + i
+                col = boat_column - 1 + i
+            else:
+                row = boat_row - 1 + i
+                col = boat_column + i
+            if (
+                row < 0
+                or row >= len(self.__boatfield)
+                or col < 0
+                or col >= len(self.__boatfield[row])
+            ):
+                continue
+            if self.__boatfield[row][col] == 1:
+                print(
+                    "Not an allowed position. Your wanted Boat is too close or crossing another one!"
+                )
+                return False
+        return True
 
     def set_ship(self, shiplength):
-        # asks startlocation and direction via arrows
-        # check not over field size and not already set
+        """
+        Asks the player for the start location and direction of a ship of the given length and sets it on the game field.
+        """
 
-        placed = False
-        while not placed:
+        while True:
             # ask start location
             start_pos = input(
                 f"Enter the start position for your ship {shiplength} long ship (e.g. A1): "
@@ -105,115 +168,66 @@ class GameField:
             try:
                 start_col = ascii_uppercase.index(start_pos[0])
                 start_row = int(start_pos[1:]) - 1
-            except Exception:
+            except (IndexError, InterruptedError, ValueError):
                 continue
 
             print("Enter the direction for your ship. Use your arrow Keys!")
-            while True:
-                if keyboard.is_pressed("up"):
-                    direction = "up"
-                    end_col = start_col
-                    end_row = start_row - (shiplength - 1)
-                    while keyboard.is_pressed("up"):
-                        pass
-
-                elif keyboard.is_pressed("down"):
-                    direction = "down"
-                    end_col = start_col
-                    end_row = start_row + (shiplength - 1)
-                    while keyboard.is_pressed("down"):
-                        pass
-
-                elif keyboard.is_pressed("left"):
-                    direction = "left"
-                    end_col = start_col - (shiplength - 1)
-                    end_row = start_row
-                    while keyboard.is_pressed("left"):
-                        pass
-
-                elif keyboard.is_pressed("right"):
-                    direction = "right"
-                    end_col = start_col + (shiplength - 1)
-                    end_row = start_row
-                    while keyboard.is_pressed("right"):
-                        pass
-
-                elif keyboard.read_key() != "":
-                    print("Invalid direction")
-                    continue
-                break
+            direction = get_arrow_key()
+            # Bei up und down ist start und end_col gleich
+            # Bei right and left ist start und end_row gleich
+            if direction == "up":
+                boat_column = start_col
+                boat_row = start_row - (shiplength - 1)
+                orientation = "vertical"
+            elif direction == "down":
+                boat_column = start_col
+                boat_row = start_row
+                orientation = "vertical"
+            elif direction == "left":
+                boat_column = start_col - (shiplength - 1)
+                boat_row = start_row
+                orientation = "horizontal"
+            elif direction == "right":
+                boat_column = start_col
+                boat_row = start_row
+                orientation = "horizontal"
+            else:
+                print("Invalid direction!")
+                continue
+            print(direction)
 
             # check if ship fits on the board
             if (
-                end_col >= self.__fsize
-                or end_col < 0
-                or end_row >= self.__fsize
-                or end_row < 0
+                boat_column >= self.__fsize
+                or boat_column < 0
+                or boat_row >= self.__fsize
+                or boat_row < 0
             ):
                 print(
                     "Ship does not fit on the board. Please choose a different start position or direction."
                 )
                 continue
 
-            # Bei up und down ist start und end_col gleich
-            # Bei right and left ist start und end_row gleich
-            if direction == "up":
-                boat_column = start_col
-                boat_row_top = end_row
-                orientation = "vertical"
-            elif direction == "down":
-                boat_column = start_col
-                boat_row_top = start_row
-                orientation = "vertical"
-            elif direction == "right":
-                boat_row = start_row
-                boat_column_left = start_col
-                orientation = "horizontal"
-            elif direction == "left":
-                boat_row = start_row
-                boat_column_left = end_col
-                orientation = "horizontal"
-            else:
-                print("Direction Error!")
-
-            valid = True
-            # Check for neighboring ships
-            if orientation == "vertical":
-                for i in range(-1, 1):
-                    for j in range(shiplength + 2):
-                        checkfield = self.__boatfield[boat_row_top - 1 + j][
-                            boat_column + i
-                        ]
-                        if checkfield == 1 and valid:
-                            print(
-                                "Not an allowed position. Your wantedBoat is too close or crossing another one!"
-                            )
-                            valid = False
-            elif orientation == "horizontal":
-                for i in range(-1, 1):
-                    for j in range(shiplength + 2):
-                        checkfield = self.__boatfield[boat_row + i][
-                            boat_column_left - 1 + j
-                        ]
-                        if checkfield == 1 and valid:
-                            print(
-                                "Not an allowed position. Your wanted Boat is too close or crossing another one!"
-                            )
-                            valid = False
+            valid = self.__check_ship_surrounding(
+                orientation, shiplength, boat_row, boat_column
+            )
 
             if valid:
-                # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach recht
+                # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach rechts
                 if orientation == "vertical":
-                    for i in range(shiplength):
-                        self.__boatfield[boat_row_top + i][boat_column] = 1
-                elif orientation == "horizontal":
-                    for i in range(shiplength):
-                        self.__boatfield[boat_row][boat_column_left + i] = 1
-                placed = True
+                    self.__boatfield[boat_row : boat_row + shiplength, boat_column] = 1
+                else:
+                    self.__boatfield[
+                        boat_row, boat_column : boat_column + shiplength
+                    ] = 1
+                break
 
     def attack_enemy(self, target):
-        placed = False
+        """
+        Attacks the enemy's boat at the specified position.
+        """
 
+        # If the player is a bot, randomly choose a position that has not been used before to attack
         if self.__bot is True:
             while True:
                 col = random.randint(0, self.__fsize - 1)
@@ -223,17 +237,19 @@ class GameField:
                     self.__botcache.append([col, row])
                     break
 
+        # Otherwise, prompt the player to choose a position to attack
         else:
-            while not placed:
-                # ask start location
+            while True:
                 pos = input("Enter the atttacking position for your ship (e.g. A1): ")
                 try:
                     col = ascii_uppercase.index(pos[0])
                     row = int(pos[1:]) - 1
-                except Exception:
+                except (IndexError, InterruptedError, ValueError):
                     continue
-                placed = True
+                break
 
+        # Check if the attack hits a ship or not
+        # And if it hits a ship, the player gets to attack again
         if target.get_boatfield()[row][col] == 1:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
@@ -245,3 +261,10 @@ class GameField:
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
+
+
+if __name__ == "__main__":
+    x1 = GameField(name="Petra", bot=False)
+    x1.set_ship(5)
+    x1.set_ship(5)
+    x1.show_boatfield()
