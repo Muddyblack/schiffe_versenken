@@ -33,9 +33,8 @@ class GameField:
 
     def __init__(self, bot=False, name="Player"):
         random.seed(datetime.now().timestamp())
-
+        self.__ships_left = 10
         self.__fsize = 10
-        self.__current_turn = False
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
@@ -65,9 +64,9 @@ class GameField:
         """Returns the player's name."""
         return self.__player_name
 
-    def get_current_turn(self):
-        """Returns the current turn boolean."""
-        return self.__current_turn
+    def get_ships_left(self):
+        """Returns the current living ships"""
+        return self.__ships_left
 
     # setter
     def set_boatfield(self, field):
@@ -86,9 +85,9 @@ class GameField:
         """Sets the value of a cell in the hitfield matrix."""
         self.__hitfield[row][col] = value
 
-    def set_current_turn(self, value):
-        """Sets the current turn boolean."""
-        self.__current_turn = value
+    def set_ships_left(self, value):
+        """Sets the current living ships"""
+        self.__ships_left = value
 
     # Show Field Functions
     def show_field(self, fieldtype):
@@ -226,6 +225,8 @@ class GameField:
         """
         Attacks the enemy's boat at the specified position.
         """
+        if self == target:
+            raise ValueError("You cannot attack yourself!")
 
         # If the player is a bot, randomly choose a position that has not been used before to attack
         if self.__bot is True:

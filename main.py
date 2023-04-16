@@ -51,6 +51,9 @@ def clear_console():
 
 def place_all_ships(obj):
     """Regelt das plazieren aller Boote."""
+    if obj.get_bot() is True:
+        # dann füll automatisch!
+        pass
     battleship = 1
     cruiser = 2
     destroyer = 3
@@ -101,9 +104,10 @@ def place_all_ships(obj):
     obj.show_boatfield()
 
 
-def save_game(save_name):
+def save_game(save_name, last_turn_player, level):
     """Saves the current state of the game in a binary file format."""
     player_list = []
+    game_info = {"last_turn_player": last_turn_player.get_player_name(), "level": level}
 
     for obj in gc.get_objects():
         if isinstance(obj, game_field.GameField):
@@ -112,7 +116,6 @@ def save_game(save_name):
                 "bot": obj.get_bot(),
                 "boatfield": obj.get_boatfield(),
                 "hitfield": obj.get_hitfield(),
-                "current_turn": obj.get_current_turn(),
             }
             player_list.append(player_info)
 
@@ -121,6 +124,8 @@ def save_game(save_name):
 
     with open(f"{save_dir}/players.obj", "wb") as obj:
         pickle.dump(player_list, obj)
+    with open(f"{save_dir}/game.info", "wb") as obj:
+        pickle.dump(game_info, obj)
 
 
 def refresh_console_lines(lines):
@@ -254,7 +259,8 @@ def start_up():
     start_screen()
     p_1 = None
     p_2 = None
-    save_name = ""
+    save_name = None
+    last_turn_player = None
 
     load = ""
     exist_game_saves = [
@@ -274,19 +280,22 @@ def start_up():
 
         with open(f"{SAVE_GAMES_PATH}/{save_name}/players.obj", "rb") as playerpickle:
             player_list = pickle.load(playerpickle)
+        with open(f"{SAVE_GAMES_PATH}/{save_name}/game.info", "rb") as playerpickle:
+            game_info = pickle.load(playerpickle)
 
-        player_1 = player_list[0]
-        player_2 = player_list[1]
+        last_turn_player = game_info["last_turn_player"]
+        level = game_info["level"]
 
-        p_1 = game_field.GameField(name=player_1["name"], bot=player_1["bot"])
-        p_1.set_current_turn(player_1["current_turn"])
-        p_1.set_boatfield(player_1["boatfield"])
-        p_1.set_hitfield(player_1["hitfield"])
+        obj_1 = player_list[0]
+        obj_2 = player_list[1]
 
-        p_2 = game_field.GameField(name=player_2["name"], bot=player_2["bot"])
-        p_2.set_current_turn(player_2["current_turn"])
-        p_2.set_boatfield(player_2["boatfield"])
-        p_2.set_hitfield(player_2["hitfield"])
+        p_1 = game_field.GameField(name=obj_1["name"], bot=obj_1["bot"])
+        p_1.set_boatfield(obj_1["boatfield"])
+        p_1.set_hitfield(obj_1["hitfield"])
+
+        p_2 = game_field.GameField(name=obj_2["name"], bot=obj_2["bot"])
+        p_2.set_boatfield(obj_2["boatfield"])
+        p_2.set_hitfield(obj_2["hitfield"])
 
     else:
         print("Hello you decided to create a new Save-game")
@@ -294,6 +303,7 @@ def start_up():
             f'{input("    Enter the save-name you wish here: ").replace(" ", "_")}_save'
         )
         opponent = ""
+        level = 0
 
         p1_name = ask_name()
         while opponent not in ("y", "n"):
@@ -317,42 +327,56 @@ def start_up():
         else:
             p_2 = game_field.GameField(bot=True)
 
+    if last_turn_player == p_1.get_player_name():
+        return_players = [p_1, p_2]
+    elif last_turn_player == p_2.get_player_name():
+        return_players = [p_2, p_1]
+    else:
         # Coin flipping who will start the Game
         starter = random.randint(0, 1)
         if starter == 0:
-            p_1.set_current_turn(True)
+            return_players = [p_1, p_2]
         else:
-            p_2.set_current_turn(True)
+            return_players = [p_2, p_1]
 
-    return {"players": [p_1, p_2], "save_name": save_name}
+    return {"players": return_players, "save_name": save_name, "level": level}
+
+
+def attack_execution(attacker, target):
+    """Attacks the target and set target as new current_player"""
+    attacker.attack_enemy(target)
+    attacker.show_hitfield()
+    target.show_boatfield()
+    input(
+        "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
+    )
 
 
 if __name__ == "__main__":
     start = start_up()
     players = start["players"]
     save = start["save_name"]
+    current_level = start["level"]
 
-    for player in players:
-        if player.get_current_turn() is False:
-            continue
+    if current_level == 0:
+        for index, player in enumerate(players):
+            save_game(save, player, current_level)
+            place_all_ships(player)
+            player.show_boatfield()
+            if index < len(players):
+                save_game(save, players[index + 1], current_level)
+            else:
+                save_game(save, players[0], current_level)
+        current_level += 1
 
-        print(f"TEST: HELLO {player.get_player_name()} it should be your turn")
-        break
+    player_1 = players[0]
+    player_2 = players[1]
 
-    # p_1 = start[0]
-    # p_2 = start[1]
-    # save = "salbana"  # start[2]
-    # p_1 = game_field.GameField("Pette", False)
-    save_game(save)
+    if current_level == 1:
+        while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
+            attack_execution(player_1, player_2)
+            save_game(save, players[0], current_level)
+            attack_execution(player_2, player_1)
+            save_game(save, players[0], current_level)
 
-    # place_all_ships(p_1)
-    # place_all_ships(p_2)
-
-    # p_1.show_boatfield()
-    # p_2.show_boatfield()
-
-    # while p_1.get_ships_left() != 0 | p_2.get_ships_left() != 0:
-    #    p_1.attack_enemy(p_2)
-    #    p_1.show_hitfield()
-    #    p_2.show_boatfield()
-    # save_game(save_name)
+    current_level += 1
