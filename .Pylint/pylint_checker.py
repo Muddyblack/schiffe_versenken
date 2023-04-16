@@ -1,5 +1,5 @@
 """Allows you to select a file via Explorer to get the pylint results fast."""
-
+# pylint: disable=wrong-import-order
 import sys
 import os
 from tkinter import filedialog
@@ -15,6 +15,7 @@ sys.path.append(
     )
 )
 
+# pylint: disable=wrong-import-position
 from Library.file_helper import read_file
 
 WORK_PATH = os.path.dirname(os.path.realpath(__file__))

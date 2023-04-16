@@ -1,3 +1,11 @@
+"""
+The GameField class represents the game board and handles all game logic.
+
+This module requires the following external libraries to be installed:
+- keyboard
+
+"""
+
 from string import ascii_uppercase
 from datetime import datetime
 import random
@@ -9,12 +17,31 @@ RED = "\033[0;31m"
 RESET = "\033[0m"
 
 
+def get_arrow_key():
+    while True:
+        if keyboard.is_pressed("up"):
+            return "up"
+
+        elif keyboard.is_pressed("down"):
+            return "down"
+
+        elif keyboard.is_pressed("left"):
+            return "left"
+
+        elif keyboard.is_pressed("right"):
+            return "right"
+
+
 class GameField:
+    """
+    This class defines the game field, which holds information about the player, positions of ships and shots in the game.
+    It has several methods to display the field and modify the field with the addition of ships and shots.
+    """
+
     def __init__(self, bot=False, name="Player"):
         random.seed(datetime.now().timestamp())
 
         self.__fsize = 10
-        self.__ships = 10
         self.__current_turn = False
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
@@ -28,8 +55,8 @@ class GameField:
         else:
             self.__player_name = name
 
-    # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
     def show_field(self, fieldtype):
+        # Print Field with Postion Indictaros at the top and left, like A1, B10, etc to the Command-Line
         print(" " * (len(str(self.__fsize)) + 2), end="")
         for elem in range(self.__fsize):
             print(f"{ascii_uppercase[elem]}", end=" ")
@@ -58,9 +85,6 @@ class GameField:
         self.show_field(self.__hitfield)
 
     # getter
-    def get_ships_left(self):
-        return self.__ships
-
     def get_bot(self):
         return self.__bot
 
@@ -73,7 +97,7 @@ class GameField:
     def get_player_name(self):
         return self.__player_name
 
-    def get_current_Turn(self):
+    def get_current_turn(self):
         return self.__current_turn
 
     # setter
@@ -89,15 +113,14 @@ class GameField:
     def set_hitfield_cell(self, row, col, value=1):
         self.__hitfield[row][col] = value
 
-    def set_current_Turn(self, value):
+    def set_current_turn(self, value):
         self.__current_turn = value
 
     def set_ship(self, shiplength):
         # asks startlocation and direction via arrows
         # check not over field size and not already set
 
-        placed = False
-        while not placed:
+        while True:
             # ask start location
             start_pos = input(
                 f"Enter the start position for your ship {shiplength} long ship (e.g. A1): "
@@ -105,43 +128,27 @@ class GameField:
             try:
                 start_col = ascii_uppercase.index(start_pos[0])
                 start_row = int(start_pos[1:]) - 1
-            except Exception:
+            except (IndexError, InterruptedError):
                 continue
 
             print("Enter the direction for your ship. Use your arrow Keys!")
-            while True:
-                if keyboard.is_pressed("up"):
-                    direction = "up"
-                    end_col = start_col
-                    end_row = start_row - (shiplength - 1)
-                    while keyboard.is_pressed("up"):
-                        pass
-
-                elif keyboard.is_pressed("down"):
-                    direction = "down"
-                    end_col = start_col
-                    end_row = start_row + (shiplength - 1)
-                    while keyboard.is_pressed("down"):
-                        pass
-
-                elif keyboard.is_pressed("left"):
-                    direction = "left"
-                    end_col = start_col - (shiplength - 1)
-                    end_row = start_row
-                    while keyboard.is_pressed("left"):
-                        pass
-
-                elif keyboard.is_pressed("right"):
-                    direction = "right"
-                    end_col = start_col + (shiplength - 1)
-                    end_row = start_row
-                    while keyboard.is_pressed("right"):
-                        pass
-
-                elif keyboard.read_key() != "":
-                    print("Invalid direction")
-                    continue
-                break
+            direction = get_arrow_key()
+            if direction == "up":
+                end_col = start_col
+                end_row = start_row - (shiplength - 1)
+            elif direction == "down":
+                end_col = start_col
+                end_row = start_row + (shiplength - 1)
+            elif direction == "left":
+                end_col = start_col - (shiplength - 1)
+                end_row = start_row
+            elif direction == "right":
+                end_col = start_col + (shiplength - 1)
+                end_row = start_row
+            else:
+                print("Invalid direction")
+                continue
+            print(direction)
 
             # check if ship fits on the board
             if (
@@ -209,7 +216,7 @@ class GameField:
                 elif orientation == "horizontal":
                     for i in range(shiplength):
                         self.__boatfield[boat_row][boat_column_left + i] = 1
-                placed = True
+                break
 
     def attack_enemy(self, target):
         placed = False
@@ -230,7 +237,7 @@ class GameField:
                 try:
                     col = ascii_uppercase.index(pos[0])
                     row = int(pos[1:]) - 1
-                except Exception:
+                except [IndexError]:
                     continue
                 placed = True
 
@@ -245,3 +252,8 @@ class GameField:
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
+
+
+if __name__ == "__main__":
+    x1 = GameField(name="Petra", bot=False)
+    x1.set_ship(5)

@@ -108,7 +108,7 @@ def save_game(save_name):
                 "bot": player.get_bot(),
                 "boatfield": player.get_boatfield(),
                 "hitfield": player.get_hitfield(),
-                "current_turn": player.get_current_Turn(),
+                "current_turn": player.get_current_turn(),
             }
             player_list.append(player_info)
 
@@ -231,12 +231,12 @@ def start_up():
         player_2 = player_list[1]
 
         p_1 = game_field.GameField(name=player_1["name"], bot=player_1["bot"])
-        p_1.set_current_Turn(player_1["current_turn"])
+        p_1.set_current_turn(player_1["current_turn"])
         p_1.set_boatfield(player_1["boatfield"])
         p_1.set_hitfield(player_1["hitfield"])
 
         p_2 = game_field.GameField(name=player_2["name"], bot=player_2["bot"])
-        p_2.set_current_Turn(player_2["current_turn"])
+        p_2.set_current_turn(player_2["current_turn"])
         p_2.set_boatfield(player_2["boatfield"])
         p_2.set_hitfield(player_2["hitfield"])
 
@@ -268,9 +268,9 @@ def start_up():
         # Coin flipping who will start the Game
         starter = random.randint(0, 1)
         if starter == 0:
-            p_1.set_current_Turn(True)
+            p_1.set_current_turn(True)
         else:
-            p_2.set_current_Turn(True)
+            p_2.set_current_turn(True)
 
     return {"players": [p_1, p_2], "save_name": save_name}
 
@@ -281,7 +281,7 @@ if __name__ == "__main__":
     save = start["save_name"]
 
     for player in players:
-        if player.get_current_Turn() is False:
+        if player.get_current_turn() is False:
             continue
 
         print(f"TEST: HELLO {player.get_player_name()} it should be your turn")
