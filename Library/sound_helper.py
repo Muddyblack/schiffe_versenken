@@ -29,4 +29,4 @@ def stop(process):
         try:
             process.kill()
         except OSError:
-            print("Couldn't kill the player")
+            print("Couldn't kill the audio-player")
