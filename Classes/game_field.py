@@ -122,23 +122,29 @@ class GameField:
             bool: True if the position is valid
         """
         if orientation == "vertical":
-            for i in range(-1, 1):
-                for j in range(shiplength + 2):
-                    checkfield = self.__boatfield[boat_row - 1 + j][boat_column + i]
-                    if checkfield == 1:
-                        print(
-                            "Not an allowed position. Your wantedBoat is too close or crossing another one!"
-                        )
-                        return False
+            rows_to_check = range(boat_row - 1, boat_row + shiplength + 1)
+            cols_to_check = range(boat_column - 1, boat_column + 2)
         elif orientation == "horizontal":
-            for i in range(-1, 1):
-                for j in range(shiplength + 2):
-                    checkfield = self.__boatfield[boat_row + i][boat_column - 1 + j]
-                    if checkfield == 1:
-                        print(
-                            "Not an allowed position. Your wanted Boat is too close or crossing another one!"
-                        )
-                        return False
+            rows_to_check = range(boat_row - 1, boat_row + 2)
+            cols_to_check = range(boat_column - 1, boat_column + shiplength + 1)
+        else:
+            return False  # Invalid orientation
+
+        for row in rows_to_check:
+            for col in cols_to_check:
+                if (
+                    row < 0
+                    or row >= len(self.__boatfield)
+                    or col < 0
+                    or col >= len(self.__boatfield[0])
+                ):
+                    continue  # Ignore out-of-bounds cells
+                if self.__boatfield[row][col] == 1:
+                    print(
+                        "Not an allowed position. Your wanted boat is too close or crossing another one!"
+                    )
+                    return False
+
         return True
 
     def set_ship(self, shiplength):
@@ -182,11 +188,15 @@ class GameField:
                 continue
             print(direction)
 
+            valid = self.__check_ship_surrounding(
+                orientation, shiplength, boat_row, boat_column
+            )
+
             # check if ship fits on the board
             if (
-                boat_column >= self.__fsize
+                boat_column + shiplength >= self.__fsize + 1
                 or boat_column < 0
-                or boat_row >= self.__fsize
+                or boat_row + shiplength >= self.__fsize + 1
                 or boat_row < 0
             ):
                 print(
@@ -194,19 +204,14 @@ class GameField:
                 )
                 continue
 
-            valid = self.__check_ship_surrounding(
-                orientation, shiplength, boat_row, boat_column
-            )
-
             if valid:
-                # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach recht
-                if orientation == "vertical":
-                    for i in range(shiplength):
-                        self.__boatfield[boat_row + i][boat_column] = 1
-                elif orientation == "horizontal":
-                    for i in range(shiplength):
-                        self.__boatfield[boat_row][boat_column + i] = 1
                 break
+
+        # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach recht
+        for i in range(shiplength):
+            self.__boatfield[boat_row + i if orientation == "vertical" else boat_row][
+                boat_column if orientation == "vertical" else boat_column + i
+            ] = 1
 
     def attack_enemy(self, target):
         """
