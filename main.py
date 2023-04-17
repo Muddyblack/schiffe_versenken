@@ -361,6 +361,7 @@ def place_all_ships(obj):
     uboat = 4
     while (battleship + cruiser + destroyer + uboat) != 0:
         obj.show_boatfield()
+        clear_input()
         print(
             f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
             f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
