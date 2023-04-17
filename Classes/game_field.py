@@ -221,10 +221,13 @@ class GameField:
 
             # check if ship fits on the board
             if (
-                (orientation == "vertical" and (boat_row + ship_len) > self.__fsize) or
-                (orientation == "horizontal" and (boat_column + ship_len) > self.__fsize) or
-                boat_row < 0 or
-                boat_column < 0
+                (orientation == "vertical" and (boat_row + ship_len) > self.__fsize)
+                or (
+                    orientation == "horizontal"
+                    and (boat_column + ship_len) > self.__fsize
+                )
+                or boat_row < 0
+                or boat_column < 0
             ):
                 print(
                     "Ship does not fit on the board. Please choose a different start position or direction."
