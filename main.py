@@ -78,6 +78,7 @@ def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
     start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
     sound_process = sound_helper.start(start_music_path)
+    
     files = [
         os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
         for file in os.listdir(START_SCREEN_ANIMATION_PATH)
