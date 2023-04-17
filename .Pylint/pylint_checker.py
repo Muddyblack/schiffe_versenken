@@ -1,5 +1,4 @@
 """Allows you to select a file via Explorer to get the pylint results fast."""
-# pylint: disable=wrong-import-order
 import sys
 import os
 from tkinter import filedialog

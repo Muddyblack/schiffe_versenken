@@ -4,14 +4,28 @@ import sys
 import gc
 import pickle
 import random
+import time
 import keyboard
 from Classes.game_field import GameField
 from Classes.player import Player
 
-#
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
+    )
+)
+
+# pylint: disable=wrong-import-position
+from Library.file_helper import read_file
+from Library.keyboard_helper import clear_input
+
+# pylint: enable=wrong-import-position
+
+# Paths
 PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
 GAME_DATA_PATH = f"{PROJECT_PATH}/GameData"
 SAVE_GAMES_PATH = f"{GAME_DATA_PATH}/saves"
+START_SCREEN_ANIMATION_PATH = f"{GAME_DATA_PATH}/start_screen"
 
 os.makedirs(SAVE_GAMES_PATH, exist_ok=True)
 
@@ -55,38 +69,49 @@ def clear_console():
 def refresh_console_lines(lines):
     """Clears the specified number of lines from the console output."""
 
-    sys.stdout.write("\033[K" * lines)
     sys.stdout.write("\033[F" * lines)
+    sys.stdout.write("\033[K" * lines)
 
 
 def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
-    print(
-        rf"""{MAGENTA}
-    _           _   _   _           _     _       
-   | |         | | | | | |         | |   (_)      
-   | |__   __ _| |_| |_| | ___  ___| |__  _ _ __  
-   | '_ \ / _` | __| __| |/ _ \/ __| '_ \| | '_ \ 
-   | |_) | (_| | |_| |_| |  __/\__ \ | | | | |_) |
-   |_.__/ \__,_|\__|\__|_|\___||___/_| |_|_| .__/ 
-                                           | |    
-                                           |_|    
-                                   {BROWN}
-    {LIGHT_GRAY}
-                       _  _                 |-._
-                    -         - _           |-._|
-                 O                 (). _    |
-                                     '(_) __|__
-                                     [__|__|_|_]
-  ~~ _|_ _|_ _|_  ~~     ~~~          |__|__|_|
-   __ |   |   |       ~~      ~~~     |_|__|__|
-   HH_|___|___|__.--"  ~~~ ~~        /|__|__|_|
-  |__________.-"     ~~~~    ~~~    / |_|__|__|
-  ~     ~~ ~      ~~       ~~      /  |_| |___|
-     ~~~~    ~~~   ~~~~   ~   ~~  /    
-    jrei{RESET}
-    """
-    )
+
+    files = [
+        os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
+        for file in os.listdir(START_SCREEN_ANIMATION_PATH)
+    ]
+    frames = sorted(files)
+
+    stop = False
+    while True:
+        if (keyboard.is_pressed("enter")) or (stop is True):
+            stop = True
+            break
+
+        for frame in frames:
+            string = read_file(frame)
+            for line in string:
+                if keyboard.is_pressed("enter") or (stop is True):
+                    stop = True
+                    break
+                print(
+                    line.replace("{BROWN}", BROWN)
+                    .replace("{LIGHT_GRAY}", LIGHT_GRAY)
+                    .replace("{MAGENTA}", MAGENTA)
+                    .replace("{RESET}", RESET)
+                )
+            print(f"\n{LIGHT_BLUE}Hit the Enter Key, to continue{RESET}", end="")
+            # Check while sleeping if enter has been entered
+            ind = 0
+            while ind in range(40):
+                time.sleep(0.01)
+                if keyboard.is_pressed("enter") or (stop is True):
+                    stop = True
+                    break
+                ind += 1
+            clear_console()
+    time.sleep(0.1)
+    clear_input()
 
 
 def display_save_games(save_games, selected_save_game_index):
@@ -110,6 +135,7 @@ def select_savegame(save_games):
     """
     selected_save_game_index = 0
     save_games_len = len(save_games)
+    input()
 
     display_save_games(save_games, selected_save_game_index)
 
@@ -131,7 +157,6 @@ def select_savegame(save_games):
             selected_save_game_index += 1
             refresh_console_lines(save_games_len)
             display_save_games(save_games, selected_save_game_index)
-
             while keyboard.is_pressed("down"):
                 pass
 
@@ -143,7 +168,7 @@ def select_savegame(save_games):
     return selected
 
 
-def ask_name():
+def ask_name(question):
     """
     Asks the user to enter his name and checks if it is not empty or longer than 15 characters
     Returns:
@@ -153,14 +178,16 @@ def ask_name():
     max_name_len = 15
 
     while True:
-        name = input("\nNice, so what is your name: ").strip()
+        name = input(f"\n{question}").strip()
 
         if name == "":
             msg = "This is just an empty String!"
         elif len(name) > max_name_len:
-            msg = "The name is too long it has: {len(name)} character allowed: {max_name_len}"
-        elif len(name) <= min_name_len:
-            msg = "The name is too short it has: {len(name)} min length: {min_name_len}"
+            msg = f"The name is too long it has: {len(name)} character allowed: {max_name_len}"
+        elif len(name) < min_name_len:
+            msg = (
+                f"The name is too short it has: {len(name)} min length: {min_name_len}"
+            )
         else:
             break
 
@@ -246,11 +273,11 @@ def create__new_game():
     """
     print("Hello you decided to create a new Save-game")
     save_name = (
-        f'{input("Enter the save name you wish to use: ").replace(" ", "_")}_save'
+        f'{ask_name("Enter the save name you wish to use: ").replace(" ", "_")}_save'
     )
     opponent = ""
 
-    p1_name = ask_name()
+    p1_name = ask_name("Nice, so what is your name: ")
     while opponent not in ("y", "n"):
         opponent = (
             input(
@@ -264,7 +291,9 @@ def create__new_game():
 
     if opponent == "y":
         while True:
-            p2_name = ask_name()
+            p2_name = ask_name(
+                f"Hello {p1_name} told me about you.\nWhat is your name: "
+            )
             if p2_name != p1_name:
                 break
             print("The other player already has this name!")
@@ -306,8 +335,10 @@ def start_up():
 
     while load not in ("y", "n"):
         load = input("Do you want to load an old save? [y/n]: ").lower().strip()
+        clear_input()
 
     if load == "y":
+        print("Select your Savegame:")
         return load_game(select_savegame(exist_game_saves))
 
     return create__new_game()
