@@ -3,9 +3,6 @@ import subprocess
 
 if os.name == "nt":
     import winsound
-else:
-    pass
-
 
 def start(file):
     if os.name == "nt":
@@ -13,23 +10,25 @@ def start(file):
     else:
         # Use the `aplay` command to play the WAV file if available
         try:
-            aplay_cmd = ["aplay", "-q", file]
-            return subprocess.Popen(aplay_cmd)
+            vlc_cmd = ["cvlc", "-q", file]
+            process = subprocess.Popen(vlc_cmd)
         except OSError:
             try:
-                vlc_cmd = ["cvlc", "--play-and-exit", file]
-                return subprocess.Popen(vlc_cmd)
+                aplay_cmd = ["aplay", "-q", file]
+                process = subprocess.Popen(aplay_cmd)
             except OSError:
                 try:
-                    # Use the `sox` command to play the WAV file if `aplay` is not available
                     sox_cmd = ["play", "-q", file]
-                    return subprocess.Popen(sox_cmd)
+                    process = subprocess.Popen(sox_cmd)
                 except OSError:
                     print("No Module on this machine to play wav files!")
-
+    return process
 
 def stop(process):
     if os.name == "nt":
         winsound.PlaySound(None, winsound.SND_PURGE)
     else:
-        process.kill()
+        try:
+            process.kill()
+        except OSError:
+            pass

@@ -121,6 +121,7 @@ def start_screen():
     time.sleep(0.1)
     sound_helper.stop(sound_process)
     clear_input()
+    clear_console()
 
 
 def display_save_games(save_games, selected_save_game_index):
