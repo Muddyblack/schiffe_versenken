@@ -25,6 +25,40 @@ RED = "\033[0;31m"
 RESET = "\033[0m"
 
 
+def get_row_and_column_input(message):
+    """Gets the Field-Koordiantes the user puts in using the message given to it. input Either in A1 or 1A format
+        - returns: row, column
+    """
+    while True:
+        user_input = input(f"{message}")
+        try:
+            l_row = int(user_input[1:]) - 1
+            l_col = int(ascii_uppercase.index(user_input[0].upper()))
+        except ValueError:
+            try:
+                # If the Array is three long, the Number in front might have two digits
+                if len(user_input) == 3:
+                    l_row = int(user_input[:2]) - 1
+                    l_col = int(ascii_uppercase.index(user_input[3:].upper()))
+                else:
+                    l_row = int(user_input[0]) - 1
+                    l_col = int(ascii_uppercase.index(user_input[1:].upper()))
+            except (IndexError, InterruptedError, ValueError):
+                print("Not a valid Input! Please try again!")
+                continue
+        except (IndexError, InterruptedError):
+            print("Not a valid Input! Please try again!")
+            continue
+
+        # Checks for validility of the input
+        if (l_row | l_col < 0) or (9 < l_row | l_col):
+            print("Outside of the Field!")
+            continue
+        # if everyhting is okay, leave Loop
+        break
+    return l_row, l_col
+
+
 class GameField:
     """
     This class defines the game field, which holds information about ships positions and shots in the game.
@@ -151,17 +185,9 @@ class GameField:
         """
         Asks the player for the start location and direction of a ship of the given length and sets it on the game field.
         """
-
         while True:
             # ask start location
-            start_pos = input(
-                f"Enter the start position for your ship {shiplength} long ship (e.g. A1): "
-            )
-            try:
-                start_col = ascii_uppercase.index(start_pos[0])
-                start_row = int(start_pos[1:]) - 1
-            except (IndexError, InterruptedError, ValueError):
-                continue
+            start_row, start_col = get_row_and_column_input(f"Enter the start position for your ship {shiplength} long ship (e.g. A1): ")
 
             print("Enter the direction for your ship. Use your arrow Keys!")
             direction = get_arrow_key()
@@ -232,14 +258,7 @@ class GameField:
 
         # Otherwise, prompt the player to choose a position to attack
         else:
-            while True:
-                pos = input("Enter the atttacking position for your ship (e.g. A1): ")
-                try:
-                    col = ascii_uppercase.index(pos[0])
-                    row = int(pos[1:]) - 1
-                except (IndexError, InterruptedError, ValueError):
-                    continue
-                break
+            row, col = get_row_and_column_input("Enter the atttacking position for your ship (e.g. A1): ")
 
         # Check if the attack hits a ship or not
         # And if it hits a ship, the player gets to attack again
