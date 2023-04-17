@@ -5,7 +5,8 @@ import gc
 import pickle
 import random
 import keyboard
-from Classes import game_field
+from Classes.game_field import GameField
+from Classes.player import Player
 
 #
 PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
@@ -51,7 +52,7 @@ def clear_console():
 
 def place_all_ships(obj):
     """Regelt das plazieren aller Boote."""
-    if obj.get_bot() is True:
+    if obj.owner.get_bot() is True:
         # dann füll automatisch!
         pass
     battleship = 1
@@ -107,13 +108,16 @@ def place_all_ships(obj):
 def save_game(save_name, last_turn_player, level):
     """Saves the current state of the game in a binary file format."""
     player_list = []
-    game_info = {"last_turn_player": last_turn_player.get_player_name(), "level": level}
+    game_info = {
+        "last_turn_player": last_turn_player.owner.get_player_name(),
+        "level": level,
+    }
 
     for obj in gc.get_objects():
-        if isinstance(obj, game_field.GameField):
+        if isinstance(obj, GameField):
             player_info = {
-                "name": obj.get_player_name(),
-                "bot": obj.get_bot(),
+                "name": obj.owner.get_player_name(),
+                "bot": obj.owner.get_bot(),
                 "boatfield": obj.get_boatfield(),
                 "hitfield": obj.get_hitfield(),
             }
@@ -289,11 +293,11 @@ def start_up():
         obj_1 = player_list[0]
         obj_2 = player_list[1]
 
-        p_1 = game_field.GameField(name=obj_1["name"], bot=obj_1["bot"])
+        p_1 = GameField(Player(name=obj_1["name"], bot=obj_1["bot"]))
         p_1.set_boatfield(obj_1["boatfield"])
         p_1.set_hitfield(obj_1["hitfield"])
 
-        p_2 = game_field.GameField(name=obj_2["name"], bot=obj_2["bot"])
+        p_2 = GameField(Player(name=obj_2["name"], bot=obj_2["bot"]))
         p_2.set_boatfield(obj_2["boatfield"])
         p_2.set_hitfield(obj_2["hitfield"])
 
@@ -315,7 +319,7 @@ def start_up():
                 .strip()
             )
 
-        p_1 = game_field.GameField(name=p1_name)
+        p_1 = GameField(Player(name=p1_name))
 
         if opponent == "y":
             while True:
@@ -323,13 +327,13 @@ def start_up():
                 if p2_name != p1_name:
                     break
                 print("The other player has already this name!")
-            p_2 = game_field.GameField(name=p2_name)
+            p_2 = GameField(Player(name=p2_name))
         else:
-            p_2 = game_field.GameField(bot=True)
+            p_2 = GameField(Player(bot=True))
 
-    if last_turn_player == p_1.get_player_name():
+    if last_turn_player == p_1.owner.get_player_name():
         return_players = [p_1, p_2]
-    elif last_turn_player == p_2.get_player_name():
+    elif last_turn_player == p_2.owner.get_player_name():
         return_players = [p_2, p_1]
     else:
         # Coin flipping who will start the Game
@@ -360,6 +364,7 @@ if __name__ == "__main__":
 
     if current_level == 0:
         for index, player in enumerate(players):
+            print(f"Your Turn {player.owner.get_player_name()}!")
             save_game(save, player, current_level)
             place_all_ships(player)
             player.show_boatfield()
@@ -374,8 +379,10 @@ if __name__ == "__main__":
 
     if current_level == 1:
         while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
+            print(f"Your Turn {player_1.owner.get_player_name()}!")
             attack_execution(player_1, player_2)
             save_game(save, players[0], current_level)
+            print(f"Your Turn {player_2.owner.get_player_name()}!")
             attack_execution(player_2, player_1)
             save_game(save, players[0], current_level)
 
