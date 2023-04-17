@@ -4,25 +4,23 @@ import subprocess
 if os.name == "nt":
     import winsound
 
+
 def start(file):
     if os.name == "nt":
         process = winsound.PlaySound(file, winsound.SND_ASYNC)
     else:
-        # Use the `aplay` command to play the WAV file if available
-        try:
-            vlc_cmd = ["cvlc", "-q", file]
-            process = subprocess.Popen(vlc_cmd)
-        except OSError:
+        players = ["aplay, cvlc, play"]
+        for player in players:
+            cmd = vlc_cmd = [player, "-q", file]
+            process = subprocess.Popen(cmd)
+            return process
             try:
                 aplay_cmd = ["aplay", "-q", file]
-                process = subprocess.Popen(aplay_cmd)
+                return subprocess.Popen(aplay_cmd)
             except OSError:
-                try:
-                    sox_cmd = ["play", "-q", file]
-                    process = subprocess.Popen(sox_cmd)
-                except OSError:
-                    print("No Module on this machine to play wav files!")
-    return process
+                pass
+        print("No Module on this machine to play wav files!")
+
 
 def stop(process):
     if os.name == "nt":
@@ -31,4 +29,4 @@ def stop(process):
         try:
             process.kill()
         except OSError:
-            pass
+            print("Couldn't kill the player")

@@ -15,6 +15,8 @@ class Player:
         else:
             self.__player_name = name
 
+        self.__ships = {"battleship": [], "cruiser": [], "destroyer": [], "uboat": []}
+
     # getter
     def get_bot(self):
         """Returns the bot instance."""
@@ -24,11 +26,31 @@ class Player:
         """Returns the player's name."""
         return self.__player_name
 
-    # setter
-    def set_bot(self):
-        """Sets the bot instance."""
-        return self.__bot
+    def get_ships(self):
+        """Returns the ship's dictionary."""
+        return self.__ships
 
-    def set_player_name(self):
+    def get_ship_amount(self):
+        """Returns the amount of ships the player currently has"""
+        index = 0
+        for key in self.__ships:
+            for pos in key:
+                index += 1
+        return index
+
+    # setter
+    def set_bot(self, value):
+        """Sets the bot instance."""
+        self.__bot = value
+
+    def set_player_name(self, name):
         """Sets the player's name."""
-        return self.__player_name
+        self.__player_name = name
+
+    def set_ships(self, value):
+        """Sets the ship's dictionary."""
+        self.__ships = value
+
+    def add_ship(self, element, pos):
+        """Sets the ship's dictionary."""
+        self.__ships[element].append(pos)
