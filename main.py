@@ -62,7 +62,6 @@ RESET = "\033[0m"
 
 # Game System funcs
 
-
 def clear_console():
     """clearing the console"""
     os.system("cls" if os.name == "nt" else "clear")

@@ -25,6 +25,22 @@ RED = "\033[0;31m"
 RESET = "\033[0m"
 
 
+def get_row_and_column_input(user_input):
+    """Gets the User Input for Row and Column, handles A1 or 1A as input"""
+    try:
+        row = int(user_input[1:]) - 1
+        col = ascii_uppercase.index(user_input[0])
+    except ValueError:
+        try:
+            row = int(user_input[0]) - 1
+            col = ascii_uppercase.index(user_input[1:])
+        except (IndexError, InterruptedError, ValueError):
+            print("Not a valid Input! Please try again!")
+    except (IndexError, InterruptedError):
+        print("Not a valid Input! Please try again!")
+    return row, col
+
+
 class GameField:
     """
     This class defines the game field, which holds information about ships positions and shots in the game.
@@ -155,8 +171,9 @@ class GameField:
         while True:
             # ask start location
             start_pos = input(
-                f"Enter the start position for your ship {shiplength} long ship (e.g. A1): "
+                f"Enter the start position for your {shiplength} long ship (e.g. A1): "
             )
+
             try:
                 start_col = ascii_uppercase.index(start_pos[0])
                 start_row = int(start_pos[1:]) - 1
@@ -254,3 +271,4 @@ class GameField:
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
+
