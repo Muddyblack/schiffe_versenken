@@ -34,8 +34,7 @@ class Player:
         """Returns the amount of ships the player currently has"""
         index = 0
         for key in self.__ships:
-            for pos in key:
-                index += 1
+            index += len(key)
         return index
 
     # setter
