@@ -135,8 +135,8 @@ def select_savegame(save_games):
     """
     selected_save_game_index = 0
     save_games_len = len(save_games)
-    input()
 
+    print("Use up and down arrows to navigate\nUse Spacebar to sleect the game")
     display_save_games(save_games, selected_save_game_index)
 
     while True:
@@ -160,7 +160,7 @@ def select_savegame(save_games):
             while keyboard.is_pressed("down"):
                 pass
 
-        elif keyboard.is_pressed("enter"):
+        elif keyboard.is_pressed(" "):
             break
 
     selected = save_games[selected_save_game_index]
@@ -338,7 +338,6 @@ def start_up():
         clear_input()
 
     if load == "y":
-        print("Select your Savegame:")
         return load_game(select_savegame(exist_game_saves))
 
     return create__new_game()
