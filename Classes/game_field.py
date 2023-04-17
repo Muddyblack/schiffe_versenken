@@ -146,7 +146,8 @@ class GameField:
             break
         return l_row, l_col
 
-    def __check_ship_surrounding(self, orientation, shiplength, boat_row, boat_column):
+
+    def __check_ship_surrounding(self, orientation, ship_len, boat_row, boat_column):
         """
         Checks if the position of a new boat to be placed in the game field is valid:
             - boat is not too close to or crossing another boat,
@@ -155,11 +156,11 @@ class GameField:
             bool: True if the position is valid
         """
         if orientation == "vertical":
-            rows_to_check = range(boat_row - 1, boat_row + shiplength + 1)
+            rows_to_check = range(boat_row - 1, boat_row + ship_len + 1)
             cols_to_check = range(boat_column - 1, boat_column + 2)
         elif orientation == "horizontal":
             rows_to_check = range(boat_row - 1, boat_row + 2)
-            cols_to_check = range(boat_column - 1, boat_column + shiplength + 1)
+            cols_to_check = range(boat_column - 1, boat_column + ship_len + 1)
         else:
             return False  # Invalid orientation
 
@@ -180,26 +181,27 @@ class GameField:
 
         return True
 
-    def set_ship(self, shiplength):
+    def set_ship(self, ship_len, ship_type):
         """
         Asks the player for the start location and direction of a ship of the given length and sets it on the game field.
         """
         while True:
             # ask start location
             start_row, start_col = self.__get_row_and_column_input("Enter the start position for your ship (e.g. A1): ")
+            
             print("Enter the direction for your ship. Use your arrow Keys!")
             direction = get_arrow_key()
             # Bei up bzw left wird der Startpunkt zu boat_row bzw boat_column zu dem oberen bzw. linken punkt umgesetzt
             if direction == "up":
                 boat_column = start_col
-                boat_row = start_row - (shiplength - 1)
+                boat_row = start_row - (ship_len - 1)
                 orientation = "vertical"
             elif direction == "down":
                 boat_column = start_col
                 boat_row = start_row
                 orientation = "vertical"
             elif direction == "left":
-                boat_column = start_col - (shiplength - 1)
+                boat_column = start_col - (ship_len - 1)
                 boat_row = start_row
                 orientation = "horizontal"
             elif direction == "right":
@@ -224,10 +226,14 @@ class GameField:
                 break
 
         # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach recht
-        for i in range(shiplength):
-            self.__boatfield[boat_row + i if orientation == "vertical" else boat_row][
-                boat_column if orientation == "vertical" else boat_column + i
-            ] = 1
+        ship_position = []
+        for i in range(ship_len):
+            row = boat_row + i if orientation == "vertical" else boat_row
+            boat_column if orientation == "vertical" else boat_column + i
+
+            self.__boatfield[row][boat_column] = 1
+            ship_position.append([row, boat_column])
+        self.owner.add_ship(ship_type, ship_position)
 
     def attack_enemy(self, target):
         """
@@ -248,7 +254,7 @@ class GameField:
 
         # Otherwise, prompt the player to choose a position to attack
         else:
-            row, col = self.__get_row_and_column_input("Enter the atttacking position for your ship (e.g. A1): ")
+            row, col = self.__get_row_and_column_input("Enter the attacking position for your ship (e.g. A1): ")
 
         # Check if the attack hits a ship or not
         # And if it hits a ship, the player gets to attack again

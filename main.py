@@ -76,9 +76,10 @@ def refresh_console_lines(lines):
 
 def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
-    # start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
-    # sound_process = sound_helper.start(start_music_path)
-    
+    start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
+
+    sound_process = sound_helper.start(start_music_path)
+
     files = [
         os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
         for file in os.listdir(START_SCREEN_ANIMATION_PATH)
@@ -87,14 +88,22 @@ def start_screen():
 
     stop = False
     while stop is False:
-        if (keyboard.is_pressed("return")) or (keyboard.is_pressed("enter")) or (stop is True):
+        if (
+            (keyboard.is_pressed("return"))
+            or (keyboard.is_pressed("enter"))
+            or (stop is True)
+        ):
             stop = True
             break
 
         for frame in frames:
             string = read_file(frame)
             for line in string:
-                if keyboard.is_pressed("return") or (keyboard.is_pressed("enter")) or (stop is True):
+                if (
+                    keyboard.is_pressed("return")
+                    or (keyboard.is_pressed("enter"))
+                    or (stop is True)
+                ):
                     stop = True
                     break
                 print(
@@ -108,7 +117,9 @@ def start_screen():
             ind = 0
             while ind in range(40):
                 time.sleep(0.01)
-                if (keyboard.is_pressed("return") or (keyboard.is_pressed("enter"))) is True or (stop is True):
+                if (
+                    keyboard.is_pressed("return") or (keyboard.is_pressed("enter"))
+                ) is True or (stop is True):
                     stop = True
                     break
                 ind += 1
@@ -223,11 +234,15 @@ def load_game(save_name):
     obj_1 = player_list[0]
     obj_2 = player_list[1]
 
-    f_1 = GameField(Player(name=obj_1["name"], bot=obj_1["bot"]))
+    p_1 = Player(name=obj_1["name"], bot=obj_1["bot"])
+    p_1.set_ships(obj_1["ships"])
+    f_1 = GameField(p_1)
     f_1.set_boatfield(obj_1["boatfield"])
     f_1.set_hitfield(obj_1["hitfield"])
 
-    f_2 = GameField(Player(name=obj_2["name"], bot=obj_2["bot"]))
+    p_2 = Player(name=obj_2["name"], bot=obj_2["bot"])
+    p_2.set_ships(obj_2["ships"])
+    f_2 = GameField(p_2)
     f_2.set_boatfield(obj_2["boatfield"])
     f_2.set_hitfield(obj_2["hitfield"])
 
@@ -259,6 +274,7 @@ def save_game(save_name, last_turn_player, level):
             player_info = {
                 "name": obj.owner.get_player_name(),
                 "bot": obj.owner.get_bot(),
+                "ships": obj.owner.get_ships(),
                 "boatfield": obj.get_boatfield(),
                 "hitfield": obj.get_hitfield(),
             }
@@ -355,59 +371,69 @@ def start_up():
 # Gameplay funcs
 
 
-def place_all_ships(obj):
+def place_all_ships(obj, save_g, curr_lvl):
     """Regelt das plazieren aller Boote."""
-    if obj.owner.get_bot() is True:
-        # dann füll automatisch!
-        pass
-    battleship = 1
-    cruiser = 2
-    destroyer = 3
-    uboat = 4
+
+    ships = obj.owner.get_ships()
+
+    battleship = 1 - len(ships["battleship"])
+    cruiser = 2 - len(ships["cruiser"])
+    destroyer = 3 - len(ships["destroyer"])
+    uboat = 4 - len(ships["uboat"])
+
     while (battleship + cruiser + destroyer + uboat) != 0:
         obj.show_boatfield()
-        clear_input()
+
         print(
             f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
             f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
         )
-        current_boat_to_place = str(
-            input("Please type in the boats name, or the length of it: ")
-        ).lower()
+
+        if obj.owner.get_bot() is True:
+            # dann füll automatisch!
+            pass
+        else:
+            clear_input()
+            current_boat_to_place = str(
+                input("Please type in the boats name, or the length of it: ")
+            ).lower()
 
         match current_boat_to_place:
             case "2" | "u-boat" | "uboat":
                 if uboat > 0:
-                    obj.set_ship(2)
+                    obj.set_ship(2, "u-boat")
                     uboat -= 1
                 else:
                     print("You already placed all your U-Boats!")
             case "3" | "destroyer":
                 if destroyer > 0:
-                    obj.set_ship(3)
+                    obj.set_ship(3, "destroyer")
                     destroyer -= 1
                 else:
                     print("You already placed all your Destroyers!")
             case "4" | "cruiser":
                 if cruiser > 0:
-                    obj.set_ship(4)
+                    obj.set_ship(4, "cruiser")
                     cruiser -= 1
                 else:
                     print("You already placed all your Cruisers!")
             case "5" | "battleship":
                 if battleship > 0:
-                    obj.set_ship(5)
+                    obj.set_ship(5, "battleship")
                     battleship -= 1
                 else:
                     print("You already placed your Battleship!")
             case _:
                 clear_console()
                 print(f"{BOLD}{RED}Unknown Boat-Type.{RESET}")
+        save_game(save_g, player, curr_lvl)
 
+    clear_console()
+    obj.show_boatfield()
     input(
         "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!"
     )
-    obj.show_boatfield()
+    clear_console()
 
 
 def attack_execution(attacker, target):
@@ -432,7 +458,7 @@ if __name__ == "__main__":
             clear_console()
             print(f"Your Turn {player.owner.get_player_name()}!")
             save_game(save, player, current_level)
-            place_all_ships(player)
+            place_all_ships(player, save, current_level)
             player.show_boatfield()
             if index < len(players):
                 save_game(save, players[index + 1], current_level)
