@@ -18,6 +18,7 @@ sys.path.append(
 # pylint: disable=wrong-import-position
 from Library.file_helper import read_file
 from Library.keyboard_helper import clear_input
+from Library import sound_helper
 
 # pylint: enable=wrong-import-position
 
@@ -25,7 +26,8 @@ from Library.keyboard_helper import clear_input
 PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
 GAME_DATA_PATH = f"{PROJECT_PATH}/GameData"
 SAVE_GAMES_PATH = f"{GAME_DATA_PATH}/saves"
-START_SCREEN_ANIMATION_PATH = f"{GAME_DATA_PATH}/start_screen"
+START_SCREEN_ANIMATION_PATH = f"{GAME_DATA_PATH}/start_screen_animation"
+SOUND_PATH = f"{GAME_DATA_PATH}/sound"
 
 os.makedirs(SAVE_GAMES_PATH, exist_ok=True)
 
@@ -75,7 +77,8 @@ def refresh_console_lines(lines):
 
 def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
-
+    start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
+    sound_helper.start(start_music_path)
     files = [
         os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
         for file in os.listdir(START_SCREEN_ANIMATION_PATH)
@@ -111,6 +114,7 @@ def start_screen():
                 ind += 1
             clear_console()
     time.sleep(0.1)
+    sound_helper.stop(start_music_path)
     clear_input()
 
 
