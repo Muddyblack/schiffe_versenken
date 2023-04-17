@@ -44,65 +44,12 @@ NEGATIVE = "\033[7m"
 CROSSED = "\033[9m"
 RESET = "\033[0m"
 
+# Game System funcs
+
 
 def clear_console():
     """clearing the console"""
     os.system("cls" if os.name == "nt" else "clear")
-
-
-def place_all_ships(obj):
-    """Regelt das plazieren aller Boote."""
-    if obj.owner.get_bot() is True:
-        # dann füll automatisch!
-        pass
-    battleship = 1
-    cruiser = 2
-    destroyer = 3
-    uboat = 4
-    while (battleship + cruiser + destroyer + uboat) != 0:
-        obj.show_boatfield()
-        print(
-            f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
-            f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
-        )
-        current_boat_to_place = str(
-            input("Please type in the boats name, or the length of it: ")
-        )
-        current_boat_to_place.lower()
-
-        match current_boat_to_place:
-            case "2" | "u-boat" | "uboat":
-                if uboat > 0:
-                    obj.set_ship(2)
-                    uboat -= 1
-                else:
-                    print("You already placed all your U-Boats!")
-            case "3" | "destroyer":
-                if destroyer > 0:
-                    obj.set_ship(3)
-                    destroyer -= 1
-                else:
-                    print("You already placed all your Destroyers!")
-            case "4" | "cruiser":
-                if cruiser > 0:
-                    obj.set_ship(4)
-                    cruiser -= 1
-                else:
-                    print("You already placed all your Cruisers!")
-            case "5" | "battleship":
-                if battleship > 0:
-                    obj.set_ship(5)
-                    battleship -= 1
-                else:
-                    print("You already placed your Battleship!")
-            case _:
-                clear_console()
-                print(f"{BOLD}{RED}Unknown Boat-Type.{RESET}")
-
-    input(
-        "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!"
-    )
-    obj.show_boatfield()
 
 
 def refresh_console_lines(lines):
@@ -110,6 +57,36 @@ def refresh_console_lines(lines):
 
     sys.stdout.write("\033[K" * lines)
     sys.stdout.write("\033[F" * lines)
+
+
+def start_screen():
+    """Prints a beautiful ASCII-Logo for the game to the console"""
+    print(
+        rf"""{MAGENTA}
+    _           _   _   _           _     _       
+   | |         | | | | | |         | |   (_)      
+   | |__   __ _| |_| |_| | ___  ___| |__  _ _ __  
+   | '_ \ / _` | __| __| |/ _ \/ __| '_ \| | '_ \ 
+   | |_) | (_| | |_| |_| |  __/\__ \ | | | | |_) |
+   |_.__/ \__,_|\__|\__|_|\___||___/_| |_|_| .__/ 
+                                           | |    
+                                           |_|    
+                                   {BROWN}
+    {LIGHT_GRAY}
+                       _  _                 |-._
+                    -         - _           |-._|
+                 O                 (). _    |
+                                     '(_) __|__
+                                     [__|__|_|_]
+  ~~ _|_ _|_ _|_  ~~     ~~~          |__|__|_|
+   __ |   |   |       ~~      ~~~     |_|__|__|
+   HH_|___|___|__.--"  ~~~ ~~        /|__|__|_|
+  |__________.-"     ~~~~    ~~~    / |_|__|__|
+  ~     ~~ ~      ~~       ~~      /  |_| |___|
+     ~~~~    ~~~   ~~~~   ~   ~~  /    
+    jrei{RESET}
+    """
+    )
 
 
 def display_save_games(save_games, selected_save_game_index):
@@ -164,36 +141,6 @@ def select_savegame(save_games):
     selected = save_games[selected_save_game_index]
     print(f"Selected save game: {os.path.basename(selected)}\n")
     return selected
-
-
-def start_screen():
-    """Prints a beautiful ASCII-Logo for the game to the console"""
-    print(
-        rf"""{MAGENTA}
-    _           _   _   _           _     _       
-   | |         | | | | | |         | |   (_)      
-   | |__   __ _| |_| |_| | ___  ___| |__  _ _ __  
-   | '_ \ / _` | __| __| |/ _ \/ __| '_ \| | '_ \ 
-   | |_) | (_| | |_| |_| |  __/\__ \ | | | | |_) |
-   |_.__/ \__,_|\__|\__|_|\___||___/_| |_|_| .__/ 
-                                           | |    
-                                           |_|    
-                                   {BROWN}
-    {LIGHT_GRAY}
-                       _  _                 |-._
-                    -         - _           |-._|
-                 O                 (). _    |
-                                     '(_) __|__
-                                     [__|__|_|_]
-  ~~ _|_ _|_ _|_  ~~     ~~~          |__|__|_|
-   __ |   |   |       ~~      ~~~     |_|__|__|
-   HH_|___|___|__.--"  ~~~ ~~        /|__|__|_|
-  |__________.-"     ~~~~    ~~~    / |_|__|__|
-  ~     ~~ ~      ~~       ~~      /  |_| |___|
-     ~~~~    ~~~   ~~~~   ~   ~~  /    
-    jrei{RESET}
-    """
-    )
 
 
 def ask_name():
@@ -366,6 +313,64 @@ def start_up():
     return create__new_game()
 
 
+# Gameplay funcs
+
+
+def place_all_ships(obj):
+    """Regelt das plazieren aller Boote."""
+    if obj.owner.get_bot() is True:
+        # dann füll automatisch!
+        pass
+    battleship = 1
+    cruiser = 2
+    destroyer = 3
+    uboat = 4
+    while (battleship + cruiser + destroyer + uboat) != 0:
+        obj.show_boatfield()
+        print(
+            f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
+            f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
+        )
+        current_boat_to_place = str(
+            input("Please type in the boats name, or the length of it: ")
+        )
+        current_boat_to_place.lower()
+
+        match current_boat_to_place:
+            case "2" | "u-boat" | "uboat":
+                if uboat > 0:
+                    obj.set_ship(2)
+                    uboat -= 1
+                else:
+                    print("You already placed all your U-Boats!")
+            case "3" | "destroyer":
+                if destroyer > 0:
+                    obj.set_ship(3)
+                    destroyer -= 1
+                else:
+                    print("You already placed all your Destroyers!")
+            case "4" | "cruiser":
+                if cruiser > 0:
+                    obj.set_ship(4)
+                    cruiser -= 1
+                else:
+                    print("You already placed all your Cruisers!")
+            case "5" | "battleship":
+                if battleship > 0:
+                    obj.set_ship(5)
+                    battleship -= 1
+                else:
+                    print("You already placed your Battleship!")
+            case _:
+                clear_console()
+                print(f"{BOLD}{RED}Unknown Boat-Type.{RESET}")
+
+    input(
+        "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!"
+    )
+    obj.show_boatfield()
+
+
 def attack_execution(attacker, target):
     """Attacks the target and set target as new current_player"""
     attacker.attack_enemy(target)
@@ -376,6 +381,7 @@ def attack_execution(attacker, target):
     )
 
 
+# Game walkthrough
 if __name__ == "__main__":
     start = start_up()
     players = start["players"]
