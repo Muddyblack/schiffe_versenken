@@ -5,7 +5,8 @@ import gc
 import pickle
 import random
 import keyboard
-from Classes import game_field
+from Classes.game_field import GameField
+from Classes.player import Player
 
 #
 PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
@@ -43,89 +44,12 @@ NEGATIVE = "\033[7m"
 CROSSED = "\033[9m"
 RESET = "\033[0m"
 
+# Game System funcs
+
 
 def clear_console():
     """clearing the console"""
     os.system("cls" if os.name == "nt" else "clear")
-
-
-def place_all_ships(obj):
-    """Regelt das plazieren aller Boote."""
-    if obj.get_bot() is True:
-        # dann füll automatisch!
-        pass
-    battleship = 1
-    cruiser = 2
-    destroyer = 3
-    uboat = 4
-    while (battleship + cruiser + destroyer + uboat) != 0:
-        obj.show_boatfield()
-        print(
-            f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
-            f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
-        )
-        current_boat_to_place = str(
-            input("Please type in the boats name, or the length of it: ")
-        )
-        current_boat_to_place.lower()
-
-        match current_boat_to_place:
-            case "2" | "u-boat" | "uboat":
-                if uboat > 0:
-                    obj.set_ship(2)
-                    uboat -= 1
-                else:
-                    print("You already placed all your U-Boats!")
-            case "3" | "destroyer":
-                if destroyer > 0:
-                    obj.set_ship(3)
-                    destroyer -= 1
-                else:
-                    print("You already placed all your Destroyers!")
-            case "4" | "cruiser":
-                if cruiser > 0:
-                    obj.set_ship(4)
-                    cruiser -= 1
-                else:
-                    print("You already placed all your Cruisers!")
-            case "5" | "battleship":
-                if battleship > 0:
-                    obj.set_ship(5)
-                    battleship -= 1
-                else:
-                    print("You already placed your Battleship!")
-            case _:
-                clear_console()
-                print(f"{BOLD}{RED}Unknown Boat-Type.{RESET}")
-
-    input(
-        "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!"
-    )
-    obj.show_boatfield()
-
-
-def save_game(save_name, last_turn_player, level):
-    """Saves the current state of the game in a binary file format."""
-    player_list = []
-    game_info = {"last_turn_player": last_turn_player.get_player_name(), "level": level}
-
-    for obj in gc.get_objects():
-        if isinstance(obj, game_field.GameField):
-            player_info = {
-                "name": obj.get_player_name(),
-                "bot": obj.get_bot(),
-                "boatfield": obj.get_boatfield(),
-                "hitfield": obj.get_hitfield(),
-            }
-            player_list.append(player_info)
-
-    save_dir = f"{SAVE_GAMES_PATH}/{save_name}"
-    os.makedirs(save_dir, exist_ok=True)
-
-    with open(f"{save_dir}/players.obj", "wb") as obj:
-        pickle.dump(player_list, obj)
-    with open(f"{save_dir}/game.info", "wb") as obj:
-        pickle.dump(game_info, obj)
 
 
 def refresh_console_lines(lines):
@@ -133,6 +57,36 @@ def refresh_console_lines(lines):
 
     sys.stdout.write("\033[K" * lines)
     sys.stdout.write("\033[F" * lines)
+
+
+def start_screen():
+    """Prints a beautiful ASCII-Logo for the game to the console"""
+    print(
+        rf"""{MAGENTA}
+    _           _   _   _           _     _       
+   | |         | | | | | |         | |   (_)      
+   | |__   __ _| |_| |_| | ___  ___| |__  _ _ __  
+   | '_ \ / _` | __| __| |/ _ \/ __| '_ \| | '_ \ 
+   | |_) | (_| | |_| |_| |  __/\__ \ | | | | |_) |
+   |_.__/ \__,_|\__|\__|_|\___||___/_| |_|_| .__/ 
+                                           | |    
+                                           |_|    
+                                   {BROWN}
+    {LIGHT_GRAY}
+                       _  _                 |-._
+                    -         - _           |-._|
+                 O                 (). _    |
+                                     '(_) __|__
+                                     [__|__|_|_]
+  ~~ _|_ _|_ _|_  ~~     ~~~          |__|__|_|
+   __ |   |   |       ~~      ~~~     |_|__|__|
+   HH_|___|___|__.--"  ~~~ ~~        /|__|__|_|
+  |__________.-"     ~~~~    ~~~    / |_|__|__|
+  ~     ~~ ~      ~~       ~~      /  |_| |___|
+     ~~~~    ~~~   ~~~~   ~   ~~  /    
+    jrei{RESET}
+    """
+    )
 
 
 def display_save_games(save_games, selected_save_game_index):
@@ -189,36 +143,6 @@ def select_savegame(save_games):
     return selected
 
 
-def start_screen():
-    """Prints a beautiful ASCII-Logo for the game to the console"""
-    print(
-        rf"""{MAGENTA}
-    _           _   _   _           _     _       
-   | |         | | | | | |         | |   (_)      
-   | |__   __ _| |_| |_| | ___  ___| |__  _ _ __  
-   | '_ \ / _` | __| __| |/ _ \/ __| '_ \| | '_ \ 
-   | |_) | (_| | |_| |_| |  __/\__ \ | | | | |_) |
-   |_.__/ \__,_|\__|\__|_|\___||___/_| |_|_| .__/ 
-                                           | |    
-                                           |_|    
-                                   {BROWN}
-    {LIGHT_GRAY}
-                       _  _                 |-._
-                    -         - _           |-._|
-                 O                 (). _    |
-                                     '(_) __|__
-                                     [__|__|_|_]
-  ~~ _|_ _|_ _|_  ~~     ~~~          |__|__|_|
-   __ |   |   |       ~~      ~~~     |_|__|__|
-   HH_|___|___|__.--"  ~~~ ~~        /|__|__|_|
-  |__________.-"     ~~~~    ~~~    / |_|__|__|
-  ~     ~~ ~      ~~       ~~      /  |_| |___|
-     ~~~~    ~~~   ~~~~   ~   ~~  /    
-    jrei{RESET}
-    """
-    )
-
-
 def ask_name():
     """
     Asks the user to enter his name and checks if it is not empty or longer than 15 characters
@@ -245,6 +169,119 @@ def ask_name():
     return name
 
 
+def load_game(save_name):
+    """
+    Loads a saved game.
+
+    Returns:
+        -(tuple): two GameField instances and dictionary with game-infos
+    """
+    with open(f"{SAVE_GAMES_PATH}/{save_name}/players.obj", "rb") as playerpickle:
+        player_list = pickle.load(playerpickle)
+    with open(f"{SAVE_GAMES_PATH}/{save_name}/game.info", "rb") as playerpickle:
+        game_info = pickle.load(playerpickle)
+
+    last_turn_player = game_info["last_turn_player"]
+    level = game_info["level"]
+
+    obj_1 = player_list[0]
+    obj_2 = player_list[1]
+
+    f_1 = GameField(Player(name=obj_1["name"], bot=obj_1["bot"]))
+    f_1.set_boatfield(obj_1["boatfield"])
+    f_1.set_hitfield(obj_1["hitfield"])
+
+    f_2 = GameField(Player(name=obj_2["name"], bot=obj_2["bot"]))
+    f_2.set_boatfield(obj_2["boatfield"])
+    f_2.set_hitfield(obj_2["hitfield"])
+
+    if last_turn_player == f_1.owner.get_player_name():
+        fields = (f_1, f_2)
+    elif last_turn_player == f_2.owner.get_player_name():
+        fields = (f_2, f_1)
+    else:
+        # Coin flipping who will start the Game
+        starter = random.randint(0, 1)
+        if starter == 0:
+            fields = (f_1, f_2)
+        else:
+            fields = (f_2, f_1)
+
+    return {"players": fields, "save_name": save_name, "level": level}
+
+
+def save_game(save_name, last_turn_player, level):
+    """Saves the current state of the game in a binary file format."""
+    player_list = []
+    game_info = {
+        "last_turn_player": last_turn_player.owner.get_player_name(),
+        "level": level,
+    }
+
+    for obj in gc.get_objects():
+        if isinstance(obj, GameField):
+            player_info = {
+                "name": obj.owner.get_player_name(),
+                "bot": obj.owner.get_bot(),
+                "boatfield": obj.get_boatfield(),
+                "hitfield": obj.get_hitfield(),
+            }
+            player_list.append(player_info)
+
+    save_dir = f"{SAVE_GAMES_PATH}/{save_name}"
+    os.makedirs(save_dir, exist_ok=True)
+
+    with open(f"{save_dir}/players.obj", "wb") as obj:
+        pickle.dump(player_list, obj)
+    with open(f"{save_dir}/game.info", "wb") as obj:
+        pickle.dump(game_info, obj)
+
+
+def create__new_game():
+    """
+    Creates a new game.
+
+    Returns:
+        - (tuple): two GameField instances and dictionary with game-infos
+    """
+    print("Hello you decided to create a new Save-game")
+    save_name = (
+        f'{input("Enter the save name you wish to use: ").replace(" ", "_")}_save'
+    )
+    opponent = ""
+
+    p1_name = ask_name()
+    while opponent not in ("y", "n"):
+        opponent = (
+            input(
+                f"Hello, {p1_name}, would you like to play against a real person? [y/n] "
+            )
+            .lower()
+            .strip()
+        )
+
+    f_1 = GameField(Player(name=p1_name))
+
+    if opponent == "y":
+        while True:
+            p2_name = ask_name()
+            if p2_name != p1_name:
+                break
+            print("The other player already has this name!")
+        f_2 = GameField(Player(name=p2_name))
+    else:
+        f_2 = GameField(Player(bot=True))
+
+    # Coin flipping who will start the Game
+    starter = random.randint(0, 1)
+    if starter == 0:
+        fields = (f_1, f_2)
+    else:
+        fields = (f_2, f_1)
+
+    return {"players": fields, "save_name": save_name, "level": 0}
+
+
 def start_up():
     """
     Sets up the initial game environment
@@ -257,18 +294,13 @@ def start_up():
         representing the players. The value for the key "save_name" is a string representing the name of the save game.
     """
     start_screen()
-    p_1 = None
-    p_2 = None
-    save_name = None
-    last_turn_player = None
-
-    load = ""
     exist_game_saves = [
         f.name
         for f in os.scandir(SAVE_GAMES_PATH)
         if f.is_dir() and not f.is_file() and "_save" in f.name
     ]
 
+    load = ""
     if len(exist_game_saves) == 0:
         load = "n"
 
@@ -276,70 +308,67 @@ def start_up():
         load = input("Do you want to load an old save? [y/n]: ").lower().strip()
 
     if load == "y":
-        save_name = select_savegame(exist_game_saves)
+        return load_game(select_savegame(exist_game_saves))
 
-        with open(f"{SAVE_GAMES_PATH}/{save_name}/players.obj", "rb") as playerpickle:
-            player_list = pickle.load(playerpickle)
-        with open(f"{SAVE_GAMES_PATH}/{save_name}/game.info", "rb") as playerpickle:
-            game_info = pickle.load(playerpickle)
+    return create__new_game()
 
-        last_turn_player = game_info["last_turn_player"]
-        level = game_info["level"]
 
-        obj_1 = player_list[0]
-        obj_2 = player_list[1]
+# Gameplay funcs
 
-        p_1 = game_field.GameField(name=obj_1["name"], bot=obj_1["bot"])
-        p_1.set_boatfield(obj_1["boatfield"])
-        p_1.set_hitfield(obj_1["hitfield"])
 
-        p_2 = game_field.GameField(name=obj_2["name"], bot=obj_2["bot"])
-        p_2.set_boatfield(obj_2["boatfield"])
-        p_2.set_hitfield(obj_2["hitfield"])
-
-    else:
-        print("Hello you decided to create a new Save-game")
-        save_name = (
-            f'{input("    Enter the save-name you wish here: ").replace(" ", "_")}_save'
+def place_all_ships(obj):
+    """Regelt das plazieren aller Boote."""
+    if obj.owner.get_bot() is True:
+        # dann füll automatisch!
+        pass
+    battleship = 1
+    cruiser = 2
+    destroyer = 3
+    uboat = 4
+    while (battleship + cruiser + destroyer + uboat) != 0:
+        obj.show_boatfield()
+        print(
+            f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
+            f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
         )
-        opponent = ""
-        level = 0
+        current_boat_to_place = str(
+            input("Please type in the boats name, or the length of it: ")
+        )
+        current_boat_to_place.lower()
 
-        p1_name = ask_name()
-        while opponent not in ("y", "n"):
-            opponent = (
-                input(
-                    f"Hello, {p1_name} would you like to play against a real person? [y/n]"
-                )
-                .lower()
-                .strip()
-            )
+        match current_boat_to_place:
+            case "2" | "u-boat" | "uboat":
+                if uboat > 0:
+                    obj.set_ship(2)
+                    uboat -= 1
+                else:
+                    print("You already placed all your U-Boats!")
+            case "3" | "destroyer":
+                if destroyer > 0:
+                    obj.set_ship(3)
+                    destroyer -= 1
+                else:
+                    print("You already placed all your Destroyers!")
+            case "4" | "cruiser":
+                if cruiser > 0:
+                    obj.set_ship(4)
+                    cruiser -= 1
+                else:
+                    print("You already placed all your Cruisers!")
+            case "5" | "battleship":
+                if battleship > 0:
+                    obj.set_ship(5)
+                    battleship -= 1
+                else:
+                    print("You already placed your Battleship!")
+            case _:
+                clear_console()
+                print(f"{BOLD}{RED}Unknown Boat-Type.{RESET}")
 
-        p_1 = game_field.GameField(name=p1_name)
-
-        if opponent == "y":
-            while True:
-                p2_name = ask_name()
-                if p2_name != p1_name:
-                    break
-                print("The other player has already this name!")
-            p_2 = game_field.GameField(name=p2_name)
-        else:
-            p_2 = game_field.GameField(bot=True)
-
-    if last_turn_player == p_1.get_player_name():
-        return_players = [p_1, p_2]
-    elif last_turn_player == p_2.get_player_name():
-        return_players = [p_2, p_1]
-    else:
-        # Coin flipping who will start the Game
-        starter = random.randint(0, 1)
-        if starter == 0:
-            return_players = [p_1, p_2]
-        else:
-            return_players = [p_2, p_1]
-
-    return {"players": return_players, "save_name": save_name, "level": level}
+    input(
+        "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!"
+    )
+    obj.show_boatfield()
 
 
 def attack_execution(attacker, target):
@@ -352,6 +381,7 @@ def attack_execution(attacker, target):
     )
 
 
+# Game walkthrough
 if __name__ == "__main__":
     start = start_up()
     players = start["players"]
@@ -360,6 +390,7 @@ if __name__ == "__main__":
 
     if current_level == 0:
         for index, player in enumerate(players):
+            print(f"Your Turn {player.owner.get_player_name()}!")
             save_game(save, player, current_level)
             place_all_ships(player)
             player.show_boatfield()
@@ -374,8 +405,10 @@ if __name__ == "__main__":
 
     if current_level == 1:
         while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
+            print(f"Your Turn {player_1.owner.get_player_name()}!")
             attack_execution(player_1, player_2)
             save_game(save, players[0], current_level)
+            print(f"Your Turn {player_2.owner.get_player_name()}!")
             attack_execution(player_2, player_1)
             save_game(save, players[0], current_level)
 

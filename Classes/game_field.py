@@ -27,31 +27,23 @@ RESET = "\033[0m"
 
 class GameField:
     """
-    This class defines the game field, which holds information about the player, positions of ships and shots in the game.
+    This class defines the game field, which holds information about ships positions and shots in the game.
     It has several methods to display the field and modify the field with the addition of ships and shots.
     """
 
-    def __init__(self, bot=False, name="Player"):
+    def __init__(self, owner):
         random.seed(datetime.now().timestamp())
+
+        self.owner = owner
         self.__ships_left = 10
         self.__fsize = 10
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
         self.__boatfield = self.__hitfield
-
-        self.__bot = bot
         self.__botcache = []
-        if bot is True:
-            self.__player_name = "bot"
-        else:
-            self.__player_name = name
 
     # getter
-    def get_bot(self):
-        """Returns the bot instance."""
-        return self.__bot
-
     def get_boatfield(self):
         """Returns the boatfield matrix."""
         return self.__boatfield
@@ -59,10 +51,6 @@ class GameField:
     def get_hitfield(self):
         """Returns the hitfield matrix."""
         return self.__hitfield
-
-    def get_player_name(self):
-        """Returns the player's name."""
-        return self.__player_name
 
     def get_ships_left(self):
         """Returns the current living ships"""
@@ -229,7 +217,7 @@ class GameField:
             raise ValueError("You cannot attack yourself!")
 
         # If the player is a bot, randomly choose a position that has not been used before to attack
-        if self.__bot is True:
+        if self.owner.get_bot() is True:
             while True:
                 col = random.randint(0, self.__fsize - 1)
                 row = random.randint(0, self.__fsize - 1)
@@ -262,10 +250,3 @@ class GameField:
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
-
-
-if __name__ == "__main__":
-    x1 = GameField(name="Petra", bot=False)
-    x1.set_ship(5)
-    x1.set_ship(5)
-    x1.show_boatfield()
