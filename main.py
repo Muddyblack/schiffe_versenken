@@ -60,8 +60,8 @@ NEGATIVE = "\033[7m"
 CROSSED = "\033[9m"
 RESET = "\033[0m"
 
-# Game System funcs
 
+# Game System funcs
 def clear_console():
     """clearing the console"""
     os.system("cls" if os.name == "nt" else "clear")
@@ -76,8 +76,8 @@ def refresh_console_lines(lines):
 
 def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
-    start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
-    sound_process = sound_helper.start(start_music_path)
+    # start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
+    # sound_process = sound_helper.start(start_music_path)
     
     files = [
         os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
@@ -118,7 +118,7 @@ def start_screen():
 
             clear_console()
     time.sleep(0.1)
-    sound_helper.stop(sound_process)
+    # sound_helper.stop(sound_process)
     clear_input()
     clear_console()
 
