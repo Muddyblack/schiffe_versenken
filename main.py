@@ -129,6 +129,7 @@ def start_screen():
 
             clear_console()
     time.sleep(0.1)
+    sound_helper.stop(sound_process)
     # sound_helper.stop(sound_process)
     clear_input()
     clear_console()
