@@ -187,7 +187,7 @@ class GameField:
         """
         while True:
             # ask start location
-            start_row, start_col = get_row_and_column_input(f"Enter the start position for your ship {shiplength} long ship (e.g. A1): ")
+            start_row, start_col = get_row_and_column_input(f"Enter the start position for your ship (e.g. A1): ")
 
             print("Enter the direction for your ship. Use your arrow Keys!")
             direction = get_arrow_key()
