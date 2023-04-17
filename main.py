@@ -105,33 +105,6 @@ def place_all_ships(obj):
     obj.show_boatfield()
 
 
-def save_game(save_name, last_turn_player, level):
-    """Saves the current state of the game in a binary file format."""
-    player_list = []
-    game_info = {
-        "last_turn_player": last_turn_player.owner.get_player_name(),
-        "level": level,
-    }
-
-    for obj in gc.get_objects():
-        if isinstance(obj, GameField):
-            player_info = {
-                "name": obj.owner.get_player_name(),
-                "bot": obj.owner.get_bot(),
-                "boatfield": obj.get_boatfield(),
-                "hitfield": obj.get_hitfield(),
-            }
-            player_list.append(player_info)
-
-    save_dir = f"{SAVE_GAMES_PATH}/{save_name}"
-    os.makedirs(save_dir, exist_ok=True)
-
-    with open(f"{save_dir}/players.obj", "wb") as obj:
-        pickle.dump(player_list, obj)
-    with open(f"{save_dir}/game.info", "wb") as obj:
-        pickle.dump(game_info, obj)
-
-
 def refresh_console_lines(lines):
     """Clears the specified number of lines from the console output."""
 
@@ -249,6 +222,119 @@ def ask_name():
     return name
 
 
+def load_game(save_name):
+    """
+    Loads a saved game.
+
+    Returns:
+        -(tuple): two GameField instances and dictionary with game-infos
+    """
+    with open(f"{SAVE_GAMES_PATH}/{save_name}/players.obj", "rb") as playerpickle:
+        player_list = pickle.load(playerpickle)
+    with open(f"{SAVE_GAMES_PATH}/{save_name}/game.info", "rb") as playerpickle:
+        game_info = pickle.load(playerpickle)
+
+    last_turn_player = game_info["last_turn_player"]
+    level = game_info["level"]
+
+    obj_1 = player_list[0]
+    obj_2 = player_list[1]
+
+    f_1 = GameField(Player(name=obj_1["name"], bot=obj_1["bot"]))
+    f_1.set_boatfield(obj_1["boatfield"])
+    f_1.set_hitfield(obj_1["hitfield"])
+
+    f_2 = GameField(Player(name=obj_2["name"], bot=obj_2["bot"]))
+    f_2.set_boatfield(obj_2["boatfield"])
+    f_2.set_hitfield(obj_2["hitfield"])
+
+    if last_turn_player == f_1.owner.get_player_name():
+        fields = (f_1, f_2)
+    elif last_turn_player == f_2.owner.get_player_name():
+        fields = (f_2, f_1)
+    else:
+        # Coin flipping who will start the Game
+        starter = random.randint(0, 1)
+        if starter == 0:
+            fields = (f_1, f_2)
+        else:
+            fields = (f_2, f_1)
+
+    return {"players": fields, "save_name": save_name, "level": level}
+
+
+def save_game(save_name, last_turn_player, level):
+    """Saves the current state of the game in a binary file format."""
+    player_list = []
+    game_info = {
+        "last_turn_player": last_turn_player.owner.get_player_name(),
+        "level": level,
+    }
+
+    for obj in gc.get_objects():
+        if isinstance(obj, GameField):
+            player_info = {
+                "name": obj.owner.get_player_name(),
+                "bot": obj.owner.get_bot(),
+                "boatfield": obj.get_boatfield(),
+                "hitfield": obj.get_hitfield(),
+            }
+            player_list.append(player_info)
+
+    save_dir = f"{SAVE_GAMES_PATH}/{save_name}"
+    os.makedirs(save_dir, exist_ok=True)
+
+    with open(f"{save_dir}/players.obj", "wb") as obj:
+        pickle.dump(player_list, obj)
+    with open(f"{save_dir}/game.info", "wb") as obj:
+        pickle.dump(game_info, obj)
+
+
+def create__new_game():
+    """
+    Creates a new game.
+
+    Returns:
+        - (tuple): two GameField instances and dictionary with game-infos
+    """
+    print("Hello you decided to create a new Save-game")
+    save_name = (
+        f'{input("Enter the save name you wish to use: ").replace(" ", "_")}_save'
+    )
+    opponent = ""
+
+    p1_name = ask_name()
+    while opponent not in ("y", "n"):
+        opponent = (
+            input(
+                f"Hello, {p1_name}, would you like to play against a real person? [y/n] "
+            )
+            .lower()
+            .strip()
+        )
+
+    f_1 = GameField(Player(name=p1_name))
+
+    if opponent == "y":
+        while True:
+            p2_name = ask_name()
+            if p2_name != p1_name:
+                break
+            print("The other player already has this name!")
+        f_2 = GameField(Player(name=p2_name))
+    else:
+        f_2 = GameField(Player(bot=True))
+
+    # Coin flipping who will start the Game
+    starter = random.randint(0, 1)
+    if starter == 0:
+        fields = (f_1, f_2)
+    else:
+        fields = (f_2, f_1)
+
+    return {"players": fields, "save_name": save_name, "level": 0}
+
+
 def start_up():
     """
     Sets up the initial game environment
@@ -261,18 +347,13 @@ def start_up():
         representing the players. The value for the key "save_name" is a string representing the name of the save game.
     """
     start_screen()
-    p_1 = None
-    p_2 = None
-    save_name = None
-    last_turn_player = None
-
-    load = ""
     exist_game_saves = [
         f.name
         for f in os.scandir(SAVE_GAMES_PATH)
         if f.is_dir() and not f.is_file() and "_save" in f.name
     ]
 
+    load = ""
     if len(exist_game_saves) == 0:
         load = "n"
 
@@ -280,70 +361,9 @@ def start_up():
         load = input("Do you want to load an old save? [y/n]: ").lower().strip()
 
     if load == "y":
-        save_name = select_savegame(exist_game_saves)
+        return load_game(select_savegame(exist_game_saves))
 
-        with open(f"{SAVE_GAMES_PATH}/{save_name}/players.obj", "rb") as playerpickle:
-            player_list = pickle.load(playerpickle)
-        with open(f"{SAVE_GAMES_PATH}/{save_name}/game.info", "rb") as playerpickle:
-            game_info = pickle.load(playerpickle)
-
-        last_turn_player = game_info["last_turn_player"]
-        level = game_info["level"]
-
-        obj_1 = player_list[0]
-        obj_2 = player_list[1]
-
-        p_1 = GameField(Player(name=obj_1["name"], bot=obj_1["bot"]))
-        p_1.set_boatfield(obj_1["boatfield"])
-        p_1.set_hitfield(obj_1["hitfield"])
-
-        p_2 = GameField(Player(name=obj_2["name"], bot=obj_2["bot"]))
-        p_2.set_boatfield(obj_2["boatfield"])
-        p_2.set_hitfield(obj_2["hitfield"])
-
-    else:
-        print("Hello you decided to create a new Save-game")
-        save_name = (
-            f'{input("    Enter the save-name you wish here: ").replace(" ", "_")}_save'
-        )
-        opponent = ""
-        level = 0
-
-        p1_name = ask_name()
-        while opponent not in ("y", "n"):
-            opponent = (
-                input(
-                    f"Hello, {p1_name} would you like to play against a real person? [y/n]"
-                )
-                .lower()
-                .strip()
-            )
-
-        p_1 = GameField(Player(name=p1_name))
-
-        if opponent == "y":
-            while True:
-                p2_name = ask_name()
-                if p2_name != p1_name:
-                    break
-                print("The other player has already this name!")
-            p_2 = GameField(Player(name=p2_name))
-        else:
-            p_2 = GameField(Player(bot=True))
-
-    if last_turn_player == p_1.owner.get_player_name():
-        return_players = [p_1, p_2]
-    elif last_turn_player == p_2.owner.get_player_name():
-        return_players = [p_2, p_1]
-    else:
-        # Coin flipping who will start the Game
-        starter = random.randint(0, 1)
-        if starter == 0:
-            return_players = [p_1, p_2]
-        else:
-            return_players = [p_2, p_1]
-
-    return {"players": return_players, "save_name": save_name, "level": level}
+    return create__new_game()
 
 
 def attack_execution(attacker, target):
