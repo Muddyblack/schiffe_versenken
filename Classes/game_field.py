@@ -121,25 +121,24 @@ class GameField:
         Returns:
             bool: True if the position is valid
         """
-        for i in range(-1, shiplength + 1):
-            if orientation == "horizontal":
-                row = boat_row + i
-                col = boat_column - 1 + i
-            else:
-                row = boat_row - 1 + i
-                col = boat_column + i
-            if (
-                row < 0
-                or row >= len(self.__boatfield)
-                or col < 0
-                or col >= len(self.__boatfield[row])
-            ):
-                continue
-            if self.__boatfield[row][col] == 1:
-                print(
-                    "Not an allowed position. Your wanted Boat is too close or crossing another one!"
-                )
-                return False
+        if orientation == "vertical":
+            for i in range(-1, 1):
+                for j in range(shiplength + 2):
+                    checkfield = self.__boatfield[boat_row - 1 + j][boat_column + i]
+                    if checkfield == 1:
+                        print(
+                            "Not an allowed position. Your wantedBoat is too close or crossing another one!"
+                        )
+                        return False
+        elif orientation == "horizontal":
+            for i in range(-1, 1):
+                for j in range(shiplength + 2):
+                    checkfield = self.__boatfield[boat_row + i][boat_column - 1 + j]
+                    if checkfield == 1:
+                        print(
+                            "Not an allowed position. Your wanted Boat is too close or crossing another one!"
+                        )
+                        return False
         return True
 
     def set_ship(self, shiplength):
@@ -200,13 +199,13 @@ class GameField:
             )
 
             if valid:
-                # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach rechts
+                # Boot in Feld plazieren Entweder von oben nach unten, oder von links nach recht
                 if orientation == "vertical":
-                    self.__boatfield[boat_row : boat_row + shiplength, boat_column] = 1
-                else:
-                    self.__boatfield[
-                        boat_row, boat_column : boat_column + shiplength
-                    ] = 1
+                    for i in range(shiplength):
+                        self.__boatfield[boat_row + i][boat_column] = 1
+                elif orientation == "horizontal":
+                    for i in range(shiplength):
+                        self.__boatfield[boat_row][boat_column + i] = 1
                 break
 
     def attack_enemy(self, target):

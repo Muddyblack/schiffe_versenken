@@ -18,6 +18,7 @@ sys.path.append(
 # pylint: disable=wrong-import-position
 from Library.file_helper import read_file
 from Library.keyboard_helper import clear_input
+from Library import sound_helper
 
 # pylint: enable=wrong-import-position
 
@@ -25,7 +26,8 @@ from Library.keyboard_helper import clear_input
 PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
 GAME_DATA_PATH = f"{PROJECT_PATH}/GameData"
 SAVE_GAMES_PATH = f"{GAME_DATA_PATH}/saves"
-START_SCREEN_ANIMATION_PATH = f"{GAME_DATA_PATH}/start_screen"
+START_SCREEN_ANIMATION_PATH = f"{GAME_DATA_PATH}/start_screen_animation"
+SOUND_PATH = f"{GAME_DATA_PATH}/sound"
 
 os.makedirs(SAVE_GAMES_PATH, exist_ok=True)
 
@@ -75,7 +77,8 @@ def refresh_console_lines(lines):
 
 def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
-
+    start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
+    sound_process = sound_helper.start(start_music_path)
     files = [
         os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
         for file in os.listdir(START_SCREEN_ANIMATION_PATH)
@@ -111,6 +114,7 @@ def start_screen():
                 ind += 1
             clear_console()
     time.sleep(0.1)
+    sound_helper.stop(sound_process)
     clear_input()
 
 
@@ -363,8 +367,7 @@ def place_all_ships(obj):
         )
         current_boat_to_place = str(
             input("Please type in the boats name, or the length of it: ")
-        )
-        current_boat_to_place.lower()
+        ).lower()
 
         match current_boat_to_place:
             case "2" | "u-boat" | "uboat":
@@ -420,6 +423,7 @@ if __name__ == "__main__":
 
     if current_level == 0:
         for index, player in enumerate(players):
+            clear_console()
             print(f"Your Turn {player.owner.get_player_name()}!")
             save_game(save, player, current_level)
             place_all_ships(player)
