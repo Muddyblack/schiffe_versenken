@@ -25,20 +25,39 @@ RED = "\033[0;31m"
 RESET = "\033[0m"
 
 
-def get_row_and_column_input(user_input):
-    """Gets the User Input for Row and Column, handles A1 or 1A as input"""
-    try:
-        row = int(user_input[1:]) - 1
-        col = ascii_uppercase.index(user_input[0])
-    except ValueError:
+def get_row_and_column_input(text):
+    """Gets the Field the user puts in using the text given to it. Either in A1 or 1A format
+        returns: row, column
+    """
+    while True:
+        user_input = input(f"{text}")
         try:
-            row = int(user_input[0]) - 1
-            col = ascii_uppercase.index(user_input[1:])
-        except (IndexError, InterruptedError, ValueError):
+            t_row = int(user_input[1:]) - 1
+            t_col = int(ascii_uppercase.index(user_input[0].upper()))
+        except ValueError:
+            try:
+                # If the Array is three long, the Number in front might have three digits. If it doesnt, the throws
+                # an error
+                if len(user_input) == 3:
+                    t_row = int(user_input[:2]) - 1
+                    t_col = int(ascii_uppercase.index(user_input[3:].upper()))
+                else:
+                    t_row = int(user_input[0]) - 1
+                    t_col = int(ascii_uppercase.index(user_input[1:].upper()))
+            except (IndexError, InterruptedError, ValueError):
+                print("Not a valid Input! Please try again!")
+                continue
+        except (IndexError, InterruptedError):
             print("Not a valid Input! Please try again!")
-    except (IndexError, InterruptedError):
-        print("Not a valid Input! Please try again!")
-    return row, col
+            continue
+
+        # Checks for validility of the input
+        if (t_row | t_col < 0) or (9 < t_row | t_col):
+            print("Outside of the Field!")
+            continue
+        # if everyhting is okay, leave Loop
+        break
+    return t_row, t_col
 
 
 class GameField:
