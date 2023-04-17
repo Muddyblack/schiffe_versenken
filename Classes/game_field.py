@@ -137,8 +137,7 @@ class GameField:
             except (IndexError, InterruptedError):
                 print("Not a valid Input! Please try again!")
                 continue
-            print(f"l_row {l_row}")
-            print(f"l_col {l_col}")
+
             # Checks for validility of the input
             if l_row < 0 or l_col < 0 or (self.__fsize - 1) < l_row or (self.__fsize - 1) < l_col:
                 print("Outside of the Field!")
@@ -187,17 +186,13 @@ class GameField:
         """
         while True:
             # ask start location
-            start_row, start_col = self.__get_row_and_column_input(f"Enter the start position for your ship (e.g. A1): ")
-            print("Output of Input")
-            print(f"start_col: {start_row}")
-            print(f"start_row: {start_col}")
-
+            start_row, start_col = self.__get_row_and_column_input("Enter the start position for your ship (e.g. A1): ")
             print("Enter the direction for your ship. Use your arrow Keys!")
             direction = get_arrow_key()
             # Bei up bzw left wird der Startpunkt zu boat_row bzw boat_column zu dem oberen bzw. linken punkt umgesetzt
             if direction == "up":
                 boat_column = start_col
-                boat_row = (start_row - (shiplength - 1))
+                boat_row = start_row - (shiplength - 1)
                 orientation = "vertical"
             elif direction == "down":
                 boat_column = start_col
@@ -215,10 +210,6 @@ class GameField:
                 print("Invalid direction!")
                 continue
             print(direction)
-
-            print("After Reorientation and check ship surrounding")
-            print(f"boat_column: {boat_column}")
-            print(f"boat_row: {boat_row}")
 
             # check if ship fits on the board
             if orientation == "vertical" and (boat_row + shiplength) > self.__fsize\
