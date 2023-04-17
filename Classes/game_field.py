@@ -25,40 +25,6 @@ RED = "\033[0;31m"
 RESET = "\033[0m"
 
 
-def get_row_and_column_input(message):
-    """Gets the Field-Koordiantes the user puts in using the message given to it. input Either in A1 or 1A format
-    - returns: row, column
-    """
-    while True:
-        user_input = input(f"{message}")
-        try:
-            l_row = int(user_input[1:]) - 1
-            l_col = int(ascii_uppercase.index(user_input[0].upper()))
-        except ValueError:
-            try:
-                # If the Array is three long, the Number in front might have two digits
-                if len(user_input) == 3:
-                    l_row = int(user_input[:2]) - 1
-                    l_col = int(ascii_uppercase.index(user_input[3:].upper()))
-                else:
-                    l_row = int(user_input[0]) - 1
-                    l_col = int(ascii_uppercase.index(user_input[1:].upper()))
-            except (IndexError, InterruptedError, ValueError):
-                print("Not a valid Input! Please try again!")
-                continue
-        except (IndexError, InterruptedError):
-            print("Not a valid Input! Please try again!")
-            continue
-
-        # Checks for validility of the input
-        if (l_row | l_col < 0) or (9 < l_row | l_col):
-            print("Outside of the Field!")
-            continue
-        # if everyhting is okay, leave Loop
-        break
-    return l_row, l_col
-
-
 class GameField:
     """
     This class defines the game field, which holds information about ships positions and shots in the game.
@@ -147,6 +113,40 @@ class GameField:
         self.show_field(self.__hitfield)
 
     # Ship placement functions
+    def __get_row_and_column_input(self, message):
+        """Gets the Field-Coordiantes the user puts in using the message given to it. input Either in A1 or 1A format
+            - returns: row, column
+        """
+        while True:
+            user_input = input(f"{message}")
+            try:
+                l_row = int(user_input[1:]) - 1
+                l_col = int(ascii_uppercase.index(user_input[0].upper()))
+            except ValueError:
+                try:
+                    # If the Array is three long, the Number in front might have two digits
+                    if len(user_input) == 3:
+                        l_row = int(user_input[:2]) - 1
+                        l_col = int(ascii_uppercase.index(user_input[3:].upper()))
+                    else:
+                        l_row = int(user_input[0]) - 1
+                        l_col = int(ascii_uppercase.index(user_input[1:].upper()))
+                except (IndexError, InterruptedError, ValueError):
+                    print("Not a valid Input! Please try again!")
+                    continue
+            except (IndexError, InterruptedError):
+                print("Not a valid Input! Please try again!")
+                continue
+
+            # Checks for validility of the input
+            if l_row < 0 or l_col < 0 or (self.__fsize - 1) < l_row or (self.__fsize - 1) < l_col:
+                print("Outside of the Field!")
+                continue
+            # if everyhting is okay, leave Loop
+            break
+        return l_row, l_col
+
+
     def __check_ship_surrounding(self, orientation, ship_len, boat_row, boat_column):
         """
         Checks if the position of a new boat to be placed in the game field is valid:
@@ -187,14 +187,11 @@ class GameField:
         """
         while True:
             # ask start location
-            start_row, start_col = get_row_and_column_input(
-                f"Enter the start position for your ship (e.g. A1): "
-            )
-
+            start_row, start_col = self.__get_row_and_column_input("Enter the start position for your ship (e.g. A1): ")
+            
             print("Enter the direction for your ship. Use your arrow Keys!")
             direction = get_arrow_key()
-            # Bei up und down ist start und end_col gleich
-            # Bei right and left ist start und end_row gleich
+            # Bei up bzw left wird der Startpunkt zu boat_row bzw boat_column zu dem oberen bzw. linken punkt umgesetzt
             if direction == "up":
                 boat_column = start_col
                 boat_row = start_row - (ship_len - 1)
@@ -216,22 +213,15 @@ class GameField:
                 continue
             print(direction)
 
-            valid = self.__check_ship_surrounding(
-                orientation, ship_len, boat_row, boat_column
-            )
-
             # check if ship fits on the board
-            if (
-                boat_column + ship_len >= self.__fsize + 1
-                or boat_column < 0
-                or boat_row + ship_len >= self.__fsize + 1
-                or boat_row < 0
-            ):
-                print(
-                    "Ship does not fit on the board. Please choose a different start position or direction."
-                )
+            if orientation == "vertical" and (boat_row + shiplength) > self.__fsize\
+                    or orientation == "horizontal" and (boat_column + shiplength) > self.__fsize:
+                print("Ship does not fit on the board. Please choose a different start position or direction.")
                 continue
 
+            valid = self.__check_ship_surrounding(
+                orientation, shiplength, boat_row, boat_column
+            )
             if valid:
                 break
 
@@ -264,9 +254,7 @@ class GameField:
 
         # Otherwise, prompt the player to choose a position to attack
         else:
-            row, col = get_row_and_column_input(
-                "Enter the atttacking position for your ship (e.g. A1): "
-            )
+            row, col = self.__get_row_and_column_input("Enter the attacking position for your ship (e.g. A1): ")
 
         # Check if the attack hits a ship or not
         # And if it hits a ship, the player gets to attack again

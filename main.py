@@ -60,9 +60,8 @@ NEGATIVE = "\033[7m"
 CROSSED = "\033[9m"
 RESET = "\033[0m"
 
+
 # Game System funcs
-
-
 def clear_console():
     """clearing the console"""
     os.system("cls" if os.name == "nt" else "clear")
@@ -130,7 +129,7 @@ def start_screen():
 
             clear_console()
     time.sleep(0.1)
-    sound_helper.stop(sound_process)
+    # sound_helper.stop(sound_process)
     clear_input()
     clear_console()
 
