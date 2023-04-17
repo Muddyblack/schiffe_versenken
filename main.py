@@ -86,15 +86,15 @@ def start_screen():
     frames = sorted(files)
 
     stop = False
-    while True:
-        if (keyboard.is_pressed("enter")) or (stop is True):
+    while stop is False:
+        if (keyboard.is_pressed("return")) or (keyboard.is_pressed("enter")) or (stop is True):
             stop = True
             break
 
         for frame in frames:
             string = read_file(frame)
             for line in string:
-                if keyboard.is_pressed("enter") or (stop is True):
+                if keyboard.is_pressed("return") or (keyboard.is_pressed("enter")) or (stop is True):
                     stop = True
                     break
                 print(
@@ -108,10 +108,14 @@ def start_screen():
             ind = 0
             while ind in range(40):
                 time.sleep(0.01)
-                if keyboard.is_pressed("enter") or (stop is True):
+                if (keyboard.is_pressed("return") or (keyboard.is_pressed("enter"))) is True or (stop is True):
                     stop = True
                     break
                 ind += 1
+
+            if stop is True:
+                break
+
             clear_console()
     time.sleep(0.1)
     sound_helper.stop(sound_process)
