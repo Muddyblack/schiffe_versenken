@@ -367,8 +367,7 @@ def place_all_ships(obj):
         )
         current_boat_to_place = str(
             input("Please type in the boats name, or the length of it: ")
-        )
-        current_boat_to_place.lower()
+        ).lower()
 
         match current_boat_to_place:
             case "2" | "u-boat" | "uboat":
@@ -424,6 +423,7 @@ if __name__ == "__main__":
 
     if current_level == 0:
         for index, player in enumerate(players):
+            clear_console()
             print(f"Your Turn {player.owner.get_player_name()}!")
             save_game(save, player, current_level)
             place_all_ships(player)
