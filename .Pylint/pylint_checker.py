@@ -39,9 +39,16 @@ with open(SAVE_PATH, "w", encoding="utf8") as f:
 
 for file in FILEPATHS:
     try:
-        subprocess.run(
+        with subprocess.Popen(
             ["pylint", file, "--output-format=colorized", "--max-line-length=160"],
-            check=True,
-        )
+            stdin=subprocess.PIPE,
+        ) as process:
+            pass
+        # subprocess.run(["pylint", file, "--output-format=colorized", "--max-line-length=160"]
+        #    ,
+        #    check=True,
+        # )
     except subprocess.CalledProcessError as e:
         print(f"Error processing file '{file}': {e}")
+
+input("Hit any key to continue...")
