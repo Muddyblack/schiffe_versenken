@@ -136,7 +136,7 @@ def start_screen():
 
 
 def display_save_games(save_games, selected_save_game_index):
-    """DisplayS the list of save games with the currently selected save game highlighted"""
+    """Displays the list of save games with the currently selected save game highlighted"""
 
     for i in enumerate(save_games):
         game_name = os.path.basename(save_games[i[0]])
@@ -442,19 +442,21 @@ def place_all_ships(obj, save_g, curr_lvl):
     clear_console()
 
 
-def attack_execution(save, curr_lvl, attacker, target):
+def attack_execution(save_path, curr_lvl, attacker, target):
     """Attacks the target and set target as new current_player"""
     status = attacker.attack_enemy(target)
     if status:
         ## DELETE FILE
+        if os.path.exists(save_path):
+            os.rmdir(save_path)
         sys.exit()
     attacker.show_hitfield()
     target.show_boatfield()
+    save_game(save_path, target, curr_lvl)
+
     input(
         "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
     )
-
-    save_game(save, target, curr_lvl)
 
 
 # Game walkthrough
@@ -482,10 +484,22 @@ if __name__ == "__main__":
 
     if current_level == 1:
         while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
-            print(player_1.owner.get_ships())
             print(f"Your Turn {player_1.owner.get_player_name()}!")
-            attack_execution(save, current_level, player_1, player_2)
+            player_1.show_boatfield()
+            player_2.show_boatfield()
+            attack_execution(
+                save_path=save,
+                curr_lvl=current_level,
+                attacker=player_1,
+                target=player_2,
+            )
 
-            print(player_2.owner.get_ships())
-            print(f"Your Turn {player_1.owner.get_player_name()}!")
-            attack_execution(save, current_level, player_2, player_1)
+            print(f"Your Turn {player_2.owner.get_player_name()}!")
+            player_2.show_boatfield()
+            player_1.show_boatfield()
+            attack_execution(
+                save_path=save,
+                curr_lvl=current_level,
+                attacker=player_2,
+                target=player_1,
+            )

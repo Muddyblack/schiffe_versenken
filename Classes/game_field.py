@@ -110,7 +110,7 @@ class GameField:
         - returns: row, column
         """
         while True:
-            user_input = input(f"{message}")
+            user_input = input(f"{message}").strip()
             try:
                 l_row = int(user_input[1:]) - 1
                 l_col = int(ascii_uppercase.index(user_input[0].upper()))
@@ -269,14 +269,15 @@ class GameField:
         # And if it hits a ship, the player gets to attack again
         if target.get_boatfield()[row][col] == 1:
             print("Sir, we hitted an enemy target!")
-            self.__hitfield[row][col] = 1
+
+            self.set_hitfield_cell(row, col, 1)
             target.set_boatfield_cell(row, col, "X")
             target.owner.ships_after_attack((row, col))
+
             if target.owner.get_ship_amount() == 0:
                 print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
                 return True
-            #####
-            self.show_hitfield()
+
             print("You can attack a second time")
             self.attack_enemy(target)
 

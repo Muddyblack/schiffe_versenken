@@ -75,6 +75,7 @@ class Player:
         self.__ships[element].append(pos)
 
 
+"""
 if __name__ == "__main__":
     player = Player(name="Petra", bot=False)
     ships = {
@@ -94,3 +95,4 @@ if __name__ == "__main__":
     player.ships_after_attack((0, 0))
 
     print(player.get_ships())
+"""
