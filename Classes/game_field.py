@@ -18,6 +18,7 @@ sys.path.append(
 )
 # pylint: disable=wrong-import-position
 from Library.keyboard_helper import get_arrow_key
+# pylint: enable=wrong-import-position
 
 # anicode
 BLUE = "\033[0;34m"
@@ -113,11 +114,11 @@ class GameField:
         self.show_field(self.__hitfield)
 
     # Ship placement functions
-    def __get_row_and_column_input(self, message):
+    def __get_row_and_column_input(self, message, bot):
         """Gets the Field-Coordiantes the user puts in using the message given to it. input Either in A1 or 1A format
         - returns: row, column
         """
-        while True:
+        while not bot:
             user_input = input(f"{message}")
             try:
                 l_row = int(user_input[1:]) - 1
@@ -140,15 +141,18 @@ class GameField:
 
             # Checks for validility of the input
             if (
-                l_row < 0
-                or l_col < 0
-                or (self.__fsize - 1) < l_row
-                or (self.__fsize - 1) < l_col
+                    l_row < 0
+                    or l_col < 0
+                    or (self.__fsize - 1) < l_row
+                    or (self.__fsize - 1) < l_col
             ):
                 print("Outside of the Field!")
                 continue
             # if everyhting is okay, leave Loop
             break
+        if bot:
+            l_row = random.randint(0, self.__fsize - 1)
+            l_col = random.randint(0, self.__fsize - 1)
         return l_row, l_col
 
     def __check_ship_surrounding(self, orientation, ship_len, boat_row, boat_column):
@@ -171,10 +175,10 @@ class GameField:
         for row in rows_to_check:
             for col in cols_to_check:
                 if (
-                    row < 0
-                    or row >= len(self.__boatfield)
-                    or col < 0
-                    or col >= len(self.__boatfield[0])
+                        row < 0
+                        or row >= len(self.__boatfield)
+                        or col < 0
+                        or col >= len(self.__boatfield[0])
                 ):
                     continue  # Ignore out-of-bounds cells
                 if self.__boatfield[row][col] == 1:
@@ -185,18 +189,26 @@ class GameField:
 
         return True
 
-    def set_ship(self, ship_len, ship_type):
+    def set_ship(self, ship_len, ship_type, is_bot):
         """
         Asks the player for the start location and direction of a ship of the given length and sets it on the game field.
         """
         while True:
             # ask start location
             start_row, start_col = self.__get_row_and_column_input(
-                "Enter the start position for your ship (e.g. A1): "
+                "Enter the start position for your ship (e.g. A1): ", is_bot
             )
+            if not is_bot:
+                print("Enter the direction for your ship. Use your arrow Keys!")
+                direction = get_arrow_key()
+            else:
+                match int(random.randint(0, 3)):
+                    case 0: direction = "up"
+                    case 1: direction = "down"
+                    case 2: direction = "left"
+                    case 3: direction = "right"
+                    case _: direction = "Unknown direction"
 
-            print("Enter the direction for your ship. Use your arrow Keys!")
-            direction = get_arrow_key()
             # Bei up bzw left wird der Startpunkt zu boat_row bzw boat_column zu dem oberen bzw. linken punkt umgesetzt
             if direction == "up":
                 boat_column = start_col
@@ -220,19 +232,19 @@ class GameField:
             print(direction)
 
             # check if ship fits on the board
+            # Is needed to reliably check if the Boat fits on the board
+            # pylint: disable=too-many-boolean-expressions
             if (
-                (orientation == "vertical" and (boat_row + ship_len) > self.__fsize)
-                or (
-                    orientation == "horizontal"
-                    and (boat_column + ship_len) > self.__fsize
-                )
-                or boat_row < 0
-                or boat_column < 0
+                    (orientation == "vertical" and (boat_row + ship_len) > self.__fsize)
+                    or (orientation == "horizontal" and (boat_column + ship_len) > self.__fsize)
+                    or boat_row < 0
+                    or boat_column < 0
             ):
                 print(
                     "Ship does not fit on the board. Please choose a different start position or direction."
                 )
                 continue
+            # pylint: enable=too-many-boolean-expressions
 
             valid = self.__check_ship_surrounding(
                 orientation, ship_len, boat_row, boat_column
@@ -260,17 +272,15 @@ class GameField:
         # If the player is a bot, randomly choose a position that has not been used before to attack
         if self.owner.get_bot() is True:
             while True:
-                col = random.randint(0, self.__fsize - 1)
-                row = random.randint(0, self.__fsize - 1)
+                row, col = self.__get_row_and_column_input("Bot", True)
 
                 if [col, row] not in self.__botcache:
                     self.__botcache.append([col, row])
                     break
-
         # Otherwise, prompt the player to choose a position to attack
         else:
             row, col = self.__get_row_and_column_input(
-                "Enter the attacking position for your ship (e.g. A1): "
+                "Enter the attacking position for your ship (e.g. A1): ", False
             )
 
         # Check if the attack hits a ship or not
