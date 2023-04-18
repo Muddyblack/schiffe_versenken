@@ -34,7 +34,9 @@ class Player:
         """Returns the amount of ships the player currently has"""
         index = 0
         for key in self.__ships:
-            index += len(key)
+            print(key)
+            index += len(self.__ships[key])
+
         return index
 
     # setter
@@ -66,8 +68,10 @@ class Player:
             if breaking:
                 break
 
-        if ():
-            pass
+        if self.get_ship_amount() is True:
+            return True
+
+        return False
 
     def add_ship(self, element, pos):
         """Sets the ship's dictionary."""

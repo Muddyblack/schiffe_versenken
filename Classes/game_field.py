@@ -5,18 +5,10 @@ This module requires the following external libraries to be installed:
     - keyboard
 
 """
-import sys
-import os
 from string import ascii_uppercase
 from datetime import datetime
 import random
 
-sys.path.append(
-    os.path.abspath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
-    )
-)
-# pylint: disable=wrong-import-position
 from Library.keyboard_helper import get_arrow_key
 
 # anicode
