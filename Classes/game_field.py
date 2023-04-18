@@ -16,6 +16,7 @@ from Library.print_helper import print_side_by_side
 # anicode
 BLUE = "\033[0;34m"
 RED = "\033[0;31m"
+LIGHT_GREEN = "\033[1;32m"
 RESET = "\033[0m"
 
 
@@ -91,6 +92,8 @@ class GameField:
                     color = BLUE
                 elif row == "X":
                     color = RED
+                elif row == "o":
+                    color = LIGHT_GREEN
                 else:
                     color = RESET
                 txt += color + str(row) + " "
@@ -281,17 +284,19 @@ class GameField:
 
             self.set_hitfield_cell(row, col, 1)
             target.set_boatfield_cell(row, col, "X")
-            target.owner.ships_after_attack((row, col))
+            target.owner.ships_after_attack([row, col])
 
             if target.owner.get_ship_amount() == 0:
                 print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
                 return True
 
             print("You can attack a second time")
-            self.attack_enemy(target)
+            return self.attack_enemy(target)
 
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
+            self.set_hitfield_cell(row, col, "o")
+
         return False

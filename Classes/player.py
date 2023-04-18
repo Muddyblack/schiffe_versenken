@@ -73,26 +73,3 @@ class Player:
     def add_ship(self, element, pos):
         """Sets the ship's dictionary."""
         self.__ships[element].append(pos)
-
-
-"""
-if __name__ == "__main__":
-    player = Player(name="Petra", bot=False)
-    ships = {
-        "battleship": [[(0, 0), (0, 1)], [(10, 0), (10, 1)]],
-        "cruiser": [[(1, 1)]],
-        "destroyer": [[(2, 2)]],
-        "uboat": [[(3, 3)]],
-    }
-    shipsb = {
-        "battleship": [[(1, 1)]],
-        "cruiser": [[(0, 0)]],
-        "destroyer": [],
-        "uboat": [],
-    }
-    player.set_ships(shipsb)
-    player.ships_after_attack((1, 1))
-    player.ships_after_attack((0, 0))
-
-    print(player.get_ships())
-"""

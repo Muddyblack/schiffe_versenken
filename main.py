@@ -1,6 +1,7 @@
 """This is the main module where the entire game logic gets merged"""
 import os
 import sys
+import shutil
 import gc
 import pickle
 import random
@@ -441,23 +442,27 @@ def place_all_ships(obj, save_g, curr_lvl):
     clear_console()
 
 
-def attack_execution(save_path, curr_lvl, attacker, target):
+def attack_execution(save_name, curr_lvl, attacker, target):
     """Attacks the target and set target as new current_player"""
     status = attacker.attack_enemy(target)
-    if status:
-        ## DELETE FILE
+    print("Status:", status)
+    if status is True:
+        ## DELETE FILE when game ends
+        save_path = f"{SAVE_GAMES_PATH}/{save_name}"
         if os.path.exists(save_path):
-            os.rmdir(save_path)
+            print(
+                f"---------------------------------------------DELETE{save_name}\n---------------------------------------------"
+            )
+            shutil.rmtree(save_path)
         sys.exit()
-    attacker.show_hitfield()
-    target.show_boatfield()
-    save_game(save_path, target, curr_lvl)
+    else:
+        attacker.show_boatfield()
+        attacker.show_hitfield()
+        save_game(save_path, target, curr_lvl)
 
-    print(target.owner.get_ships())
-
-    input(
-        "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
-    )
+        input(
+            "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
+        )
 
 
 # Game walkthrough
@@ -489,11 +494,9 @@ if __name__ == "__main__":
             print(f"{RED}Your Turn {player_1.owner.get_player_name()}!{RESET}")
             player_1.show_boatfield()
             player_1.show_hitfield()
-            print("Enemy: \n")
-            player_2.show_boatfield()
 
             attack_execution(
-                save_path=save,
+                save_name=save,
                 curr_lvl=current_level,
                 attacker=player_1,
                 target=player_2,
@@ -503,10 +506,8 @@ if __name__ == "__main__":
             print(f"{RED}Your Turn {player_2.owner.get_player_name()}!{RESET}")
             player_2.show_boatfield()
             player_2.show_hitfield()
-            print("Enemy: \n")
-            player_1.show_boatfield()
             attack_execution(
-                save_path=save,
+                save_name=save,
                 curr_lvl=current_level,
                 attacker=player_2,
                 target=player_1,
