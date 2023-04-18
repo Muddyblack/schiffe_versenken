@@ -10,6 +10,7 @@ from datetime import datetime
 import random
 
 from Library.keyboard_helper import get_arrow_key
+from Library.print_helper import print_side_by_side
 
 # anicode
 BLUE = "\033[0;34m"
@@ -32,7 +33,9 @@ class GameField:
         self.__hitfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
-        self.__boatfield = self.__hitfield
+        self.__boatfield = [
+            [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
+        ]
         self.__botcache = []
 
     # getter
@@ -70,21 +73,20 @@ class GameField:
         self.__ships_left = value
 
     # Show Field Functions
-    def show_field(self, fieldtype):
+    def get_field_text(self, fieldtype):
         """
-        Prints Field with Postion Indictaros at the top and left, like A1, B10, etc.
+        Returns string of Field with Postion Indictaros at the top and left, like A1, B10, etc.
         """
 
-        print(" " * (len(str(self.__fsize)) + 2), end="")
+        txt = " " * (len(str(self.__fsize)) + 2)
         for elem in range(self.__fsize):
-            print(f"{ascii_uppercase[elem]}", end=" ")
-        print("\n")
+            txt += f"{ascii_uppercase[elem]} "
+        txt += "\n"
 
         for num, line in enumerate(fieldtype, 1):
-            print(f"{num}", end="   ")
-
+            txt += f"{num}   "
             if len(str(num)) > 1:
-                print("\b" * (len(str(num)) - 1), end="")
+                txt += "\b" * (len(str(num)) - 1)
             for row in line:
                 if row == 1:
                     color = BLUE
@@ -92,17 +94,25 @@ class GameField:
                     color = RED
                 else:
                     color = RESET
-                print(color + str(row), end=" ")
-            print(RESET)
-        print(RED + "owner: " + self.owner.get_player_name() + RESET + "\n")
+                txt += color + str(row) + " "
+            txt += RESET + "\n"
+        txt += RED + "owner: " + self.owner.get_player_name() + RESET + "\n"
+        return txt
 
     def show_boatfield(self):
         """Prints the boatfield matrix."""
-        self.show_field(self.__boatfield)
+        print(self.get_field_text(self.__boatfield))
 
     def show_hitfield(self):
         """Prints the hitfield matrix."""
-        self.show_field(self.__hitfield)
+        print(self.get_field_text(self.__hitfield))
+
+    def show_fields_side_by_side(self):
+        """Should print the boatfield and the hitfield matrix side by side."""
+        print_side_by_side(
+            self.get_field_text(self.__boatfield),
+            self.get_field_text(self.__hitfield),
+        )
 
     # Ship placement functions
     def __get_row_and_column_input(self, message):
