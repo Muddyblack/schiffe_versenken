@@ -10,7 +10,7 @@ from main import place_all_ships
 import unittest
 from hypothesis import given
 import hypothesis.strategies as st
-from Classes.game_field import GameField
+from Classes.player import Player
 
 
 #@given(st.one_of(st.text() or st.integers(min_value=1, max_value=4)))
@@ -18,7 +18,12 @@ from Classes.game_field import GameField
 #    boat = current_boat_to_place
 #    assert boat == "battleship" or "1" or "cruiser" or "2" or "destroyer" or "3" or "uboat" or "4"
 
-@given(st.builds(GameField))
-def test_place_all_ships(player):
-    place_all_ships(player)
-    assert player.are_all_ships_placed()
+
+class TestPlaceAllShips(unittest.TestCase):
+    @given(st.builds(Player))
+    def test_place_all_ships(player):  #self, player
+        place_all_ships(player)
+        assert player.are_all_ships_placed()
+
+if __name__ == '__main__':
+    unittest.main()
