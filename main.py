@@ -442,14 +442,19 @@ def place_all_ships(obj, save_g, curr_lvl):
     clear_console()
 
 
-def attack_execution(attacker, target):
+def attack_execution(save, curr_lvl, attacker, target):
     """Attacks the target and set target as new current_player"""
-    attacker.attack_enemy(target)
+    status = attacker.attack_enemy(target)
+    if status:
+        ## DELETE FILE
+        sys.exit()
     attacker.show_hitfield()
     target.show_boatfield()
     input(
         "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
     )
+
+    save_game(save, target, curr_lvl)
 
 
 # Game walkthrough
@@ -479,12 +484,8 @@ if __name__ == "__main__":
         while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
             print(player_1.owner.get_ships())
             print(f"Your Turn {player_1.owner.get_player_name()}!")
-            attack_execution(player_1, player_2)
+            attack_execution(save, current_level, player_1, player_2)
 
-            save_game(save, player_2, current_level)
             print(player_2.owner.get_ships())
             print(f"Your Turn {player_1.owner.get_player_name()}!")
-            attack_execution(player_2, player_1)
-            save_game(save, player_1, current_level)
-
-    current_level += 1
+            attack_execution(save, current_level, player_2, player_1)

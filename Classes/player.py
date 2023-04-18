@@ -70,13 +70,6 @@ class Player:
             if breaking:
                 break
 
-        """
-        if self.get_ship_amount() == 0:
-            print("All enemy ships have been destroyed.")
-            print(f"Congratulations {self.get_player_name()}")
-            return True
-        """
-
     def add_ship(self, element, pos):
         """Sets the ship's dictionary."""
         self.__ships[element].append(pos)
