@@ -34,12 +34,15 @@ class Player:
         """Returns the amount of ships the player currently has"""
         index = 0
         for key in self.__ships:
-            index += len(key)
+            index += len(self.__ships[key])
+
         return index
 
     # setter
     def set_bot(self, value):
         """Sets the bot instance."""
+        if not isinstance(value, bool):
+            raise ValueError("Only accepts boolean")
         self.__bot = value
 
     def set_player_name(self, name):
@@ -49,6 +52,23 @@ class Player:
     def set_ships(self, value):
         """Sets the ship's dictionary."""
         self.__ships = value
+
+    def ships_after_attack(self, target_cell):
+        """Removes hitted cells from ships and checks if there is still something left to play"""
+        breaking = False
+        for key in self.__ships:
+            for ship_ind, ship in enumerate(self.__ships[key]):
+                if target_cell in ship:
+                    self.__ships[key][ship_ind].remove(target_cell)
+                    if len(self.__ships[key][ship_ind]) == 0:
+                        self.__ships[key] = [x for x in self.__ships[key] if x != []]
+                        print(f"{key} got Destroyed")
+                else:
+                    continue
+                breaking = True
+                break
+            if breaking:
+                break
 
     def add_ship(self, element, pos):
         """Sets the ship's dictionary."""

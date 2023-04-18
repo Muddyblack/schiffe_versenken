@@ -1,6 +1,7 @@
 """This is the main module where the entire game logic gets merged"""
 import os
 import sys
+import shutil
 import gc
 import pickle
 import random
@@ -135,7 +136,7 @@ def start_screen():
 
 
 def display_save_games(save_games, selected_save_game_index):
-    """DisplayS the list of save games with the currently selected save game highlighted"""
+    """Displays the list of save games with the currently selected save game highlighted"""
 
     for i in enumerate(save_games):
         game_name = os.path.basename(save_games[i[0]])
@@ -397,6 +398,7 @@ def place_all_ships(obj, save_g, curr_lvl):
     uboat = 4 - len(ships["uboat"])
 
     while (battleship + cruiser + destroyer + uboat) != 0:
+
         is_bot = obj.owner.get_bot
         if is_bot is False:
             obj.show_boatfield()
@@ -405,6 +407,7 @@ def place_all_ships(obj, save_g, curr_lvl):
                 f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
                 f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
             )
+
             clear_input()
             current_boat_to_place = str(
                    input("Please type in the boats name, or the length of it: ")
@@ -416,7 +419,8 @@ def place_all_ships(obj, save_g, curr_lvl):
         match current_boat_to_place:
             case "2" | "u-boat" | "uboat":
                 if uboat > 0:
-                    obj.set_ship(2, "u-boat", is_bot)
+                    obj.set_ship(2, "uboat")
+
                     uboat -= 1
                 else:
                     print("You already placed all your U-Boats!")
@@ -451,14 +455,27 @@ def place_all_ships(obj, save_g, curr_lvl):
     clear_console()
 
 
-def attack_execution(attacker, target):
+def attack_execution(save_name, curr_lvl, attacker, target):
     """Attacks the target and set target as new current_player"""
-    attacker.attack_enemy(target)
-    attacker.show_hitfield()
-    target.show_boatfield()
-    input(
-        "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
-    )
+    status = attacker.attack_enemy(target)
+    print("Status:", status)
+    if status is True:
+        ## DELETE FILE when game ends
+        save_path = f"{SAVE_GAMES_PATH}/{save_name}"
+        if os.path.exists(save_path):
+            print(
+                f"---------------------------------------------DELETE{save_name}\n---------------------------------------------"
+            )
+            shutil.rmtree(save_path)
+        sys.exit()
+    else:
+        attacker.show_boatfield()
+        attacker.show_hitfield()
+        save_game(save_path, target, curr_lvl)
+
+        input(
+            "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
+        )
 
 
 # Game walkthrough
@@ -471,11 +488,11 @@ if __name__ == "__main__":
     if current_level == 0:
         for index, player in enumerate(players):
             clear_console()
-            print(f"Your Turn {player.owner.get_player_name()}!")
+            print(f"{RED}Your Turn {player.owner.get_player_name()}!{RESET}")
             save_game(save, player, current_level)
             place_all_ships(player, save, current_level)
             player.show_boatfield()
-            if index < len(players):
+            if index < len(players) - 1:
                 save_game(save, players[index + 1], current_level)
             else:
                 save_game(save, players[0], current_level)
@@ -486,11 +503,25 @@ if __name__ == "__main__":
 
     if current_level == 1:
         while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
-            print(f"Your Turn {player_1.owner.get_player_name()}!")
-            attack_execution(player_1, player_2)
-            save_game(save, players[0], current_level)
-            print(f"Your Turn {player_2.owner.get_player_name()}!")
-            attack_execution(player_2, player_1)
-            save_game(save, players[0], current_level)
+            clear_console()
+            print(f"{RED}Your Turn {player_1.owner.get_player_name()}!{RESET}")
+            player_1.show_boatfield()
+            player_1.show_hitfield()
 
-    current_level += 1
+            attack_execution(
+                save_name=save,
+                curr_lvl=current_level,
+                attacker=player_1,
+                target=player_2,
+            )
+
+            clear_console()
+            print(f"{RED}Your Turn {player_2.owner.get_player_name()}!{RESET}")
+            player_2.show_boatfield()
+            player_2.show_hitfield()
+            attack_execution(
+                save_name=save,
+                curr_lvl=current_level,
+                attacker=player_2,
+                target=player_1,
+            )
