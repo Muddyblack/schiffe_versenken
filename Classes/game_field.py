@@ -271,6 +271,7 @@ class GameField:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
             target.set_boatfield_cell(row, col, "X")
+            
             #####
             self.show_hitfield()
             print("You can attack a second time")

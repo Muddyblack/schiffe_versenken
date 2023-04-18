@@ -34,7 +34,6 @@ class Player:
         """Returns the amount of ships the player currently has"""
         index = 0
         for key in self.__ships:
-            print(key)
             index += len(self.__ships[key])
 
         return index
@@ -42,6 +41,8 @@ class Player:
     # setter
     def set_bot(self, value):
         """Sets the bot instance."""
+        if not isinstance(value, bool):
+            raise ValueError("Only accepts boolean")
         self.__bot = value
 
     def set_player_name(self, name):
@@ -54,13 +55,14 @@ class Player:
 
     def ships_after_attack(self, target_cell):
         """Removes hitted cells from ships and checks if there is still something left to play"""
+        breaking = False
         for key in self.__ships:
-            for ship in key:
-                if len(ship) == 0:
-                    print("SHip Destroyed")
-                    key.remove(ship)
-                elif target_cell in ship:
-                    ship.remove(target_cell)
+            for ship_ind, ship in enumerate(self.__ships[key]):
+                if target_cell in ship:
+                    self.__ships[key][ship_ind].remove(target_cell)
+                    if len(self.__ships[key][ship_ind]) == 0:
+                        self.__ships[key] = [x for x in self.__ships[key] if x != []]
+                        print(f"{key} got Destroyed")
                 else:
                     continue
                 breaking = True
@@ -68,11 +70,34 @@ class Player:
             if breaking:
                 break
 
-        if self.get_ship_amount() is True:
+        """
+        if self.get_ship_amount() == 0:
+            print("All enemy ships have been destroyed.")
+            print(f"Congratulations {self.get_player_name()}")
             return True
-
-        return False
+        """
 
     def add_ship(self, element, pos):
         """Sets the ship's dictionary."""
         self.__ships[element].append(pos)
+
+
+if __name__ == "__main__":
+    player = Player(name="Petra", bot=False)
+    ships = {
+        "battleship": [[(0, 0), (0, 1)], [(10, 0), (10, 1)]],
+        "cruiser": [[(1, 1)]],
+        "destroyer": [[(2, 2)]],
+        "uboat": [[(3, 3)]],
+    }
+    shipsb = {
+        "battleship": [[(1, 1)]],
+        "cruiser": [[(0, 0)]],
+        "destroyer": [],
+        "uboat": [],
+    }
+    player.set_ships(shipsb)
+    player.ships_after_attack((1, 1))
+    player.ships_after_attack((0, 0))
+
+    print(player.get_ships())
