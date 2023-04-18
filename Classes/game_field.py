@@ -101,7 +101,7 @@ class GameField:
                 else:
                     color = RESET
                 print(color + str(row), end=" ")
-            print("")
+            print(RESET)
         print("\n")
 
     def show_boatfield(self):
@@ -115,7 +115,7 @@ class GameField:
     # Ship placement functions
     def __get_row_and_column_input(self, message):
         """Gets the Field-Coordiantes the user puts in using the message given to it. input Either in A1 or 1A format
-            - returns: row, column
+        - returns: row, column
         """
         while True:
             user_input = input(f"{message}")
@@ -139,13 +139,17 @@ class GameField:
                 continue
 
             # Checks for validility of the input
-            if l_row < 0 or l_col < 0 or (self.__fsize - 1) < l_row or (self.__fsize - 1) < l_col:
+            if (
+                l_row < 0
+                or l_col < 0
+                or (self.__fsize - 1) < l_row
+                or (self.__fsize - 1) < l_col
+            ):
                 print("Outside of the Field!")
                 continue
             # if everyhting is okay, leave Loop
             break
         return l_row, l_col
-
 
     def __check_ship_surrounding(self, orientation, ship_len, boat_row, boat_column):
         """
@@ -187,8 +191,10 @@ class GameField:
         """
         while True:
             # ask start location
-            start_row, start_col = self.__get_row_and_column_input("Enter the start position for your ship (e.g. A1): ")
-            
+            start_row, start_col = self.__get_row_and_column_input(
+                "Enter the start position for your ship (e.g. A1): "
+            )
+
             print("Enter the direction for your ship. Use your arrow Keys!")
             direction = get_arrow_key()
             # Bei up bzw left wird der Startpunkt zu boat_row bzw boat_column zu dem oberen bzw. linken punkt umgesetzt
@@ -214,9 +220,18 @@ class GameField:
             print(direction)
 
             # check if ship fits on the board
-            if orientation == "vertical" and (boat_row + ship_len) > self.__fsize\
-                    or orientation == "horizontal" and (boat_column + ship_len) > self.__fsize:
-                print("Ship does not fit on the board. Please choose a different start position or direction.")
+            if (
+                (orientation == "vertical" and (boat_row + ship_len) > self.__fsize)
+                or (
+                    orientation == "horizontal"
+                    and (boat_column + ship_len) > self.__fsize
+                )
+                or boat_row < 0
+                or boat_column < 0
+            ):
+                print(
+                    "Ship does not fit on the board. Please choose a different start position or direction."
+                )
                 continue
 
             valid = self.__check_ship_surrounding(
@@ -229,10 +244,10 @@ class GameField:
         ship_position = []
         for i in range(ship_len):
             row = boat_row + i if orientation == "vertical" else boat_row
-            boat_column if orientation == "vertical" else boat_column + i
+            col = boat_column if orientation == "vertical" else boat_column + i
 
-            self.__boatfield[row][boat_column] = 1
-            ship_position.append([row, boat_column])
+            self.__boatfield[row][col] = 1
+            ship_position.append([row, col])
         self.owner.add_ship(ship_type, ship_position)
 
     def attack_enemy(self, target):
@@ -254,7 +269,9 @@ class GameField:
 
         # Otherwise, prompt the player to choose a position to attack
         else:
-            row, col = self.__get_row_and_column_input("Enter the attacking position for your ship (e.g. A1): ")
+            row, col = self.__get_row_and_column_input(
+                "Enter the attacking position for your ship (e.g. A1): "
+            )
 
         # Check if the attack hits a ship or not
         # And if it hits a ship, the player gets to attack again

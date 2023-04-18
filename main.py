@@ -129,6 +129,7 @@ def start_screen():
 
             clear_console()
     time.sleep(0.1)
+    sound_helper.stop(sound_process)
     # sound_helper.stop(sound_process)
     clear_input()
     clear_console()
@@ -289,17 +290,22 @@ def save_game(save_name, last_turn_player, level):
         pickle.dump(game_info, obj)
 
 
-def create__new_game():
+def create__new_game(existing_saves):
     """
     Creates a new game.
 
     Returns:
         - (tuple): two GameField instances and dictionary with game-infos
     """
-    print("Hello you decided to create a new Save-game")
-    save_name = (
-        f'{ask_name("Enter the save name you wish to use: ").replace(" ", "_")}_save'
-    )
+    while True:
+        print("Hello you decided to create a new Save-game")
+        save_name = f'{ask_name("Enter the save name you wish to use: ").replace(" ", "_")}_save'
+
+        if save_name in existing_saves:
+            print("This name does already exist!")
+        else:
+            break
+
     opponent = ""
 
     p1_name = ask_name("Nice, so what is your name: ")
@@ -365,7 +371,7 @@ def start_up():
     if load == "y":
         return load_game(select_savegame(exist_game_saves))
 
-    return create__new_game()
+    return create__new_game(exist_game_saves)
 
 
 # Gameplay funcs
