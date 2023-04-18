@@ -18,7 +18,7 @@ sys.path.append(
 # pylint: disable=wrong-import-position
 from Library.file_helper import read_file
 from Library.keyboard_helper import clear_input
-from Library import sound_helper
+# from Library import sound_helper
 
 # pylint: enable=wrong-import-position
 
@@ -129,7 +129,7 @@ def start_screen():
 
             clear_console()
     time.sleep(0.1)
-    sound_helper.stop(sound_process)
+    # sound_helper.stop(sound_process)
     clear_input()
     clear_console()
 
