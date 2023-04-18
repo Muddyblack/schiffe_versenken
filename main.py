@@ -388,8 +388,7 @@ def place_all_ships(obj, save_g, curr_lvl):
     uboat = 4 - len(ships["uboat"])
 
     while (battleship + cruiser + destroyer + uboat) != 0:
-        # obj.show_boatfield()
-        obj.show_fields_side_by_side()
+        obj.show_boatfield()
         print(
             f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
             f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
@@ -454,6 +453,8 @@ def attack_execution(save_path, curr_lvl, attacker, target):
     target.show_boatfield()
     save_game(save_path, target, curr_lvl)
 
+    print(target.owner.get_ships())
+
     input(
         "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
     )
@@ -469,7 +470,7 @@ if __name__ == "__main__":
     if current_level == 0:
         for index, player in enumerate(players):
             clear_console()
-            print(f"Your Turn {player.owner.get_player_name()}!")
+            print(f"{RED}Your Turn {player.owner.get_player_name()}!{RESET}")
             save_game(save, player, current_level)
             place_all_ships(player, save, current_level)
             player.show_boatfield()
@@ -485,10 +486,12 @@ if __name__ == "__main__":
     if current_level == 1:
         while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
             clear_console()
-            print(f"Your Turn {player_1.owner.get_player_name()}!")
-            player_1.show_fields_side_by_side()
-            # player_1.show_boatfield()
-            # player_2.show_boatfield()
+            print(f"{RED}Your Turn {player_1.owner.get_player_name()}!{RESET}")
+            player_1.show_boatfield()
+            player_1.show_hitfield()
+            print("Enemy: \n")
+            player_2.show_boatfield()
+
             attack_execution(
                 save_path=save,
                 curr_lvl=current_level,
@@ -497,8 +500,10 @@ if __name__ == "__main__":
             )
 
             clear_console()
-            print(f"Your Turn {player_2.owner.get_player_name()}!")
+            print(f"{RED}Your Turn {player_2.owner.get_player_name()}!{RESET}")
             player_2.show_boatfield()
+            player_2.show_hitfield()
+            print("Enemy: \n")
             player_1.show_boatfield()
             attack_execution(
                 save_path=save,

@@ -8,6 +8,7 @@ This module requires the following external libraries to be installed:
 from string import ascii_uppercase
 from datetime import datetime
 import random
+from copy import deepcopy
 
 from Library.keyboard_helper import get_arrow_key
 from Library.print_helper import print_side_by_side
@@ -30,12 +31,10 @@ class GameField:
         self.owner = owner
         self.__ships_left = 10
         self.__fsize = 10
-        self.__hitfield = [
-            [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
-        ]
         self.__boatfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
+        self.__hitfield = deepcopy(self.__boatfield)
         self.__botcache = []
 
     # getter
@@ -96,7 +95,7 @@ class GameField:
                     color = RESET
                 txt += color + str(row) + " "
             txt += RESET + "\n"
-        txt += RED + "owner: " + self.owner.get_player_name() + RESET + "\n"
+        txt += RESET + "\n"
         return txt
 
     def show_boatfield(self):
