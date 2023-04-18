@@ -407,7 +407,7 @@ def place_all_ships(obj, save_g, curr_lvl):
         match current_boat_to_place:
             case "2" | "u-boat" | "uboat":
                 if uboat > 0:
-                    obj.set_ship(2, "u-boat")
+                    obj.set_ship(2, "uboat")
                     uboat -= 1
                 else:
                     print("You already placed all your U-Boats!")
@@ -466,7 +466,7 @@ if __name__ == "__main__":
             save_game(save, player, current_level)
             place_all_ships(player, save, current_level)
             player.show_boatfield()
-            if index < len(players):
+            if index < len(players) - 1:
                 save_game(save, players[index + 1], current_level)
             else:
                 save_game(save, players[0], current_level)
@@ -477,11 +477,14 @@ if __name__ == "__main__":
 
     if current_level == 1:
         while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
+            print(player_1.owner.get_ships())
             print(f"Your Turn {player_1.owner.get_player_name()}!")
             attack_execution(player_1, player_2)
-            save_game(save, players[0], current_level)
-            print(f"Your Turn {player_2.owner.get_player_name()}!")
+
+            save_game(save, player_2, current_level)
+            print(player_2.owner.get_ships())
+            print(f"Your Turn {player_1.owner.get_player_name()}!")
             attack_execution(player_2, player_1)
-            save_game(save, players[0], current_level)
+            save_game(save, player_1, current_level)
 
     current_level += 1

@@ -50,6 +50,25 @@ class Player:
         """Sets the ship's dictionary."""
         self.__ships = value
 
+    def ships_after_attack(self, target_cell):
+        """Removes hitted cells from ships and checks if there is still something left to play"""
+        for key in self.__ships:
+            for ship in key:
+                if len(ship) == 0:
+                    print("SHip Destroyed")
+                    key.remove(ship)
+                elif target_cell in ship:
+                    ship.remove(target_cell)
+                else:
+                    continue
+                breaking = True
+                break
+            if breaking:
+                break
+
+        if ():
+            pass
+
     def add_ship(self, element, pos):
         """Sets the ship's dictionary."""
         self.__ships[element].append(pos)

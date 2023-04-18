@@ -102,7 +102,7 @@ class GameField:
                     color = RESET
                 print(color + str(row), end=" ")
             print(RESET)
-        print("\n")
+        print(RED + "owner: " + self.owner.get_player_name() + RESET + "\n")
 
     def show_boatfield(self):
         """Prints the boatfield matrix."""
@@ -279,9 +279,11 @@ class GameField:
             print("Sir, we hitted an enemy target!")
             self.__hitfield[row][col] = 1
             target.set_boatfield_cell(row, col, "X")
+            #####
             self.show_hitfield()
             print("You can attack a second time")
             self.attack_enemy(target)
+
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
