@@ -19,7 +19,7 @@ sys.path.append(
 # pylint: disable=wrong-import-position
 from Library.file_helper import read_file
 from Library.keyboard_helper import clear_input
-from Library import sound_helper
+# from Library import sound_helper
 
 # pylint: enable=wrong-import-position
 
@@ -77,9 +77,9 @@ def refresh_console_lines(lines):
 
 def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
-    start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
+    # start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
 
-    sound_process = sound_helper.start(start_music_path)
+    # sound_process = sound_helper.start(start_music_path)
 
     files = [
         os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
@@ -130,7 +130,6 @@ def start_screen():
 
             clear_console()
     time.sleep(0.1)
-    sound_helper.stop(sound_process)
     # sound_helper.stop(sound_process)
     clear_input()
     clear_console()
@@ -376,6 +375,16 @@ def start_up():
 
 
 # Gameplay funcs
+def choose_random_ship():
+    """Chooses a random ship and returns in stringname of the boat"""
+    rand_ship = random.randint(0, 3)
+    match rand_ship:
+        case 0: chosen_ship = "battleship"
+        case 1: chosen_ship = "cruiser"
+        case 2: chosen_ship = "destroyer"
+        case 3: chosen_ship = "uboat"
+        case _: chosen_ship = "Unknown"
+    return str(chosen_ship)
 
 
 def place_all_ships(obj, save_g, curr_lvl):
@@ -389,43 +398,47 @@ def place_all_ships(obj, save_g, curr_lvl):
     uboat = 4 - len(ships["uboat"])
 
     while (battleship + cruiser + destroyer + uboat) != 0:
-        obj.show_boatfield()
-        print(
-            f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
-            f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
-        )
 
-        if obj.owner.get_bot() is True:
-            # dann füll automatisch!
-            pass
-        else:
+        is_bot = obj.owner.get_bot
+        if is_bot is False:
+            obj.show_boatfield()
+
+            print(
+                f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
+                f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
+            )
+
             clear_input()
             current_boat_to_place = str(
-                input("Please type in the boats name, or the length of it: ")
+                   input("Please type in the boats name, or the length of it: ")
             ).lower()
+        else:
+            # Hier Schiffe automatisch plazieren
+            current_boat_to_place = choose_random_ship()
 
         match current_boat_to_place:
             case "2" | "u-boat" | "uboat":
                 if uboat > 0:
                     obj.set_ship(2, "uboat")
+
                     uboat -= 1
                 else:
                     print("You already placed all your U-Boats!")
             case "3" | "destroyer":
                 if destroyer > 0:
-                    obj.set_ship(3, "destroyer")
+                    obj.set_ship(3, "destroyer", is_bot)
                     destroyer -= 1
                 else:
                     print("You already placed all your Destroyers!")
             case "4" | "cruiser":
                 if cruiser > 0:
-                    obj.set_ship(4, "cruiser")
+                    obj.set_ship(4, "cruiser", is_bot)
                     cruiser -= 1
                 else:
                     print("You already placed all your Cruisers!")
             case "5" | "battleship":
                 if battleship > 0:
-                    obj.set_ship(5, "battleship")
+                    obj.set_ship(5, "battleship", is_bot)
                     battleship -= 1
                 else:
                     print("You already placed your Battleship!")
