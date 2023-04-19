@@ -121,8 +121,8 @@ class GameField:
         """Gets the Field-Coordiantes the user puts in using the message given to it. input Either in A1 or 1A format
         - returns: row, column
         """
-        
-        while True:
+
+        while bot is False:
             user_input = input(f"{message}").strip()
 
             try:
@@ -146,10 +146,10 @@ class GameField:
 
             # Checks for validility of the input
             if (
-                    l_row < 0
-                    or l_col < 0
-                    or (self.__fsize - 1) < l_row
-                    or (self.__fsize - 1) < l_col
+                l_row < 0
+                or l_col < 0
+                or (self.__fsize - 1) < l_row
+                or (self.__fsize - 1) < l_col
             ):
                 print("Outside of the Field!")
                 continue
@@ -180,10 +180,10 @@ class GameField:
         for row in rows_to_check:
             for col in cols_to_check:
                 if (
-                        row < 0
-                        or row >= len(self.__boatfield)
-                        or col < 0
-                        or col >= len(self.__boatfield[0])
+                    row < 0
+                    or row >= len(self.__boatfield)
+                    or col < 0
+                    or col >= len(self.__boatfield[0])
                 ):
                     continue  # Ignore out-of-bounds cells
                 if self.__boatfield[row][col] == 1:
@@ -208,11 +208,16 @@ class GameField:
                 direction = get_arrow_key()
             else:
                 match int(random.randint(0, 3)):
-                    case 0: direction = "up"
-                    case 1: direction = "down"
-                    case 2: direction = "left"
-                    case 3: direction = "right"
-                    case _: direction = "Unknown direction"
+                    case 0:
+                        direction = "up"
+                    case 1:
+                        direction = "down"
+                    case 2:
+                        direction = "left"
+                    case 3:
+                        direction = "right"
+                    case _:
+                        direction = "Unknown direction"
 
             # Bei up bzw left wird der Startpunkt zu boat_row bzw boat_column zu dem oberen bzw. linken punkt umgesetzt
             if direction == "up":
@@ -240,10 +245,13 @@ class GameField:
             # Is needed to reliably check if the Boat fits on the board
             # pylint: disable=too-many-boolean-expressions
             if (
-                    (orientation == "vertical" and (boat_row + ship_len) > self.__fsize)
-                    or (orientation == "horizontal" and (boat_column + ship_len) > self.__fsize)
-                    or boat_row < 0
-                    or boat_column < 0
+                (orientation == "vertical" and (boat_row + ship_len) > self.__fsize)
+                or (
+                    orientation == "horizontal"
+                    and (boat_column + ship_len) > self.__fsize
+                )
+                or boat_row < 0
+                or boat_column < 0
             ):
                 print(
                     "Ship does not fit on the board. Please choose a different start position or direction."
