@@ -5,24 +5,18 @@ This module requires the following external libraries to be installed:
     - keyboard
 
 """
-import sys
-import os
 from string import ascii_uppercase
 from datetime import datetime
 import random
+from copy import deepcopy
 
-sys.path.append(
-    os.path.abspath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
-    )
-)
-# pylint: disable=wrong-import-position
 from Library.keyboard_helper import get_arrow_key
-# pylint: enable=wrong-import-position
+from Library.print_helper import print_side_by_side
 
 # anicode
 BLUE = "\033[0;34m"
 RED = "\033[0;31m"
+LIGHT_GREEN = "\033[1;32m"
 RESET = "\033[0m"
 
 
@@ -38,10 +32,10 @@ class GameField:
         self.owner = owner
         self.__ships_left = 10
         self.__fsize = 10
-        self.__hitfield = [
+        self.__boatfield = [
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
-        self.__boatfield = self.__hitfield
+        self.__hitfield = deepcopy(self.__boatfield)
         self.__botcache = []
 
     # getter
@@ -79,47 +73,58 @@ class GameField:
         self.__ships_left = value
 
     # Show Field Functions
-    def show_field(self, fieldtype):
+    def get_field_text(self, fieldtype):
         """
-        Prints Field with Postion Indictaros at the top and left, like A1, B10, etc.
+        Returns string of Field with Postion Indictaros at the top and left, like A1, B10, etc.
         """
 
-        print(" " * (len(str(self.__fsize)) + 2), end="")
+        txt = " " * (len(str(self.__fsize)) + 2)
         for elem in range(self.__fsize):
-            print(f"{ascii_uppercase[elem]}", end=" ")
-        print("\n")
+            txt += f"{ascii_uppercase[elem]} "
+        txt += "\n"
 
         for num, line in enumerate(fieldtype, 1):
-            print(f"{num}", end="   ")
-
+            txt += f"{num}   "
             if len(str(num)) > 1:
-                print("\b" * (len(str(num)) - 1), end="")
+                txt += "\b" * (len(str(num)) - 1)
             for row in line:
                 if row == 1:
                     color = BLUE
                 elif row == "X":
                     color = RED
+                elif row == "o":
+                    color = LIGHT_GREEN
                 else:
                     color = RESET
-                print(color + str(row), end=" ")
-            print(RESET)
-        print("\n")
+                txt += color + str(row) + " "
+            txt += RESET + "\n"
+        txt += RESET + "\n"
+        return txt
 
     def show_boatfield(self):
         """Prints the boatfield matrix."""
-        self.show_field(self.__boatfield)
+        print(self.get_field_text(self.__boatfield))
 
     def show_hitfield(self):
         """Prints the hitfield matrix."""
-        self.show_field(self.__hitfield)
+        print(self.get_field_text(self.__hitfield))
+
+    def show_fields_side_by_side(self):
+        """Should print the boatfield and the hitfield matrix side by side."""
+        print_side_by_side(
+            self.get_field_text(self.__boatfield),
+            self.get_field_text(self.__hitfield),
+        )
 
     # Ship placement functions
     def __get_row_and_column_input(self, message, bot):
         """Gets the Field-Coordiantes the user puts in using the message given to it. input Either in A1 or 1A format
         - returns: row, column
         """
-        while not bot:
-            user_input = input(f"{message}")
+
+        while bot is False:
+            user_input = input(f"{message}").strip()
+
             try:
                 l_row = int(user_input[1:]) - 1
                 l_col = int(ascii_uppercase.index(user_input[0].upper()))
@@ -141,10 +146,10 @@ class GameField:
 
             # Checks for validility of the input
             if (
-                    l_row < 0
-                    or l_col < 0
-                    or (self.__fsize - 1) < l_row
-                    or (self.__fsize - 1) < l_col
+                l_row < 0
+                or l_col < 0
+                or (self.__fsize - 1) < l_row
+                or (self.__fsize - 1) < l_col
             ):
                 print("Outside of the Field!")
                 continue
@@ -175,10 +180,10 @@ class GameField:
         for row in rows_to_check:
             for col in cols_to_check:
                 if (
-                        row < 0
-                        or row >= len(self.__boatfield)
-                        or col < 0
-                        or col >= len(self.__boatfield[0])
+                    row < 0
+                    or row >= len(self.__boatfield)
+                    or col < 0
+                    or col >= len(self.__boatfield[0])
                 ):
                     continue  # Ignore out-of-bounds cells
                 if self.__boatfield[row][col] == 1:
@@ -203,11 +208,16 @@ class GameField:
                 direction = get_arrow_key()
             else:
                 match int(random.randint(0, 3)):
-                    case 0: direction = "up"
-                    case 1: direction = "down"
-                    case 2: direction = "left"
-                    case 3: direction = "right"
-                    case _: direction = "Unknown direction"
+                    case 0:
+                        direction = "up"
+                    case 1:
+                        direction = "down"
+                    case 2:
+                        direction = "left"
+                    case 3:
+                        direction = "right"
+                    case _:
+                        direction = "Unknown direction"
 
             # Bei up bzw left wird der Startpunkt zu boat_row bzw boat_column zu dem oberen bzw. linken punkt umgesetzt
             if direction == "up":
@@ -235,10 +245,13 @@ class GameField:
             # Is needed to reliably check if the Boat fits on the board
             # pylint: disable=too-many-boolean-expressions
             if (
-                    (orientation == "vertical" and (boat_row + ship_len) > self.__fsize)
-                    or (orientation == "horizontal" and (boat_column + ship_len) > self.__fsize)
-                    or boat_row < 0
-                    or boat_column < 0
+                (orientation == "vertical" and (boat_row + ship_len) > self.__fsize)
+                or (
+                    orientation == "horizontal"
+                    and (boat_column + ship_len) > self.__fsize
+                )
+                or boat_row < 0
+                or boat_column < 0
             ):
                 print(
                     "Ship does not fit on the board. Please choose a different start position or direction."
@@ -287,12 +300,22 @@ class GameField:
         # And if it hits a ship, the player gets to attack again
         if target.get_boatfield()[row][col] == 1:
             print("Sir, we hitted an enemy target!")
-            self.__hitfield[row][col] = 1
+
+            self.set_hitfield_cell(row, col, 1)
             target.set_boatfield_cell(row, col, "X")
-            self.show_hitfield()
+            target.owner.ships_after_attack([row, col])
+
+            if target.owner.get_ship_amount() == 0:
+                print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
+                return True
+
             print("You can attack a second time")
-            self.attack_enemy(target)
+            return self.attack_enemy(target)
+
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
+            self.set_hitfield_cell(row, col, "o")
+
+        return False
