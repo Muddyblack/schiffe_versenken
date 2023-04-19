@@ -21,7 +21,7 @@ from Classes.player import Player
 
 class TestPlaceAllShips(unittest.TestCase):
     @given(st.builds(Player))
-    def test_place_all_ships(player):  #self, player
+    def test_place_all_ships(self, player):  #self, player
         place_all_ships(player)
         assert player.are_all_ships_placed()
 
