@@ -19,6 +19,7 @@ sys.path.append(
 # pylint: disable=wrong-import-position
 from Library.file_helper import read_file
 from Library.keyboard_helper import clear_input
+
 # from Library import sound_helper
 
 # pylint: enable=wrong-import-position
@@ -379,11 +380,16 @@ def choose_random_ship():
     """Chooses a random ship and returns in stringname of the boat"""
     rand_ship = random.randint(0, 3)
     match rand_ship:
-        case 0: chosen_ship = "battleship"
-        case 1: chosen_ship = "cruiser"
-        case 2: chosen_ship = "destroyer"
-        case 3: chosen_ship = "uboat"
-        case _: chosen_ship = "Unknown"
+        case 0:
+            chosen_ship = "battleship"
+        case 1:
+            chosen_ship = "cruiser"
+        case 2:
+            chosen_ship = "destroyer"
+        case 3:
+            chosen_ship = "uboat"
+        case _:
+            chosen_ship = "Unknown"
     return str(chosen_ship)
 
 
@@ -398,11 +404,10 @@ def place_all_ships(obj, save_g, curr_lvl):
     uboat = 4 - len(ships["uboat"])
 
     while (battleship + cruiser + destroyer + uboat) != 0:
-
-        is_bot = obj.owner.get_bot
+        is_bot = obj.owner.get_bot()
+        print(is_bot)
+        obj.show_boatfield()
         if is_bot is False:
-            obj.show_boatfield()
-
             print(
                 f"You have {battleship} Battleship (5-Long), {cruiser} Cruiser (4-Long), {destroyer} Destroyer (3-Long)"
                 f" and {uboat} U-Boats (2-Long) availible!\nWhich Ship would you like to place?"
@@ -410,7 +415,7 @@ def place_all_ships(obj, save_g, curr_lvl):
 
             clear_input()
             current_boat_to_place = str(
-                   input("Please type in the boats name, or the length of it: ")
+                input("Please type in the boats name, or the length of it: ")
             ).lower()
         else:
             # Hier Schiffe automatisch plazieren
@@ -419,7 +424,7 @@ def place_all_ships(obj, save_g, curr_lvl):
         match current_boat_to_place:
             case "2" | "u-boat" | "uboat":
                 if uboat > 0:
-                    obj.set_ship(2, "uboat")
+                    obj.set_ship(2, "uboat", is_bot)
 
                     uboat -= 1
                 else:
