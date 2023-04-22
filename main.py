@@ -106,8 +106,11 @@ def place_all_ships(obj):
 
 def attack_execution(attacker, target):
     """Attacks the target and set target as new current_player"""
-    status = attacker.attack_enemy(target)
-    if status is True:
+    status = 1
+    while status == 1:
+        status = attacker.attack_enemy(target)
+        game.save_game()
+    if status == 0:
         ## DELETE FILE when game ends
         save_path = game.get_save_path()
         if os.path.exists(save_path):
@@ -159,6 +162,7 @@ if __name__ == "__main__":
             )
             player_1.show_fields_side_by_side()
 
+            print(player_1.owner.get_ships())
             attack_execution(
                 attacker=player_1,
                 target=player_2,
@@ -169,6 +173,7 @@ if __name__ == "__main__":
                 f"{console_helper.RED}Your Turn {player_2.owner.get_player_name()}!{console_helper.RESET}"
             )
             player_2.show_fields_side_by_side()
+            print(player_2.owner.get_ships())
             attack_execution(
                 attacker=player_2,
                 target=player_1,

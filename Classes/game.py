@@ -370,7 +370,7 @@ class Game:
         exist_save_games = [
             f.name
             for f in os.scandir(self.__save_games_path)
-            if f.is_dir() and not f.is_file() and "_save" in f.name
+            if f.is_dir() and not f.is_file() and f.name.endswith("_save")
         ]
 
         load = ""

@@ -287,10 +287,15 @@ class GameField:
         if self == target:
             raise ValueError("You cannot attack yourself!")
 
+        if target.owner.get_ship_amount() == 0:
+            print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
+            return 0
+
         # If the player is a bot, randomly choose a position that has not been used before to attack
-        if self.owner.get_bot() is True:
+        bot = self.owner.get_bot()
+        if bot:
             while True:
-                row, col = self.__get_row_and_column_input("Bot", True)
+                row, col = self.__get_row_and_column_input("Bot", bot)
 
                 if [col, row] not in self.__botcache:
                     self.__botcache.append([col, row])
@@ -298,7 +303,7 @@ class GameField:
         # Otherwise, prompt the player to choose a position to attack
         else:
             row, col = self.__get_row_and_column_input(
-                "Enter the attacking position for your ship (e.g. A1): ", False
+                "Enter the attacking position for your ship (e.g. A1): ", bot
             )
 
         # Check if the attack hits a ship or not
@@ -312,17 +317,16 @@ class GameField:
 
             if target.owner.get_ship_amount() == 0:
                 print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
-                return True
+                return 0
 
             print("You can attack a second time")
+            return 1
             return self.attack_enemy(target)
 
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
-            print(
-                f"{console_helper.BLINK}Sir we've hit the bull's eye!{console_helper.RESET}"
-            )
+            print("Sir we've hit the bull's eye!")
             self.set_hitfield_cell(row, col, "o")
 
-        return False
+        return 2
