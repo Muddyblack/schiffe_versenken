@@ -320,7 +320,9 @@ class GameField:
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
-            print("Sir we've hit the bull's eye!")
+            print(
+                f"{console_helper.BLINK}Sir we've hit the bull's eye!{console_helper.RESET}"
+            )
             self.set_hitfield_cell(row, col, "o")
 
         return False
