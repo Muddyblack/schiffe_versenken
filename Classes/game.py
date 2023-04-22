@@ -73,7 +73,7 @@ class Game:
 
     # Class functions
 
-    def ask_name(self, question):
+    def __ask_name(self, question):
         """
         Asks the user to enter his name and checks if it is not empty or longer than 15 characters
         Returns:
@@ -182,7 +182,7 @@ class Game:
         """
         while True:
             print("Hello you decided to create a new Save-game")
-            save_name = f'{self.ask_name("Enter the save name you wish to use: ").replace(" ", "_")}_save'
+            save_name = f'{self.__ask_name("Enter the save name you wish to use: ").replace(" ", "_")}_save'
 
             if save_name in existing_saves:
                 print("This name does already exist!")
@@ -192,7 +192,7 @@ class Game:
 
         opponent = ""
 
-        p1_name = self.ask_name("Nice, so what is your name: ")
+        p1_name = self.__ask_name("Nice, so what is your name: ")
         while opponent not in ("y", "n"):
             opponent = (
                 input(
@@ -206,7 +206,7 @@ class Game:
 
         if opponent == "y":
             while True:
-                p2_name = self.ask_name(
+                p2_name = self.__ask_name(
                     f"Hello {p1_name} told me about you.\nWhat is your name: "
                 )
                 if p2_name != p1_name:
@@ -226,7 +226,7 @@ class Game:
         self.__players = fields
         self.__current_level = 0
 
-    def start_screen(self):
+    def __start_screen(self):
         """Prints a beautiful ASCII-Logo for the game to the console"""
         sound_process = simpleaudio.WaveObject.from_wave_file(
             f"{self.__sound_path}/Start-Screen.wav"
@@ -372,7 +372,7 @@ class Game:
             A dictionary with keys "players" and "save_name". The value for the key "players" is a list of two GameField instances
             representing the players. The value for the key "save_name" is a string representing the name of the save game.
         """
-        self.start_screen()
+        self.__start_screen()
         exist_save_games = [
             f.name
             for f in os.scandir(self.__save_games_path)
