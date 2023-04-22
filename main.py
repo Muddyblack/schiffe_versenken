@@ -7,22 +7,12 @@ import pickle
 import random
 import time
 import keyboard
+import simpleaudio
 from Classes.game_field import GameField
 from Classes.player import Player
-
-sys.path.append(
-    os.path.abspath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
-    )
-)
-
-# pylint: disable=wrong-import-position
+from Library import console_helper
 from Library.file_helper import read_file
 from Library.keyboard_helper import clear_input
-
-# from Library import sound_helper
-
-# pylint: enable=wrong-import-position
 
 # Paths
 PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
@@ -30,57 +20,19 @@ GAME_DATA_PATH = f"{PROJECT_PATH}/GameData"
 SAVE_GAMES_PATH = f"{GAME_DATA_PATH}/saves"
 START_SCREEN_ANIMATION_PATH = f"{GAME_DATA_PATH}/start_screen_animation"
 SOUND_PATH = f"{GAME_DATA_PATH}/sound"
-
 os.makedirs(SAVE_GAMES_PATH, exist_ok=True)
 
 # enables ansi escape characters in terminal
 os.system("")
 
-# Define color codes for ANSI escape sequences
-BLACK = "\033[0;30m"
-RED = "\033[0;31m"
-GREEN = "\033[0;32m"
-BROWN = "\033[0;33m"
-BLUE = "\033[0;34m"
-MAGENTA = "\033[35m"
-CYAN = "\033[0;36m"
-LIGHT_GRAY = "\033[0;37m"
-DARK_GRAY = "\033[1;30m"
-LIGHT_RED = "\033[1;31m"
-LIGHT_GREEN = "\033[1;32m"
-YELLOW = "\033[1;33m"
-LIGHT_BLUE = "\033[1;34m"
-LIGHT_PURPLE = "\033[1;35m"
-LIGHT_CYAN = "\033[1;36m"
-LIGHT_WHITE = "\033[1;37m"
-BOLD = "\033[1m"
-FAINT = "\033[2m"
-ITALIC = "\033[3m"
-UNDERLINE = "\033[4m"
-BLINK = "\033[5m"
-NEGATIVE = "\033[7m"
-CROSSED = "\033[9m"
-RESET = "\033[0m"
-
 
 # Game System funcs
-def clear_console():
-    """clearing the console"""
-    os.system("cls" if os.name == "nt" else "clear")
-
-
-def refresh_console_lines(lines):
-    """Clears the specified number of lines from the console output."""
-
-    sys.stdout.write("\033[F" * lines)
-    sys.stdout.write("\033[K" * lines)
-
-
 def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
-    # start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
+    start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
 
-    # sound_process = sound_helper.start(start_music_path)
+    sound_process = simpleaudio.WaveObject.from_wave_file(start_music_path)
+    play_obj = sound_process.play()
 
     files = [
         os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
@@ -109,12 +61,15 @@ def start_screen():
                     stop = True
                     break
                 print(
-                    line.replace("{BROWN}", BROWN)
-                    .replace("{LIGHT_GRAY}", LIGHT_GRAY)
-                    .replace("{MAGENTA}", MAGENTA)
-                    .replace("{RESET}", RESET)
+                    line.replace("{BROWN}", console_helper.BROWN)
+                    .replace("{LIGHT_GRAY}", console_helper.LIGHT_GRAY)
+                    .replace("{MAGENTA}", console_helper.MAGENTA)
+                    .replace("{RESET}", console_helper.RESET)
                 )
-            print(f"\n{LIGHT_BLUE}Hit the Enter Key, to continue{RESET}", end="")
+            print(
+                f"\n{console_helper.LIGHT_BLUE}Hit the Enter Key, to continue{console_helper.RESET}",
+                end="",
+            )
             # Check while sleeping if enter has been entered
             ind = 0
             while ind in range(40):
@@ -129,11 +84,11 @@ def start_screen():
             if stop is True:
                 break
 
-            clear_console()
+            console_helper.clear_console()
     time.sleep(0.1)
-    # sound_helper.stop(sound_process)
+    play_obj.stop()
     clear_input()
-    clear_console()
+    console_helper.clear_console()
 
 
 def display_save_games(save_games, selected_save_game_index):
@@ -142,7 +97,7 @@ def display_save_games(save_games, selected_save_game_index):
     for i in enumerate(save_games):
         game_name = os.path.basename(save_games[i[0]])
         if i[0] == selected_save_game_index:
-            print(f"{CYAN}> {game_name}{RESET}")
+            print(f"{console_helper.CYAN}> {game_name}{console_helper.RESET}")
         else:
             print(f"  {game_name}")
 
@@ -166,7 +121,7 @@ def select_savegame(save_games):
 
         if keyboard.is_pressed("up") and selected_save_game_index > 0:
             selected_save_game_index -= 1
-            refresh_console_lines(save_games_len)
+            console_helper.refresh_console_lines(save_games_len)
             display_save_games(save_games, selected_save_game_index)
 
             while keyboard.is_pressed("up"):
@@ -177,7 +132,7 @@ def select_savegame(save_games):
             and selected_save_game_index < len(save_games) - 1
         ):
             selected_save_game_index += 1
-            refresh_console_lines(save_games_len)
+            console_helper.refresh_console_lines(save_games_len)
             display_save_games(save_games, selected_save_game_index)
             while keyboard.is_pressed("down"):
                 pass
@@ -448,16 +403,18 @@ def place_all_ships(obj, save_g, curr_lvl):
                 else:
                     print("You already placed your Battleship!")
             case _:
-                clear_console()
-                print(f"{BOLD}{RED}Unknown Boat-Type.{RESET}")
+                console_helper.clear_console()
+                print(
+                    f"{console_helper.BOLD}{console_helper.RED}Unknown Boat-Type.{console_helper.RESET}"
+                )
         save_game(save_g, player, curr_lvl)
 
-    clear_console()
+    console_helper.clear_console()
     obj.show_boatfield()
     input(
         "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!"
     )
-    clear_console()
+    console_helper.clear_console()
 
 
 def attack_execution(save_name, curr_lvl, attacker, target):
@@ -474,8 +431,7 @@ def attack_execution(save_name, curr_lvl, attacker, target):
             shutil.rmtree(save_path)
         sys.exit()
     else:
-        attacker.show_boatfield()
-        attacker.show_hitfield()
+        attacker.show_fields_side_by_side()
         save_game(save_path, target, curr_lvl)
 
         input(
@@ -492,8 +448,10 @@ if __name__ == "__main__":
 
     if current_level == 0:
         for index, player in enumerate(players):
-            clear_console()
-            print(f"{RED}Your Turn {player.owner.get_player_name()}!{RESET}")
+            console_helper.clear_console()
+            print(
+                f"{console_helper.RED}Your Turn {player.owner.get_player_name()}!{console_helper.RESET}"
+            )
             save_game(save, player, current_level)
             place_all_ships(player, save, current_level)
             player.show_boatfield()
@@ -508,10 +466,11 @@ if __name__ == "__main__":
 
     if current_level == 1:
         while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
-            clear_console()
-            print(f"{RED}Your Turn {player_1.owner.get_player_name()}!{RESET}")
-            player_1.show_boatfield()
-            player_1.show_hitfield()
+            console_helper.clear_console()
+            print(
+                f"{console_helper.RED}Your Turn {player_1.owner.get_player_name()}!{console_helper.RESET}"
+            )
+            player_1.show_fields_side_by_side()
 
             attack_execution(
                 save_name=save,
@@ -520,10 +479,11 @@ if __name__ == "__main__":
                 target=player_2,
             )
 
-            clear_console()
-            print(f"{RED}Your Turn {player_2.owner.get_player_name()}!{RESET}")
-            player_2.show_boatfield()
-            player_2.show_hitfield()
+            console_helper.clear_console()
+            print(
+                f"{console_helper.RED}Your Turn {player_2.owner.get_player_name()}!{console_helper.RESET}"
+            )
+            player_2.show_fields_side_by_side()
             attack_execution(
                 save_name=save,
                 curr_lvl=current_level,

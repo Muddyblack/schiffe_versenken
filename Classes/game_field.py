@@ -11,13 +11,7 @@ import random
 from copy import deepcopy
 
 from Library.keyboard_helper import get_arrow_key
-from Library.print_helper import print_side_by_side
-
-# anicode
-BLUE = "\033[0;34m"
-RED = "\033[0;31m"
-LIGHT_GREEN = "\033[1;32m"
-RESET = "\033[0m"
+from Library import console_helper
 
 
 class GameField:
@@ -89,16 +83,16 @@ class GameField:
                 txt += "\b" * (len(str(num)) - 1)
             for row in line:
                 if row == 1:
-                    color = BLUE
+                    color = console_helper.BLUE
                 elif row == "X":
-                    color = RED
+                    color = console_helper.RED
                 elif row == "o":
-                    color = LIGHT_GREEN
+                    color = console_helper.LIGHT_GREEN
                 else:
-                    color = RESET
+                    color = console_helper.RESET
                 txt += color + str(row) + " "
-            txt += RESET + "\n"
-        txt += RESET + "\n"
+            txt += console_helper.RESET + "\n"
+        txt += console_helper.RESET
         return txt
 
     def show_boatfield(self):
@@ -111,9 +105,20 @@ class GameField:
 
     def show_fields_side_by_side(self):
         """Should print the boatfield and the hitfield matrix side by side."""
-        print_side_by_side(
-            self.get_field_text(self.__boatfield),
-            self.get_field_text(self.__hitfield),
+        padding = 4
+        print(
+            console_helper.GREEN
+            + "Boatfield"
+            + " " * ((len(self.__boatfield) * 2) + padding - 1)
+            + "Hitfield"
+            + console_helper.RESET
+        )
+        console_helper.print_side_by_side(
+            [
+                f"{self.get_field_text(self.__boatfield)}",
+                f"{self.get_field_text(self.__hitfield)}",
+            ],
+            padding=padding,
         )
 
     # Ship placement functions

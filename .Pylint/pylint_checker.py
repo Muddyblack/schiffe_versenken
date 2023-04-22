@@ -15,13 +15,14 @@ sys.path.append(
 )
 
 # pylint: disable=wrong-import-position
-from Library.file_helper import read_file
+from Library import file_helper
+
 
 WORK_PATH = os.path.dirname(os.path.realpath(__file__))
 SAVE_PATH = f"{WORK_PATH}/savePath.txt"
 
 try:
-    WORK_PATH = read_file(SAVE_PATH)
+    WORK_PATH = file_helper.read_file(SAVE_PATH)
 except FileNotFoundError:
     pass
 
