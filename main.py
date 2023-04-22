@@ -30,9 +30,9 @@ os.system("")
 def start_screen():
     """Prints a beautiful ASCII-Logo for the game to the console"""
     start_music_path = f"{SOUND_PATH}/Start-Screen.wav"
+    end_music_path = f"{SOUND_PATH}/Start_game.wav"
 
-    sound_process = simpleaudio.WaveObject.from_wave_file(start_music_path)
-    play_obj = sound_process.play()
+    sound_process = simpleaudio.WaveObject.from_wave_file(start_music_path).play()
 
     files = [
         os.path.abspath(os.path.join(START_SCREEN_ANIMATION_PATH, file))
@@ -86,7 +86,9 @@ def start_screen():
 
             console_helper.clear_console()
     time.sleep(0.1)
-    play_obj.stop()
+    sound_process.stop()
+    simpleaudio.WaveObject.from_wave_file(end_music_path).play()
+
     clear_input()
     console_helper.clear_console()
 
@@ -120,6 +122,10 @@ def select_savegame(save_games):
         # Handle arrow key presses to move the selected save game index up or down
 
         if keyboard.is_pressed("up") and selected_save_game_index > 0:
+            simpleaudio.WaveObject.from_wave_file(
+                f"{SOUND_PATH}/Menu-Select.wav"
+            ).play()
+
             selected_save_game_index -= 1
             console_helper.refresh_console_lines(save_games_len)
             display_save_games(save_games, selected_save_game_index)
@@ -131,6 +137,10 @@ def select_savegame(save_games):
             keyboard.is_pressed("down")
             and selected_save_game_index < len(save_games) - 1
         ):
+            simpleaudio.WaveObject.from_wave_file(
+                f"{SOUND_PATH}/Menu-Select.wav"
+            ).play()
+
             selected_save_game_index += 1
             console_helper.refresh_console_lines(save_games_len)
             display_save_games(save_games, selected_save_game_index)
@@ -142,6 +152,7 @@ def select_savegame(save_games):
 
     selected = save_games[selected_save_game_index]
     print(f"Selected save game: {os.path.basename(selected)}\n")
+    simpleaudio.WaveObject.from_wave_file(f"{SOUND_PATH}/Selected.wav").play()
     return selected
 
 
@@ -420,7 +431,6 @@ def place_all_ships(obj, save_g, curr_lvl):
 def attack_execution(save_name, curr_lvl, attacker, target):
     """Attacks the target and set target as new current_player"""
     status = attacker.attack_enemy(target)
-    print("Status:", status)
     if status is True:
         ## DELETE FILE when game ends
         save_path = f"{SAVE_GAMES_PATH}/{save_name}"
@@ -432,7 +442,7 @@ def attack_execution(save_name, curr_lvl, attacker, target):
         sys.exit()
     else:
         attacker.show_fields_side_by_side()
-        save_game(save_path, target, curr_lvl)
+        save_game(save_name, target, curr_lvl)
 
         input(
             "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
@@ -490,3 +500,7 @@ if __name__ == "__main__":
                 attacker=player_2,
                 target=player_1,
             )
+        audio_process = simpleaudio.WaveObject.from_wave_file(
+            f"{SOUND_PATH}/winning.wav"
+        )
+        audio_process.play().wait_done()
