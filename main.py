@@ -118,6 +118,10 @@ def attack_execution(attacker, target):
                 f"---------------------------------------------DELETE{save_path}\n---------------------------------------------"
             )
             shutil.rmtree(save_path)
+        audio_process = simpleaudio.WaveObject.from_wave_file(
+            f"{game.get_sound_path()}/winning.wav"
+        )
+        audio_process.play().wait_done()
         sys.exit()
     else:
         attacker.show_fields_side_by_side()
@@ -162,7 +166,6 @@ if __name__ == "__main__":
             )
             player_1.show_fields_side_by_side()
 
-            print(player_1.owner.get_ships())
             attack_execution(
                 attacker=player_1,
                 target=player_2,
@@ -173,12 +176,7 @@ if __name__ == "__main__":
                 f"{console_helper.RED}Your Turn {player_2.owner.get_player_name()}!{console_helper.RESET}"
             )
             player_2.show_fields_side_by_side()
-            print(player_2.owner.get_ships())
             attack_execution(
                 attacker=player_2,
                 target=player_1,
             )
-        audio_process = simpleaudio.WaveObject.from_wave_file(
-            f"{game.get_sound_path()}/winning.wav"
-        )
-        audio_process.play().wait_done()

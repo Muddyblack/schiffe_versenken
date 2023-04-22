@@ -288,7 +288,9 @@ class GameField:
             raise ValueError("You cannot attack yourself!")
 
         if target.owner.get_ship_amount() == 0:
-            print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
+            print(
+                f"{console_helper.RED}Congrats {self.owner.get_player_name()}, YOU WON!{console_helper.RESET}"
+            )
             return 0
 
         # If the player is a bot, randomly choose a position that has not been used before to attack
