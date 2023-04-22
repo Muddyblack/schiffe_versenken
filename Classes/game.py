@@ -7,7 +7,6 @@ import simpleaudio
 import keyboard
 
 from Library import console_helper
-from Library.file_helper import read_file
 from Library.keyboard_helper import clear_input
 
 from Classes.player import Player
@@ -239,32 +238,18 @@ class Game:
         frames = sorted(files)
 
         stop = False
-        while stop is False:
-            if (
-                (keyboard.is_pressed("return"))
-                or (keyboard.is_pressed("enter"))
-                or (stop is True)
-            ):
-                stop = True
-                break
-
+        while not stop:
             for frame in frames:
-                string = read_file(frame)
-                for line in string:
-                    if (
-                        keyboard.is_pressed("return")
-                        or (keyboard.is_pressed("enter"))
-                        or (stop is True)
-                    ):
-                        stop = True
-                        break
-
-                    print(
-                        line.replace("{BROWN}", console_helper.BROWN)
+                with open(frame, "r", encoding="utf-8") as file:
+                    string = (
+                        file.read()
+                        .replace("{BROWN}", console_helper.BROWN)
                         .replace("{LIGHT_GRAY}", console_helper.LIGHT_GRAY)
                         .replace("{MAGENTA}", console_helper.MAGENTA)
                         .replace("{RESET}", console_helper.RESET)
                     )
+
+                print(string)
 
                 print(
                     f"\n{console_helper.LIGHT_BLUE}Hit the Enter Key, to continue{console_helper.RESET}",
