@@ -47,6 +47,7 @@ class Game:
         return f"{self.__save_games_path}/{self.__save_name}"
 
     def get_sound_path(self):
+        """Returns the path of the sound_folder"""
         return f"{self.__sound_path}"
 
     def get_current_level(self):
