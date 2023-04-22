@@ -178,7 +178,7 @@ if __name__ == "__main__":
                 attacker=player_2,
                 target=player_1,
             )
-        # audio_process = simpleaudio.WaveObject.from_wave_file(
-        #    f"{SOUND_PATH}/winning.wav"
-        # )
-        # audio_process.play().wait_done()
+        audio_process = simpleaudio.WaveObject.from_wave_file(
+            f"{game.get_sound_path()}/winning.wav"
+        )
+        audio_process.play().wait_done()

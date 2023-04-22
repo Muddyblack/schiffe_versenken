@@ -46,6 +46,9 @@ class Game:
         """Returns the Absolete save Path of the current Game"""
         return f"{self.__save_games_path}/{self.__save_name}"
 
+    def get_sound_path(self):
+        return f"{self.__sound_path}"
+
     def get_current_level(self):
         """Returns the current level of the game"""
         return self.__current_level
@@ -321,7 +324,7 @@ class Game:
             # Handle arrow key presses to move the selected save game index up or down
 
             if keyboard.is_pressed("up") and selected_save_game_index > 0:
-                simpleaudio.WaveObject.from_wave_file(
+                sound_process = simpleaudio.WaveObject.from_wave_file(
                     f"{self.__sound_path}/Menu-Select.wav"
                 ).play()
 
@@ -331,12 +334,13 @@ class Game:
 
                 while keyboard.is_pressed("up"):
                     pass
+                sound_process.wait_done()
 
             elif (
                 keyboard.is_pressed("down")
                 and selected_save_game_index < len(exist_save_games) - 1
             ):
-                simpleaudio.WaveObject.from_wave_file(
+                sound_process = simpleaudio.WaveObject.from_wave_file(
                     f"{self.__sound_path}/Menu-Select.wav"
                 ).play()
 
@@ -345,6 +349,7 @@ class Game:
                 self.__display_save_games(exist_save_games, selected_save_game_index)
                 while keyboard.is_pressed("down"):
                     pass
+                sound_process.wait_done()
 
             elif keyboard.is_pressed(" "):
                 break
