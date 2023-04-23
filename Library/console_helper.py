@@ -1,6 +1,4 @@
 """Contains functions that help using the terminal as I/O"""
-
-import math
 import os
 import sys
 
@@ -29,6 +27,16 @@ BLINK = "\033[5m"
 NEGATIVE = "\033[7m"
 CROSSED = "\033[9m"
 RESET = "\033[0m"
+
+
+def max_line_length(lines):
+    """Compute the maximum length of lines in a list."""
+    max_length = 0
+    for line in lines:
+        line_length = len(line)
+        if line_length > max_length:
+            max_length = line_length
+    return max_length
 
 
 def clear_console():
@@ -61,7 +69,7 @@ def print_side_by_side(strings, padding=4, strip=False):
     strings_lines = [s.splitlines() for s in strings]
 
     # Find the maximum number of lines among all the strings
-    max_lines = max([len(lines) for lines in strings_lines])
+    max_lines = max_line_length(strings_lines)
 
     # Loop through each line and print them side by side
     for i in range(max_lines):

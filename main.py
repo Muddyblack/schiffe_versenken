@@ -10,7 +10,6 @@ from Library.keyboard_helper import clear_input
 from Classes.game import Game
 
 # enables ansi escape characters in terminal
-os.system(f"{console_helper.RESET}")
 PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
 
 game = Game(PROJECT_PATH)

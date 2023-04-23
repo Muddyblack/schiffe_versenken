@@ -1,3 +1,7 @@
+"""
+- Handles game-logic, game-saving and loading
+- Manages players and their game-fields. 
+"""
 import os
 import time
 import pickle
@@ -14,17 +18,15 @@ from Classes.game_field import GameField
 
 
 class Game:
+    """
+    The Game class serves as the main entry point for running the game
+    """
+
     def __init__(self, project_path):
         os.system(f"{console_helper.RESET}")
-
-        self.project_path = project_path
-
         # Paths
-        self.__game_data_path = f"{self.project_path}/GameData"
+        self.__game_data_path = f"{project_path}/GameData"
         self.__save_games_path = f"{self.__game_data_path}/saves"
-        self.__start_screen_animation_path = (
-            f"{self.__game_data_path}/start_screen_animation"
-        )
         self.__sound_path = f"{self.__game_data_path}/sound"
         os.makedirs(self.__save_games_path, exist_ok=True)
 
@@ -231,9 +233,11 @@ class Game:
             f"{self.__sound_path}/Start-Screen.wav"
         ).play()
 
+        start_screen_animation_path = f"{self.__game_data_path}/start_screen_animation"
+
         files = [
-            os.path.abspath(os.path.join(self.__start_screen_animation_path, file))
-            for file in os.listdir(self.__start_screen_animation_path)
+            os.path.abspath(os.path.join(start_screen_animation_path, file))
+            for file in os.listdir(start_screen_animation_path)
         ]
         frames = sorted(files)
 

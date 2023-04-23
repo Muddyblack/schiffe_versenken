@@ -1,4 +1,5 @@
-from distutils.core import setup, Extension
+# pylint: disable=C)
+from setuptools import setup, Extension
 
 
 def main():

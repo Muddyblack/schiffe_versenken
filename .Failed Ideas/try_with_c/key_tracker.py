@@ -1,6 +1,20 @@
-import sys
+# pylint: disable=C)
+"""
+This is the start of a module for python using C to get Keyboard events without blocking the main script.
+It would not require root access on Linux like the already existing keyboard-module does!
+"""
 
-if sys.platform.startswith("win"):
+####
+#
+# THIS IS NOT FINISHED AND IN DEV
+#
+###
+import sys
+import os
+
+# Import the for different system and Python versions compiled Code
+# At the moment only Python 3.11.2 for Windows and Linux(Debian11)
+if os.name == "nt":
     if sys.maxsize > 2**32:
         import key_tracker_x64 as key_tracker
     else:
@@ -8,49 +22,64 @@ if sys.platform.startswith("win"):
 else:
     import key_tracker_x86_64 as key_tracker
 
+if os.name == "nt":
 
-def get_pressed_key():
-    key = key_tracker.read_key()
-
-    if sys.platform.startswith("win"):
+    def get_pressed_key():
+        """
+        STILL in DEV
+        Was used for another script to get some keys as text form
+        IN FUTURE: This Moethod will be renamed to return for all Keys their String-Names
+        """
+        key = key_tracker.read_key()
+        keyname = ""
         if key == 13:
-            return "enter"
+            keyname = "enter"
         elif key == 32:
-            return "space"
+            keyname = "space"
         elif key == 72:
-            return "up"
+            keyname = "up"
         elif key == 80:
-            return "down"
+            keyname = "down"
         elif key == 77:
-            return "right"
+            keyname = "right"
         elif key == 75:
-            return "left"
+            keyname = "left"
         else:
-            return key
+            keyname = key
+        return keyname
 
-    else:
+else:
+
+    def get_pressed_key():
+        """
+        STILL in DEV
+        Was used for another script to get some keys as text form
+        IN FUTURE: This Moethod will be renamed to return for all Keys their String-Names
+        """
+        key = key_tracker.read_key()
         if key == 10:
-            return "enter"
+            keyname = "enter"
         elif key == 32:
-            return "space"
+            keyname = "space"
         elif key == 27:
             key = key_tracker.read_key()
             if key == 91:
                 key = key_tracker.read_key()
                 if key == 65:
-                    return "up"
+                    keyname = "up"
                 elif key == 66:
-                    return "down"
+                    keyname = "down"
                 elif key == 67:
-                    return "right"
+                    keyname = "right"
                 elif key == 68:
-                    return "left"
+                    keyname = "left"
         else:
-            return key
+            keyname = key
+        return keyname
 
 
 if __name__ == "__main__":
     while True:
-        key = get_pressed_key()
-        if key != 0:
-            print(key)
+        pressed_key = get_pressed_key()
+        if pressed_key != 0:
+            print(pressed_key)

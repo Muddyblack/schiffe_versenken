@@ -45,10 +45,7 @@ for file in FILEPATHS:
             stdin=subprocess.PIPE,
         ) as process:
             pass
-        # subprocess.run(["pylint", file, "--output-format=colorized", "--max-line-length=160"]
-        #    ,
-        #    check=True,
-        # )
+
     except subprocess.CalledProcessError as e:
         print(f"Error processing file '{file}': {e}")
 
