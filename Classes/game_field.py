@@ -11,13 +11,7 @@ import random
 from copy import deepcopy
 
 from Library.keyboard_helper import get_arrow_key
-from Library.print_helper import print_side_by_side
-
-# anicode
-BLUE = "\033[0;34m"
-RED = "\033[0;31m"
-LIGHT_GREEN = "\033[1;32m"
-RESET = "\033[0m"
+from Library import console_helper
 
 
 class GameField:
@@ -89,16 +83,16 @@ class GameField:
                 txt += "\b" * (len(str(num)) - 1)
             for row in line:
                 if row == 1:
-                    color = BLUE
+                    color = console_helper.BLUE
                 elif row == "X":
-                    color = RED
+                    color = console_helper.RED
                 elif row == "o":
-                    color = LIGHT_GREEN
+                    color = console_helper.LIGHT_GREEN
                 else:
-                    color = RESET
+                    color = console_helper.RESET
                 txt += color + str(row) + " "
-            txt += RESET + "\n"
-        txt += RESET + "\n"
+            txt += console_helper.RESET + "\n"
+        txt += console_helper.RESET
         return txt
 
     def show_boatfield(self):
@@ -111,9 +105,20 @@ class GameField:
 
     def show_fields_side_by_side(self):
         """Should print the boatfield and the hitfield matrix side by side."""
-        print_side_by_side(
-            self.get_field_text(self.__boatfield),
-            self.get_field_text(self.__hitfield),
+        padding = 4
+        print(
+            console_helper.GREEN
+            + "Boatfield"
+            + " " * ((len(self.__boatfield) * 2) + padding - 1)
+            + "Hitfield"
+            + console_helper.RESET
+        )
+        console_helper.print_side_by_side(
+            [
+                f"{self.get_field_text(self.__boatfield)}",
+                f"{self.get_field_text(self.__hitfield)}",
+            ],
+            padding=padding,
         )
 
     # Ship placement functions
@@ -282,10 +287,17 @@ class GameField:
         if self == target:
             raise ValueError("You cannot attack yourself!")
 
+        if target.owner.get_ship_amount() == 0:
+            print(
+                f"{console_helper.RED}Congrats {self.owner.get_player_name()}, YOU WON!{console_helper.RESET}"
+            )
+            return 0
+
         # If the player is a bot, randomly choose a position that has not been used before to attack
-        if self.owner.get_bot() is True:
+        bot = self.owner.get_bot()
+        if bot:
             while True:
-                row, col = self.__get_row_and_column_input("Bot", True)
+                row, col = self.__get_row_and_column_input("Bot", bot)
 
                 if [col, row] not in self.__botcache:
                     self.__botcache.append([col, row])
@@ -293,7 +305,7 @@ class GameField:
         # Otherwise, prompt the player to choose a position to attack
         else:
             row, col = self.__get_row_and_column_input(
-                "Enter the attacking position for your ship (e.g. A1): ", False
+                "Enter the attacking position for your ship (e.g. A1): ", bot
             )
 
         # Check if the attack hits a ship or not
@@ -307,10 +319,10 @@ class GameField:
 
             if target.owner.get_ship_amount() == 0:
                 print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
-                return True
+                return "win"
 
             print("You can attack a second time")
-            return self.attack_enemy(target)
+            return "hit"
 
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
@@ -318,4 +330,4 @@ class GameField:
             print("Sir we've hit the bull's eye!")
             self.set_hitfield_cell(row, col, "o")
 
-        return False
+        return "water"

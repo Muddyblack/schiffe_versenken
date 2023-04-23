@@ -20,4 +20,8 @@ pipreqs /path/to/project
 
 - [ASCII-Art](https://github.com/DawnHK/Ascii-Art/blob/master/ascii-art.de/www.ascii-art.de/ascii/ab/battleship.txt)
 - [Start-Music](https://www.youtube.com/watch?v=ZpUA_kIwDT0)
-- [side-by-side-print](https://github.com/jxmorris12/side-by-side/blob/master/side_by_side/diff.py)
+- [Start-Screen-Music](https://www.youtube.com/watch?v=ZpUA_kIwDT0)
+- [Start-Game-sound](https://www.youtube.com/watch?v=vIz103rCD-s)
+- [Select-Sound](https://www.youtube.com/watch?v=T9N0pmLI7Jw)
+- [Affirmed-Sound](https://www.youtube.com/watch?v=YNSbL-Cek1c)
+- [Winning-sound](https://www.youtube.com/shorts/OZMXOfyndiw)
