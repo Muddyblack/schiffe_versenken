@@ -10,8 +10,7 @@ from Library.keyboard_helper import clear_input
 from Classes.game import Game
 
 # enables ansi escape characters in terminal
-os.system("")
-
+os.system(f"{console_helper.RESET}")
 PROJECT_PATH = f"{os.path.abspath(os.path.dirname(os.path.realpath(__file__)))}"
 
 game = Game(PROJECT_PATH)
@@ -106,11 +105,11 @@ def place_all_ships(obj):
 
 def attack_execution(attacker, target):
     """Attacks the target and set target as new current_player"""
-    status = 1
-    while status == 1:
+    status = "hit"
+    while status == "hit":
         status = attacker.attack_enemy(target)
         game.save_game()
-    if status == 0:
+    if status == "win":
         ## DELETE FILE when game ends
         save_path = game.get_save_path()
         if os.path.exists(save_path):

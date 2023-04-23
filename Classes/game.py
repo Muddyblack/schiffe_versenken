@@ -15,7 +15,7 @@ from Classes.game_field import GameField
 
 class Game:
     def __init__(self, project_path):
-        os.system("")
+        os.system(f"{console_helper.RESET}")
 
         self.project_path = project_path
 
@@ -239,6 +239,10 @@ class Game:
 
         stop = False
         while not stop:
+            if not sound_process.is_playing():
+                sound_process = simpleaudio.WaveObject.from_wave_file(
+                    f"{self.__sound_path}/Start-Screen.wav"
+                ).play()
             for frame in frames:
                 with open(frame, "r", encoding="utf-8") as file:
                     string = (

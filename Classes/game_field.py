@@ -319,11 +319,10 @@ class GameField:
 
             if target.owner.get_ship_amount() == 0:
                 print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
-                return 0
+                return "win"
 
             print("You can attack a second time")
-            return 1
-            return self.attack_enemy(target)
+            return "hit"
 
         elif target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
@@ -331,4 +330,4 @@ class GameField:
             print("Sir we've hit the bull's eye!")
             self.set_hitfield_cell(row, col, "o")
 
-        return 2
+        return "water"
