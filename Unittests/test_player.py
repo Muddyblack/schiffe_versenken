@@ -25,7 +25,7 @@ class TestPlayer(unittest.TestCase):
     def test_get_ships(self):
         self.assertEqual(
             self.player.get_ships(),
-            {"battleship": [], "cruiser": [], "destroyer": [], "uboat": []},
+            {"battleship": [], "cruiser": [], "destroyer": [], "submarine": []},
         )
 
     def test_get_ship_amount(self):
@@ -44,7 +44,7 @@ class TestPlayer(unittest.TestCase):
             "battleship": [[(0, 0)]],
             "cruiser": [[(1, 1)]],
             "destroyer": [[(2, 2)]],
-            "uboat": [[(3, 3)]],
+            "submarine": [[(3, 3)]],
         }
         self.player.set_ships(ships)
         self.assertEqual(self.player.get_ships(), ships)
@@ -55,7 +55,7 @@ class TestPlayer(unittest.TestCase):
             "battleship": [[(0, 0), (0, 1)], [(10, 0), (10, 1)]],
             "cruiser": [[(1, 1)]],
             "destroyer": [[(2, 2)]],
-            "uboat": [[(3, 3)]],
+            "submarine": [[(3, 3)]],
         }
         self.player.set_ships(ships)
 
@@ -67,7 +67,7 @@ class TestPlayer(unittest.TestCase):
                 "battleship": [[(0, 1)], [(10, 0), (10, 1)]],
                 "cruiser": [[(1, 1)]],
                 "destroyer": [[(2, 2)]],
-                "uboat": [[(3, 3)]],
+                "submarine": [[(3, 3)]],
             },
         )
 
@@ -79,7 +79,7 @@ class TestPlayer(unittest.TestCase):
                 "battleship": [[(0, 1)], [(10, 0), (10, 1)]],
                 "cruiser": [[(1, 1)]],
                 "destroyer": [[(2, 2)]],
-                "uboat": [[(3, 3)]],
+                "submarine": [[(3, 3)]],
             },
         )
 
@@ -91,7 +91,7 @@ class TestPlayer(unittest.TestCase):
                 "battleship": [[(10, 0), (10, 1)]],
                 "cruiser": [[(1, 1)]],
                 "destroyer": [[(2, 2)]],
-                "uboat": [[(3, 3)]],
+                "submarine": [[(3, 3)]],
             },
         )
 
@@ -99,7 +99,7 @@ class TestPlayer(unittest.TestCase):
         self.player.add_ship("battleship", [(0, 0)])
         self.assertEqual(
             self.player.get_ships(),
-            {"battleship": [[(0, 0)]], "cruiser": [], "destroyer": [], "uboat": []},
+            {"battleship": [[(0, 0)]], "cruiser": [], "destroyer": [], "submarine": []},
         )
 
 
