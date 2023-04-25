@@ -8,10 +8,6 @@ import keyboard
 def get_arrow_key():
     """
     Detects which arrow key is pressed on the keyboard and returns the corresponding direction.
-
-    Returns:
-        str: The direction of the arrow key that is pressed on the keyboard. It can be one of the following:
-             "up", "down", "left", or "right".
     """
 
     while True:
@@ -28,6 +24,7 @@ def get_arrow_key():
             return "right"
 
 
+# pylint disabling required to import only for current running OS
 # pylint: disable=import-outside-toplevel
 def clear_input():
     """Clears input buffer by reading and discarding input events."""

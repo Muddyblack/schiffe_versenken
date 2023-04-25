@@ -5,17 +5,14 @@ from Library import game_paths
 
 class Player:
     """
-    The Player class represents the user with its name or if it is a bot.
+    The Player class represents the user with its name or if it is a bot and his ships.
     It has several methods to set and get the user attributes.
     """
 
-    def __init__(self, bot=False, name="Player"):
+    def __init__(self, bot=False, name="bot"):
         self.__bot = bot
 
-        if self.__bot is True:
-            self.__player_name = "bot"
-        else:
-            self.__player_name = name
+        self.__player_name = name
 
         self.__botcache = []
 

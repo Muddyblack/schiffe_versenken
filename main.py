@@ -6,15 +6,17 @@ import shutil
 import random
 import simpleaudio
 from Library import console_helper
-from Library.keyboard_helper import clear_input
+from Library import keyboard_helper
 from Library import random_helper
+from Library import game_paths
+
 
 from Classes.game import Game
 
-
-# enables ansi escape characters in terminal
-game = Game()
 random.seed(time.time())
+
+# Setup the Game
+game = Game()
 
 
 # Gameplay funcs
@@ -32,11 +34,13 @@ def left_to_place_ships(ship_types, ships):
     for ind, (key, value) in enumerate(ship_types.items(), start=1):
         ships_of_type_left = int(value["max"]) - len(ships[key])
         ships_left += ships_of_type_left
+
         if ships_of_type_left > 0:
             ship_num_col = console_helper.GREEN
         else:
             ship_num_col = console_helper.RED
             placed_ships.append(ind)
+
         print_text += f"{ind}: {key} {ship_num_col}{ships_of_type_left}{console_helper.RESET} ({value['length']}-Long)\n"
 
     # removing last comma and space
@@ -50,47 +54,51 @@ def left_to_place_ships(ship_types, ships):
 
 
 def place_all_ships(obj):
-    """Manages the placement of all ships"""
+    """Manages the placement of all ships for the player/bot"""
 
     # gets the allowed ships and their settings as dictionary
     ship_types = obj.owner.get_ship_preferences()
+
     is_bot = obj.owner.get_bot()
 
+    # Loop until all ships have beenn placed
     while True:
         ships = obj.owner.get_ships()
+
         left_ships = left_to_place_ships(ship_types, ships)
         left_ships_txt = left_ships[0]
         left_ships_num = left_ships[1]
         placed_ships = left_ships[2]
 
+        # Exiting loop when no ship left to place
         if left_ships_num == 0:
             break
 
-        # Get bot/user input what ship should be set.
+        # Getting bot/user input what ship should be set.
         if is_bot is False:
+            # Get Input from User
+
             obj.show_boatfield()
-            # Ask User for input
             print(left_ships_txt)
 
-            clear_input()
+            keyboard_helper.clear_input()
             current_boat_to_place = (
-                str(
-                    input(
-                        f"Please type in the boats {console_helper.LIGHT_WHITE}index{console_helper.RESET}, "
-                        + f"or its {console_helper.LIGHT_WHITE}name{console_helper.RESET}: "
-                    )
+                input(
+                    f"Please type in the boats {console_helper.LIGHT_WHITE}index{console_helper.RESET}, "
+                    + f"or its {console_helper.LIGHT_WHITE}name{console_helper.RESET}: "
                 )
                 .lower()
                 .strip()
             )
         else:
             # Get input from bot
+
             current_boat_to_place = random_helper.randint_exc(
                 1, len(ship_types), placed_ships
             )
 
         # Getting the boat name if input was an integer
-        # And looking if input is an ingame object
+        # And looking if input is an Ingame-Object
         try:
             if (
                 str(current_boat_to_place).isdigit()
@@ -110,10 +118,13 @@ def place_all_ships(obj):
             time.sleep(0.25)
             continue
 
+        # Placing the ship
         if (int(curr_ship_type["max"]) - len(ships[current_boat_to_place])) > 0:
             ship_placed = obj.set_ship(
                 curr_ship_type["length"], current_boat_to_place, is_bot
             )
+            # If placing the ship did not work, then the game board is impossible.
+            # In that case the placed ships get resettet and we start from scratch placing the ships
             if not ship_placed:
                 obj.set_boatfield(obj.init_field())
                 obj.owner.set_ships(obj.owner.init_ships())
@@ -125,11 +136,11 @@ def place_all_ships(obj):
                     + f"\n------------------------------------------------------\n{console_helper.RESET}"
                 )
                 time.sleep(3)
+
             if ship_placed and not is_bot:
                 simpleaudio.WaveObject.from_wave_file(
-                    f"{game.get_sound_path()}/Set-Ship.wav"
+                    f"{game_paths.SOUND_PATH}/Set-Ship.wav"
                 ).play()
-
         else:
             print(
                 f"{console_helper.RED}You already placed all your {current_boat_to_place}!{console_helper.RESET}"
@@ -149,36 +160,47 @@ def place_all_ships(obj):
 
 
 def attack_execution(attacker, target):
-    """Attacks the target and set target as new current_player"""
+    """Attacks the target and sets target as new current_player"""
+
     status = "hit"
+
     if attacker.owner.get_bot() is False:
         attacker.show_fields_side_by_side()
+
     while status == "hit":
         status = attacker.attack_enemy(target)
         game.save_game()
+
+        # playing audio depending on the status
         if status == "hit":
             simpleaudio.WaveObject.from_wave_file(
-                f"{game.get_sound_path()}/HIT.wav"
+                f"{game_paths.SOUND_PATH}/HIT.wav"
             ).play()
         elif status == "water":
             simpleaudio.WaveObject.from_wave_file(
-                f"{game.get_sound_path()}/Water-Drop.wav"
+                f"{game_paths.SOUND_PATH}/Water-Drop.wav"
             ).play()
+
         time.sleep(0.1)
+
     if status == "win":
-        ## DELETE FILE when game ends
+        ## DELETE FILE when game ends and play winning sound
+
         save_path = game.get_save_path()
         if os.path.exists(save_path):
             print(
                 f"---------------------------------------------DELETE{save_path}\n---------------------------------------------"
             )
             shutil.rmtree(save_path)
-        audio_process = simpleaudio.WaveObject.from_wave_file(
-            f"{game.get_sound_path()}/winning.wav"
-        )
-        audio_process.play().wait_done()
+
+        simpleaudio.WaveObject.from_wave_file(
+            f"{game_paths.SOUND_PATH}/winning.wav"
+        ).play().wait_done()
+
+        ##EXITIING the script
         sys.exit()
     else:
+        # End the function saving and waiting for User to continue
         game.set_last_turn_player(target)
         game.save_game()
 
@@ -196,44 +218,42 @@ def attack_execution(attacker, target):
 if __name__ == "__main__":
     players = game.get_players()
 
+    # Walking through players and letting place their ships
     if game.get_current_level() == 0:
         for index, player in enumerate(players):
             console_helper.clear_console()
             print(
                 f"{console_helper.RED}Your Turn {player.owner.get_player_name()}!{console_helper.RESET}"
             )
+
             game.save_game()
             place_all_ships(player)
+
             if player.owner.get_bot() is False:
                 player.show_boatfield()
-            if index < len(players) - 1:
+
+            if index < (len(players) - 1):
                 game.set_last_turn_player(players[index + 1])
                 game.save_game()
             else:
                 game.set_last_turn_player(players[0])
                 game.save_game()
+
         game.set_current_level(game.get_current_level() + 1)
         game.save_game()
 
-    player_1 = players[0]
-    player_2 = players[1]
+    # Starting the Attacking loop until one player wins
 
     if game.get_current_level() == 1:
-        while (player_1.get_ships_left() != 0) and (player_2.get_ships_left() != 0):
-            console_helper.clear_console()
-            print(
-                f"{console_helper.RED}Your Turn {player_1.owner.get_player_name()}!{console_helper.RESET}"
-            )
-            attack_execution(
-                attacker=player_1,
-                target=player_2,
-            )
+        while True:
+            for index, player in enumerate(players):
+                if index < (len(players) - 1):
+                    next_p = players[index + 1]
+                else:
+                    next_p = players[0]
 
-            console_helper.clear_console()
-            print(
-                f"{console_helper.RED}Your Turn {player_2.owner.get_player_name()}!{console_helper.RESET}"
-            )
-            attack_execution(
-                attacker=player_2,
-                target=player_1,
-            )
+                console_helper.clear_console()
+                print(
+                    f"{console_helper.BROWN}Your Turn {player.owner.get_player_name()}!{console_helper.RESET}"
+                )
+                attack_execution(attacker=player, target=next_p)

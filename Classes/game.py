@@ -11,7 +11,7 @@ import simpleaudio
 import keyboard
 
 from Library import console_helper
-from Library.keyboard_helper import clear_input
+from Library import keyboard_helper
 from Library import game_paths
 
 from Classes.player import Player
@@ -25,7 +25,6 @@ class Game:
 
     def __init__(self):
         os.system(f"{console_helper.RESET}")
-        # Paths
         os.makedirs(game_paths.SAVE_GAMES_PATH, exist_ok=True)
 
         self.__players = None
@@ -37,17 +36,13 @@ class Game:
         time.sleep(0.3)
 
     # getter
-    def get_players(self):
-        """Returns an Array of the players"""
-        return self.__players
-
     def get_save_path(self):
         """Returns the Absolete save Path of the current Game"""
         return f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}"
 
-    def get_sound_path(self):
-        """Returns the path of the sound_folder"""
-        return f"{game_paths.SOUND_PATH}"
+    def get_players(self):
+        """Returns an Array of the players"""
+        return self.__players
 
     def get_current_level(self):
         """Returns the current level of the game"""
@@ -72,16 +67,19 @@ class Game:
 
     # Class functions
 
-    def __ask_name(self, question):
+    def __ask_name(self, question, duplication=[]):
         """
-        Asks the user to enter his name and checks if it is not empty or longer than 15 characters
-        Returns:
-            -(str): name
+        Asks the user to enter his name and checks:
+            - if it is not empty or longer than 15 characters
+            - contains not allowed characters
+            - is duplicated
         """
+        not_allowed_chars = r'\/:*?"<>|'
         min_name_len = 3
         max_name_len = 15
 
         while True:
+            keyboard_helper.clear_input()
             name = input(f"\n{question}").strip()
 
             if name == "":
@@ -90,6 +88,10 @@ class Game:
                 msg = f"The name is too long it has: {len(name)} character allowed: {max_name_len}"
             elif len(name) < min_name_len:
                 msg = f"The name is too short it has: {len(name)} min length: {min_name_len}"
+            elif any(char in name for char in not_allowed_chars):
+                msg = f"{not_allowed_chars} are not allowed in your name!"
+            elif name in duplication:
+                msg = f"{name} is already taken. Choose another name!"
             else:
                 break
 
@@ -105,6 +107,7 @@ class Game:
             "level": self.__current_level,
         }
 
+        # collecting data from all instances of GameField class
         for obj in gc.get_objects():
             if isinstance(obj, GameField):
                 player_info = {
@@ -117,9 +120,9 @@ class Game:
                 }
                 player_list.append(player_info)
 
+        # Write to file and create path if not existing
         save_dir = f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}"
         os.makedirs(save_dir, exist_ok=True)
-
         with open(f"{save_dir}/players.obj", "wb") as file:
             pickle.dump(player_list, file)
         with open(f"{save_dir}/game.info", "wb") as file:
@@ -128,10 +131,9 @@ class Game:
     def load_game(self):
         """
         Loads a saved game.
-
-        Returns:
-            -(tuple): two GameField instances and dictionary with game-infos
         """
+
+        # Reading required files
         with open(
             f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}/players.obj", "rb"
         ) as playerpickle:
@@ -145,6 +147,7 @@ class Game:
         self.__current_level = game_info["level"]
         field_list = []
 
+        # creating objects from save-file
         for obj in player_list:
             player = Player(name=obj["name"], bot=obj["bot"])
             player.set_ships(obj["ships"])
@@ -157,16 +160,14 @@ class Game:
 
         def rotate_array_backwards(arr):
             first_element = arr[0]
-
             # Postpone elements one to the left
             for i in range(0, len(arr) - 1):
                 arr[i] = arr[i + 1]
-
             # set last elem to the first elem
             arr[-1] = first_element
-
             return arr
 
+        # Checking who had last turn
         check_ind = 0
         while True:
             if check_ind >= len(field_list):
@@ -184,57 +185,57 @@ class Game:
 
         self.__players = field_list
 
-    def __create__new_game(self, existing_saves):
+    def __yes_no_question(self, question):
         """
-        Creates a new game.
-
-        Returns:
-            - (tuple): two GameField instances and dictionary with game-infos
+        Function that returns True or Flase for yes or no questions
         """
         while True:
-            print("Hello you decided to create a new Save-game")
-            save_name = f'{self.__ask_name("Enter the save name you wish to use: ").replace(" ", "_")}_save'
-
-            if save_name in existing_saves:
-                print("This name does already exist!")
+            user_input = input(f"{question} [y/n] ").lower().strip()
+            if user_input == "y" or user_input == "yes" or user_input == "":
+                return True
+            elif user_input == "n" or user_input == "no":
+                return False
             else:
-                self.__save_name = save_name
-                break
+                print("You can only answer with yes or no!")
 
-        opponent = ""
+    def __create__new_game(self, existing_saves, player=2):
+        """
+        Creates a new game.
+        """
 
-        p1_name = self.__ask_name("Nice, so what is your name: ")
-        while opponent not in ("y", "n"):
-            opponent = (
-                input(
-                    f"Hello, {p1_name}, would you like to play against a real person? [y/n] "
+        # Asks for the save-game name
+        print("Hello you decided to create a new Save-game")
+        existing_saves_names = [elem.replace("_save", "") for elem in existing_saves]
+        self.__save_name = f'{self.__ask_name("Enter the save name you wish to use: ", existing_saves_names).replace(" ", "_")}_save'
+
+        # Asks if the User should be a bot, ask for the name and create the GamField
+        field_list = []
+        player_names = []
+        bots = 0
+
+        for index in range(player):
+            player_name = ""
+            is_bot = False
+
+            if self.__yes_no_question(f"Welcome Player{index+1}!\nAre You a bot?"):
+                bots += 1
+                is_bot = True
+                player_name = f"bot_{bots}"
+            else:
+                player_name = self.__ask_name(
+                    "Nice, so what is your name: ", player_names
                 )
-                .lower()
-                .strip()
-            )
+            player_names.append(player)
+            field_list.append(GameField(Player(bot=is_bot, name=player_name)))
 
-        f_1 = GameField(Player(name=p1_name))
+        # Random gonna decide who starts
+        first_cache = field_list[0]
+        random_starter = random.randint(0, len(field_list) - 1)
+        field_list[0] = field_list[random_starter]
+        field_list[random_starter] = first_cache
 
-        if opponent == "y":
-            while True:
-                p2_name = self.__ask_name(
-                    f"Hello {p1_name} told me about you.\nWhat is your name: "
-                )
-                if p2_name != p1_name:
-                    break
-                print("The other player already has this name!")
-            f_2 = GameField(Player(name=p2_name))
-        else:
-            f_2 = GameField(Player(bot=True))
-
-        # Coin flipping who will start the Game
-        starter = random.randint(0, 1)
-        if starter == 0:
-            fields = (f_1, f_2)
-        else:
-            fields = (f_2, f_1)
-
-        self.__players = fields
+        # Finish and set Variables
+        self.__players = field_list
         self.__current_level = 0
 
     def __start_screen(self):
@@ -300,7 +301,7 @@ class Game:
             f"{game_paths.SOUND_PATH}/Start_game.wav"
         ).play()
 
-        clear_input()
+        keyboard_helper.clear_input()
         console_helper.clear_console()
 
     def __display_save_games(self, save_games, selected_save_game_index):
@@ -391,7 +392,7 @@ class Game:
 
         while load not in ("y", "n"):
             load = input("Do you want to load an old save? [y/n]: ").lower().strip()
-            clear_input()
+            keyboard_helper.clear_input()
 
         if load == "y":
             self.__select_savegame(exist_save_games)

@@ -53,39 +53,25 @@ def refresh_console_lines(lines):
 
 def print_side_by_side(strings, padding=4, strip=False):
     """
-    Print n strings side by side in the console with padding between them,
-    even if the strings contain ANSI escape codes.
-
-    Args:
-        strings (list): A list of strings to be printed side by side.
-        padding (int, optional): The number of spaces to use as padding between the strings.
-                                Default is 4.
-
-    Returns:
-        None
+    Prints n strings side by side in the console with padding between them (ALLOWS ANSI)
     """
-
-    # Split each string into a list of lines
     strings_lines = [s.splitlines() for s in strings]
-
-    # Find the maximum number of lines among all the strings
     max_lines = max_line_length(strings_lines)
 
     # Loop through each line and print them side by side
     for i in range(max_lines):
-        # Print each string's line, separated by padding spaces
         for j, lines in enumerate(strings_lines):
             if i < len(lines):
-                # Strip the leading and trailing whitespaces from the line
+                # Strip line if wanted
                 if strip:
                     line = lines[i].strip()
                 else:
                     line = lines[i]
                 print(line.ljust(len(line) + padding), end="")
-                # Add extra padding after printing the line, except for the last string
+
+                # Adding padding
                 if j < len(strings_lines) - 1:
                     print(" " * padding, end="")
             else:
                 print(" " * (len(lines[0]) + padding), end="")
-        # Print a newline character after each line
         print()
