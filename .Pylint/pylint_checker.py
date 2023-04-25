@@ -14,6 +14,8 @@ sys.path.append(
     )
 )
 
+# Pylint mus be deactivated because we have to append the project path directory here.
+# Python cannot go upper than the runnings script directory
 # pylint: disable=wrong-import-position
 from Library import file_helper
 
