@@ -52,12 +52,12 @@ def left_to_place_ships(ship_types, ships):
 def place_all_ships(obj):
     """Manages the placement of all ships"""
 
-    ships = obj.owner.get_ships()
     # gets the allowed ships and their settings as dictionary
     ship_types = obj.owner.get_ship_preferences()
     is_bot = obj.owner.get_bot()
 
     while True:
+        ships = obj.owner.get_ships()
         left_ships = left_to_place_ships(ship_types, ships)
         left_ships_txt = left_ships[0]
         left_ships_num = left_ships[1]
@@ -111,8 +111,21 @@ def place_all_ships(obj):
             continue
 
         if (int(curr_ship_type["max"]) - len(ships[current_boat_to_place])) > 0:
-            obj.set_ship(curr_ship_type["length"], current_boat_to_place, is_bot)
-            if not is_bot:
+            ship_placed = obj.set_ship(
+                curr_ship_type["length"], current_boat_to_place, is_bot
+            )
+            if not ship_placed:
+                obj.set_boatfield(obj.init_field())
+                obj.owner.set_ships(obj.owner.init_ships())
+                game.save_game()
+
+                print(
+                    f"{console_helper.RED}------------------------------------------------------\n"
+                    + "IF THIS LOOP DOES NOT FINISH RESTART THE GAME"
+                    + f"\n------------------------------------------------------\n{console_helper.RESET}"
+                )
+                time.sleep(3)
+            if ship_placed and not is_bot:
                 simpleaudio.WaveObject.from_wave_file(
                     f"{game.get_sound_path()}/Set-Ship.wav"
                 ).play()

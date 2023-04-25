@@ -22,7 +22,7 @@ class Player:
         self.__ship_preferences = {}
         self.load_ship_preferences()
 
-        self.__ships = {key: [] for key in self.__ship_preferences.keys()}
+        self.__ships = self.init_ships()
 
     # getter
     def get_bot(self):
@@ -52,6 +52,11 @@ class Player:
     def get_ship_preferences(self):
         """Returns the dictionary with all allowed ships and their settings"""
         return self.__ship_preferences
+
+    # init
+    def init_ships(self):
+        """Returning the starter ships Dictionary"""
+        return {key: [] for key in self.__ship_preferences.keys()}
 
     # setter
     def set_bot(self, value):
