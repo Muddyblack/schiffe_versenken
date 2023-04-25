@@ -157,6 +157,7 @@ def attack_execution(attacker, target):
         game.save_game()
 
         if attacker.owner.get_bot() is False:
+            console_helper.clear_console()
             attacker.show_fields_side_by_side()
             input(
                 "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
