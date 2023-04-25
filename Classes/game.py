@@ -67,7 +67,7 @@ class Game:
 
     # Class functions
 
-    def __ask_name(self, question, duplication=[]):
+    def __ask_name(self, question, duplication=""):
         """
         Asks the user to enter his name and checks:
             - if it is not empty or longer than 15 characters
@@ -191,12 +191,12 @@ class Game:
         """
         while True:
             user_input = input(f"{question} [y/n] ").lower().strip()
-            if user_input == "y" or user_input == "yes" or user_input == "":
+            if user_input in ("y", "yes", ""):
                 return True
-            elif user_input == "n" or user_input == "no":
+            if user_input in ("n", "no"):
                 return False
-            else:
-                print("You can only answer with yes or no!")
+
+            print("You can only answer with yes or no!")
 
     def __create__new_game(self, existing_saves, player=2):
         """
@@ -248,6 +248,7 @@ class Game:
             f"{game_paths.GAME_DATA_PATH}/start_screen_animation"
         )
 
+        # Get all files for animation and print them in loop until interrupted by user.
         files = [
             os.path.abspath(os.path.join(start_screen_animation_path, file))
             for file in os.listdir(start_screen_animation_path)
@@ -316,16 +317,13 @@ class Game:
 
     def __select_savegame(self, exist_save_games):
         """
-        Allows the user to select a saved game from a list of saved game directories displayed on the console.
-        The user uses arrow-keys and the enter-key
-
-        Returns:
-            - (str): The selected game directory.
+        - Allows the user to select a saved game from a list of saved game directories displayed on the console.
+        - The user uses arrow-keys and the space-key
         """
         selected_save_game_index = 0
         save_games_len = len(exist_save_games)
-
         print("Use up and down arrows to navigate\nUse Spacebar to sleect the game")
+
         self.__display_save_games(exist_save_games, selected_save_game_index)
 
         while True:
@@ -362,22 +360,25 @@ class Game:
             elif keyboard.is_pressed(" "):
                 break
 
+        # Set Variable and exit function with playing start-sound
         self.__save_name = exist_save_games[selected_save_game_index]
         print(f"Selected save game: {os.path.basename(self.__save_name)}\n")
+
         simpleaudio.WaveObject.from_wave_file(
             f"{game_paths.SOUND_PATH}/Selected.wav"
         ).play()
 
     def start_up(self):
         """
-        Sets up the initial game environment
-        If the user chooses to load an old save, it loads the save game and returns the GameField instances for both players.
+        Sets up the initial game environment.
+        If the user chooses to load an old save, it loads the save game and returns the GameField instances for all players.
         Otherwise, it asks for the player's name, whether they want to play against a real person or a bot, and starts the game
         by randomly choosing which player goes first.
 
         Returns:
-            A dictionary with keys "players" and "save_name". The value for the key "players" is a list of two GameField instances
-            representing the players. The value for the key "save_name" is a string representing the name of the save game.
+            - A dictionary with keys "players" and "save_name".
+                - The value for the key "players" is a list of GameField instances representing the players.
+                - The value for the key "save_name" is a string representing the name of the save game.
         """
         self.__start_screen()
         exist_save_games = [
@@ -386,16 +387,9 @@ class Game:
             if f.is_dir() and not f.is_file() and f.name.endswith("_save")
         ]
 
-        load = ""
-        if len(exist_save_games) == 0:
-            load = "n"
-
-        while load not in ("y", "n"):
-            load = input("Do you want to load an old save? [y/n]: ").lower().strip()
-            keyboard_helper.clear_input()
-
-        if load == "y":
-            self.__select_savegame(exist_save_games)
-            return self.load_game()
+        if len(exist_save_games) != 0:
+            if self.__yes_no_question("Do you want to load an old save?"):
+                self.__select_savegame(exist_save_games)
+                return self.load_game()
 
         return self.__create__new_game(exist_save_games)
