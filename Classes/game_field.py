@@ -205,7 +205,8 @@ class GameField:
         while True:
             # ask start location
             start_row, start_col = self.__get_row_and_column_input(
-                "Enter the start position for your ship (e.g. A1): ", is_bot
+                f"Enter the start position for your {console_helper.BROWN}{ship_type}{console_helper.RESET} (e.g. A1): ",
+                is_bot,
             )
 
             if not is_bot:
