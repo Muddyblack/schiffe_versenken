@@ -344,7 +344,9 @@ class GameField:
             target.owner.ships_after_attack([row, col])
 
             if target.owner.get_ship_amount() == 0:
-                print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
+                print(
+                    f"{console_helper.LIGHT_RED}Congrats {self.owner.get_player_name()}, YOU WON!{console_helper.RESET}"
+                )
                 return "win"
 
             console_helper.clear_console()
