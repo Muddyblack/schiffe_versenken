@@ -11,7 +11,7 @@ import random
 import simpleaudio
 from copy import deepcopy
 
-from Library.keyboard_helper import get_arrow_key
+from Library import keyboard_helper
 from Library import console_helper
 
 
@@ -128,7 +128,8 @@ class GameField:
         """
 
         while bot is False:
-            user_input = input(f"{message}").strip()
+            keyboard_helper.clear_input()
+            user_input = input(f"{message}").strip().replace(" ", "")
 
             try:
                 l_row = int(user_input[1:]) - 1
@@ -214,7 +215,7 @@ class GameField:
 
             if not is_bot:
                 print("Enter the direction for your ship. Use your arrow Keys!")
-                direction = get_arrow_key()
+                direction = keyboard_helper.get_arrow_key()
             else:
                 match int(random.randint(0, 3)):
                     case 0:

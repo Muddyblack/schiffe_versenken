@@ -55,9 +55,9 @@ def place_all_ships(obj):
     ships = obj.owner.get_ships()
     # gets the allowed ships and their settings as dictionary
     ship_types = obj.owner.get_ship_preferences()
+    is_bot = obj.owner.get_bot()
 
     while True:
-        is_bot = obj.owner.get_bot()
         left_ships = left_to_place_ships(ship_types, ships)
         left_ships_txt = left_ships[0]
         left_ships_num = left_ships[1]
@@ -90,7 +90,7 @@ def place_all_ships(obj):
             )
 
         # Getting the boat name if input was an integer
-        # And looking if input is an ingame object7
+        # And looking if input is an ingame object
         try:
             if (
                 str(current_boat_to_place).isdigit()
@@ -123,8 +123,8 @@ def place_all_ships(obj):
             )
 
         game.save_game()
+        console_helper.clear_console()
 
-    console_helper.clear_console()
     if is_bot is False:
         obj.show_boatfield()
         input(
@@ -170,6 +170,7 @@ def attack_execution(attacker, target):
         game.save_game()
 
         if attacker.owner.get_bot() is False:
+            console_helper.clear_console()
             attacker.show_fields_side_by_side()
             input(
                 "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
