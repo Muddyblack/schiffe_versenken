@@ -89,17 +89,14 @@ def place_all_ships(obj):
                 1, len(ship_types), placed_ships
             )
 
-        # Getting the boat name if input was an integer.
-
-        if str(current_boat_to_place) != "" and str(
-            current_boat_to_place
-        ).isdigit() <= len(ship_types):
-            current_boat_to_place = list(ship_types.keys())[
-                int(current_boat_to_place) - 1
-            ]
-
-        # Looking if input is an ingame object
+        # Getting the boat name if input was an integer
+        # And looking if input is an ingame object7
         try:
+            if str(current_boat_to_place).isdigit() <= len(ship_types):
+                current_boat_to_place = list(ship_types.keys())[
+                    int(current_boat_to_place) - 1
+                ]
+
             curr_ship_type = ship_types[current_boat_to_place]
         except (KeyError, ValueError):
             console_helper.clear_console()
@@ -113,7 +110,9 @@ def place_all_ships(obj):
             obj.set_ship(curr_ship_type["length"], current_boat_to_place, is_bot)
 
         else:
-            print(f"You already placed all your {current_boat_to_place}!")
+            print(
+                f"{console_helper.RED}You already placed all your {current_boat_to_place}!{console_helper.RESET}"
+            )
 
         game.save_game()
 
