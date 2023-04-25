@@ -91,7 +91,9 @@ def place_all_ships(obj):
 
         # Getting the boat name if input was an integer.
 
-        if str(current_boat_to_place).isdigit() <= len(ship_types):
+        if str(current_boat_to_place) != "" and str(
+            current_boat_to_place
+        ).isdigit() <= len(ship_types):
             current_boat_to_place = list(ship_types.keys())[
                 int(current_boat_to_place) - 1
             ]
@@ -172,7 +174,7 @@ if __name__ == "__main__":
             )
             game.save_game()
             place_all_ships(player)
-            if player.get_bot() is False:
+            if player.owner.get_bot() is False:
                 player.show_boatfield()
             if index < len(players) - 1:
                 game.set_last_turn_player(players[index + 1])
