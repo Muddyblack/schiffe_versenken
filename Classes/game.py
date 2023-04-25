@@ -7,7 +7,6 @@ import time
 import random
 import pickle
 import gc
-import random
 import simpleaudio
 import keyboard
 
@@ -169,15 +168,15 @@ class Game:
 
         check_ind = 0
         while True:
-            if field_list[0].owner.get_player_name() != self.__last_turn_player:
-                field_list = rotate_array_backwards(field_list)
-            elif check_ind >= len(field_list):
+            if check_ind >= len(field_list):
                 # if no existing starter, probability calculation gonna set one
                 first_cache = field_list[0]
                 random_starter = random.randint(0, len(field_list) - 1)
                 field_list[0] = field_list[random_starter]
                 field_list[random_starter] = first_cache
                 break
+            if field_list[0].owner.get_player_name() != self.__last_turn_player:
+                field_list = rotate_array_backwards(field_list)
             else:
                 break
             check_ind += 1
@@ -259,6 +258,7 @@ class Game:
                 sound_process = simpleaudio.WaveObject.from_wave_file(
                     f"{game_paths.SOUND_PATH}/Start-Screen.wav"
                 ).play()
+
             for frame in frames:
                 with open(frame, "r", encoding="utf-8") as file:
                     string = (

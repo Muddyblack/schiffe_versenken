@@ -76,7 +76,8 @@ def place_all_ships(obj):
             current_boat_to_place = (
                 str(
                     input(
-                        f"Please type in the boats {console_helper.LIGHT_WHITE}index{console_helper.RESET}, or its {console_helper.LIGHT_WHITE}name{console_helper.RESET}: "
+                        f"Please type in the boats {console_helper.LIGHT_WHITE}index{console_helper.RESET}, "
+                        + f"or its {console_helper.LIGHT_WHITE}name{console_helper.RESET}: "
                     )
                 )
                 .lower()
@@ -89,6 +90,7 @@ def place_all_ships(obj):
             )
 
         # Getting the boat name if input was an integer.
+
         if str(current_boat_to_place).isdigit() <= len(ship_types):
             current_boat_to_place = list(ship_types.keys())[
                 int(current_boat_to_place) - 1
@@ -127,7 +129,7 @@ def place_all_ships(obj):
 def attack_execution(attacker, target):
     """Attacks the target and set target as new current_player"""
     status = "hit"
-    if not attacker.owner.get_bot():
+    if attacker.owner.get_bot() is False:
         attacker.show_fields_side_by_side()
     while status == "hit":
         status = attacker.attack_enemy(target)
@@ -149,7 +151,7 @@ def attack_execution(attacker, target):
         game.set_last_turn_player(target)
         game.save_game()
 
-        if not attacker.owner.get_bot():
+        if attacker.owner.get_bot() is False:
             attacker.show_fields_side_by_side()
             input(
                 "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"

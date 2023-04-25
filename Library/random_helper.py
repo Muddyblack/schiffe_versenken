@@ -8,5 +8,5 @@ def randint_exc(start, end, *exception):
     res = random.randint(start, end)
     if res not in exception:
         return res
-    else:
-        return randint_exc(start, end, *exception)
+
+    return randint_exc(start, end, *exception)

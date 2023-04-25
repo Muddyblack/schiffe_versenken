@@ -8,12 +8,10 @@ This module requires the following external libraries to be installed:
 from string import ascii_uppercase
 import time
 import random
-import json
 from copy import deepcopy
 
 from Library.keyboard_helper import get_arrow_key
 from Library import console_helper
-from Library import game_paths
 
 
 class GameField:
@@ -324,7 +322,8 @@ class GameField:
                 return "win"
 
             console_helper.clear_console()
-            self.show_fields_side_by_side()
+            if bot is False:
+                self.show_fields_side_by_side()
             print(
                 f"Sir, we hitted an enemy target at {console_helper.BROWN}({row},{col}){console_helper.RESET}!"
             )
@@ -332,7 +331,7 @@ class GameField:
             print("You can attack a second time")
             return "hit"
 
-        elif target.get_boatfield()[row][col] == "X":
+        if target.get_boatfield()[row][col] == "X":
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
