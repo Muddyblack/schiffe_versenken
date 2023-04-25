@@ -198,7 +198,7 @@ class Game:
 
             print("You can only answer with yes or no!")
 
-    def __create__new_game(self, existing_saves, player=2):
+    def __create__new_game(self, existing_saves, player_num=2):
         """
         Creates a new game.
         """
@@ -213,7 +213,7 @@ class Game:
         player_names = []
         bots = 0
 
-        for index in range(player):
+        for index in range(player_num):
             player_name = ""
             is_bot = False
 
