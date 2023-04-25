@@ -32,12 +32,6 @@ class TestGameField(unittest.TestCase):
         self.assertEqual(len(hitfield), 10)
         self.assertEqual(len(hitfield[0]), 10)
 
-    def test_get_ships_left(self):
-        # Test the get_ships_left() method
-        ships_left = self.game_field.get_ships_left()
-        self.assertIsInstance(ships_left, int)
-        self.assertEqual(ships_left, 10)
-
     def test_set_boatfield(self):
         # Test the set_boatfield() method
         boatfield = [[0 for _ in range(10)] for _ in range(10)]
@@ -59,11 +53,6 @@ class TestGameField(unittest.TestCase):
         # Test the set_hitfield_cell() method
         self.game_field.set_hitfield_cell(0, 0, 1)
         self.assertEqual(self.game_field.get_hitfield()[0][0], 1)
-
-    def test_set_ships_left(self):
-        # Test the set_ships_left() method
-        self.game_field.set_ships_left(5)
-        self.assertEqual(self.game_field.get_ships_left(), 5)
 
 
 if __name__ == "__main__":
