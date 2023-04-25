@@ -92,7 +92,11 @@ def place_all_ships(obj):
         # Getting the boat name if input was an integer
         # And looking if input is an ingame object7
         try:
-            if str(current_boat_to_place).isdigit() <= len(ship_types):
+            if (
+                str(current_boat_to_place).isdigit()
+                and int(current_boat_to_place) > 0
+                and int(current_boat_to_place) <= len(ship_types)
+            ):
                 current_boat_to_place = list(ship_types.keys())[
                     int(current_boat_to_place) - 1
                 ]
