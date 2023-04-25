@@ -116,7 +116,7 @@ def place_all_ships(obj):
         game.save_game()
 
     console_helper.clear_console()
-    if not is_bot:
+    if is_bot is False:
         obj.show_boatfield()
         input(
             "You placed all your Boats! Your final Field looks like this. Press Enter to Continue!Press Enter to Continue!"
@@ -172,7 +172,8 @@ if __name__ == "__main__":
             )
             game.save_game()
             place_all_ships(player)
-            player.show_boatfield()
+            if player.get_bot() is False:
+                player.show_boatfield()
             if index < len(players) - 1:
                 game.set_last_turn_player(players[index + 1])
                 game.save_game()
