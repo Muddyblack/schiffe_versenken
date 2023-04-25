@@ -3,6 +3,7 @@ savePath.txt
 anicodes.py
 GameData/saves
 .save_anim/
+full_audio_files/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

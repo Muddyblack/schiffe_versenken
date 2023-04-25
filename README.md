@@ -25,3 +25,6 @@ pipreqs /path/to/project
 - [Select-Sound](https://www.youtube.com/watch?v=T9N0pmLI7Jw)
 - [Affirmed-Sound](https://www.youtube.com/watch?v=YNSbL-Cek1c)
 - [Winning-sound](https://www.youtube.com/shorts/OZMXOfyndiw)
+- [Cannon-Sounds](https://www.youtube.com/watch?v=j5DUDmPHNb0)
+- [Water-Drop-Sound](https://www.youtube.com/watch?v=T90ISUd2YXo)
+- [Set-Ship-Sound](https://www.youtube.com/watch?v=D9IHzv3wzqo)

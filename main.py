@@ -112,6 +112,10 @@ def place_all_ships(obj):
 
         if (int(curr_ship_type["max"]) - len(ships[current_boat_to_place])) > 0:
             obj.set_ship(curr_ship_type["length"], current_boat_to_place, is_bot)
+            if not is_bot:
+                simpleaudio.WaveObject.from_wave_file(
+                    f"{game.get_sound_path()}/Set-Ship.wav"
+                ).play()
 
         else:
             print(
@@ -139,6 +143,15 @@ def attack_execution(attacker, target):
     while status == "hit":
         status = attacker.attack_enemy(target)
         game.save_game()
+        if status == "hit":
+            simpleaudio.WaveObject.from_wave_file(
+                f"{game.get_sound_path()}/HIT.wav"
+            ).play()
+        elif status == "water":
+            simpleaudio.WaveObject.from_wave_file(
+                f"{game.get_sound_path()}/Water-Drop.wav"
+            ).play()
+        time.sleep(0.1)
     if status == "win":
         ## DELETE FILE when game ends
         save_path = game.get_save_path()

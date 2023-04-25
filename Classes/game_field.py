@@ -8,6 +8,7 @@ This module requires the following external libraries to be installed:
 from string import ascii_uppercase
 import time
 import random
+import simpleaudio
 from copy import deepcopy
 
 from Library.keyboard_helper import get_arrow_key
@@ -208,6 +209,8 @@ class GameField:
                 f"Enter the start position for your {console_helper.BROWN}{ship_type}{console_helper.RESET} (e.g. A1): ",
                 is_bot,
             )
+
+            print(start_row, start_col)
 
             if not is_bot:
                 print("Enter the direction for your ship. Use your arrow Keys!")

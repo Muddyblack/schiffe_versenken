@@ -34,6 +34,7 @@ class Game:
 
         self.start_up()
         self.__last_turn_player = self.__players[0]
+        time.sleep(0.3)
 
     # getter
     def get_players(self):
