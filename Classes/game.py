@@ -4,6 +4,7 @@
 """
 import os
 import time
+import random
 import pickle
 import gc
 import random
@@ -12,6 +13,7 @@ import keyboard
 
 from Library import console_helper
 from Library.keyboard_helper import clear_input
+from Library import game_paths
 
 from Classes.player import Player
 from Classes.game_field import GameField
@@ -22,20 +24,16 @@ class Game:
     The Game class serves as the main entry point for running the game
     """
 
-    def __init__(self, project_path):
+    def __init__(self):
         os.system(f"{console_helper.RESET}")
         # Paths
-        self.__game_data_path = f"{project_path}/GameData"
-        self.__save_games_path = f"{self.__game_data_path}/saves"
-        self.__sound_path = f"{self.__game_data_path}/sound"
-        os.makedirs(self.__save_games_path, exist_ok=True)
+        os.makedirs(game_paths.SAVE_GAMES_PATH, exist_ok=True)
 
         self.__players = None
         self.__save_name = None
         self.__current_level = None
 
         self.start_up()
-
         self.__last_turn_player = self.__players[0]
 
     # getter
@@ -45,11 +43,11 @@ class Game:
 
     def get_save_path(self):
         """Returns the Absolete save Path of the current Game"""
-        return f"{self.__save_games_path}/{self.__save_name}"
+        return f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}"
 
     def get_sound_path(self):
         """Returns the path of the sound_folder"""
-        return f"{self.__sound_path}"
+        return f"{game_paths.SOUND_PATH}"
 
     def get_current_level(self):
         """Returns the current level of the game"""
@@ -112,19 +110,20 @@ class Game:
                 player_info = {
                     "name": obj.owner.get_player_name(),
                     "bot": obj.owner.get_bot(),
+                    "botcache": obj.owner.get_botcache(),
                     "ships": obj.owner.get_ships(),
                     "boatfield": obj.get_boatfield(),
                     "hitfield": obj.get_hitfield(),
                 }
                 player_list.append(player_info)
 
-        save_dir = f"{self.__save_games_path}/{self.__save_name}"
+        save_dir = f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}"
         os.makedirs(save_dir, exist_ok=True)
 
-        with open(f"{save_dir}/players.obj", "wb") as obj:
-            pickle.dump(player_list, obj)
-        with open(f"{save_dir}/game.info", "wb") as obj:
-            pickle.dump(game_info, obj)
+        with open(f"{save_dir}/players.obj", "wb") as file:
+            pickle.dump(player_list, file)
+        with open(f"{save_dir}/game.info", "wb") as file:
+            pickle.dump(game_info, file)
 
     def load_game(self):
         """
@@ -134,45 +133,56 @@ class Game:
             -(tuple): two GameField instances and dictionary with game-infos
         """
         with open(
-            f"{self.__save_games_path}/{self.__save_name}/players.obj", "rb"
+            f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}/players.obj", "rb"
         ) as playerpickle:
             player_list = pickle.load(playerpickle)
         with open(
-            f"{self.__save_games_path}/{self.__save_name}/game.info", "rb"
+            f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}/game.info", "rb"
         ) as playerpickle:
             game_info = pickle.load(playerpickle)
 
         self.__last_turn_player = game_info["last_turn_player"]
         self.__current_level = game_info["level"]
+        field_list = []
 
-        obj_1 = player_list[0]
-        obj_2 = player_list[1]
+        for obj in player_list:
+            player = Player(name=obj["name"], bot=obj["bot"])
+            player.set_ships(obj["ships"])
+            player.set_botcache(obj["botcache"])
+            field = GameField(player)
+            field.set_boatfield(obj["boatfield"])
+            field.set_hitfield(obj["hitfield"])
 
-        p_1 = Player(name=obj_1["name"], bot=obj_1["bot"])
-        p_1.set_ships(obj_1["ships"])
-        f_1 = GameField(p_1)
-        f_1.set_boatfield(obj_1["boatfield"])
-        f_1.set_hitfield(obj_1["hitfield"])
+            field_list.append(field)
 
-        p_2 = Player(name=obj_2["name"], bot=obj_2["bot"])
-        p_2.set_ships(obj_2["ships"])
-        f_2 = GameField(p_2)
-        f_2.set_boatfield(obj_2["boatfield"])
-        f_2.set_hitfield(obj_2["hitfield"])
+        def rotate_array_backwards(arr):
+            first_element = arr[0]
 
-        if self.__last_turn_player == f_1.owner.get_player_name():
-            fields = (f_1, f_2)
-        elif self.__last_turn_player == f_2.owner.get_player_name():
-            fields = (f_2, f_1)
-        else:
-            # Coin flipping who will start the Game
-            starter = random.randint(0, 1)
-            if starter == 0:
-                fields = (f_1, f_2)
+            # Postpone elements one to the left
+            for i in range(0, len(arr) - 1):
+                arr[i] = arr[i + 1]
+
+            # set last elem to the first elem
+            arr[-1] = first_element
+
+            return arr
+
+        check_ind = 0
+        while True:
+            if field_list[0].owner.get_player_name() != self.__last_turn_player:
+                field_list = rotate_array_backwards(field_list)
+            elif check_ind >= len(field_list):
+                # if no existing starter, probability calculation gonna set one
+                first_cache = field_list[0]
+                random_starter = random.randint(0, len(field_list) - 1)
+                field_list[0] = field_list[random_starter]
+                field_list[random_starter] = first_cache
+                break
             else:
-                fields = (f_2, f_1)
+                break
+            check_ind += 1
 
-        self.__players = fields
+        self.__players = field_list
 
     def __create__new_game(self, existing_saves):
         """
@@ -230,10 +240,12 @@ class Game:
     def __start_screen(self):
         """Prints a beautiful ASCII-Logo for the game to the console"""
         sound_process = simpleaudio.WaveObject.from_wave_file(
-            f"{self.__sound_path}/Start-Screen.wav"
+            f"{game_paths.SOUND_PATH}/Start-Screen.wav"
         ).play()
 
-        start_screen_animation_path = f"{self.__game_data_path}/start_screen_animation"
+        start_screen_animation_path = (
+            f"{game_paths.GAME_DATA_PATH}/start_screen_animation"
+        )
 
         files = [
             os.path.abspath(os.path.join(start_screen_animation_path, file))
@@ -245,7 +257,7 @@ class Game:
         while not stop:
             if not sound_process.is_playing():
                 sound_process = simpleaudio.WaveObject.from_wave_file(
-                    f"{self.__sound_path}/Start-Screen.wav"
+                    f"{game_paths.SOUND_PATH}/Start-Screen.wav"
                 ).play()
             for frame in frames:
                 with open(frame, "r", encoding="utf-8") as file:
@@ -284,7 +296,7 @@ class Game:
         time.sleep(0.1)
         sound_process.stop()
         simpleaudio.WaveObject.from_wave_file(
-            f"{self.__sound_path}/Start_game.wav"
+            f"{game_paths.SOUND_PATH}/Start_game.wav"
         ).play()
 
         clear_input()
@@ -319,7 +331,7 @@ class Game:
 
             if keyboard.is_pressed("up") and selected_save_game_index > 0:
                 sound_process = simpleaudio.WaveObject.from_wave_file(
-                    f"{self.__sound_path}/Menu-Select.wav"
+                    f"{game_paths.SOUND_PATH}/Menu-Select.wav"
                 ).play()
 
                 selected_save_game_index -= 1
@@ -335,7 +347,7 @@ class Game:
                 and selected_save_game_index < len(exist_save_games) - 1
             ):
                 sound_process = simpleaudio.WaveObject.from_wave_file(
-                    f"{self.__sound_path}/Menu-Select.wav"
+                    f"{game_paths.SOUND_PATH}/Menu-Select.wav"
                 ).play()
 
                 selected_save_game_index += 1
@@ -351,7 +363,7 @@ class Game:
         self.__save_name = exist_save_games[selected_save_game_index]
         print(f"Selected save game: {os.path.basename(self.__save_name)}\n")
         simpleaudio.WaveObject.from_wave_file(
-            f"{self.__sound_path}/Selected.wav"
+            f"{game_paths.SOUND_PATH}/Selected.wav"
         ).play()
 
     def start_up(self):
@@ -368,7 +380,7 @@ class Game:
         self.__start_screen()
         exist_save_games = [
             f.name
-            for f in os.scandir(self.__save_games_path)
+            for f in os.scandir(game_paths.SAVE_GAMES_PATH)
             if f.is_dir() and not f.is_file() and f.name.endswith("_save")
         ]
 

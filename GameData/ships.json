@@ -1,0 +1,18 @@
+{
+    "battleship" : {
+        "length" : 5,
+        "max" : 1
+    },
+    "cruiser" : {
+        "length" : 4,
+        "max" : 2
+    },
+    "destroyer" : {
+        "length" : 3,
+        "max" : 3
+    },
+    "submarine" : {
+        "length" : 2,
+        "max" : 4
+    }
+}

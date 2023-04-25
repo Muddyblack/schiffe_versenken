@@ -6,12 +6,14 @@ This module requires the following external libraries to be installed:
 
 """
 from string import ascii_uppercase
-from datetime import datetime
+import time
 import random
+import json
 from copy import deepcopy
 
 from Library.keyboard_helper import get_arrow_key
 from Library import console_helper
+from Library import game_paths
 
 
 class GameField:
@@ -21,7 +23,7 @@ class GameField:
     """
 
     def __init__(self, owner):
-        random.seed(datetime.now().timestamp())
+        random.seed(time.time())
 
         self.owner = owner
         self.__ships_left = 10
@@ -30,7 +32,6 @@ class GameField:
             [0 * i for j in range(self.__fsize)] for i in range(self.__fsize)
         ]
         self.__hitfield = deepcopy(self.__boatfield)
-        self.__botcache = []
 
     # getter
     def get_boatfield(self):
@@ -208,6 +209,7 @@ class GameField:
             start_row, start_col = self.__get_row_and_column_input(
                 "Enter the start position for your ship (e.g. A1): ", is_bot
             )
+
             if not is_bot:
                 print("Enter the direction for your ship. Use your arrow Keys!")
                 direction = get_arrow_key()
@@ -298,9 +300,11 @@ class GameField:
         if bot:
             while True:
                 row, col = self.__get_row_and_column_input("Bot", bot)
+                botcache = self.owner.get_botcache()
 
-                if [col, row] not in self.__botcache:
-                    self.__botcache.append([col, row])
+                if [col, row] not in botcache:
+                    botcache.append([col, row])
+                    self.owner.set_botcache(botcache)
                     break
         # Otherwise, prompt the player to choose a position to attack
         else:
@@ -311,8 +315,6 @@ class GameField:
         # Check if the attack hits a ship or not
         # And if it hits a ship, the player gets to attack again
         if target.get_boatfield()[row][col] == 1:
-            print("Sir, we hitted an enemy target!")
-
             self.set_hitfield_cell(row, col, 1)
             target.set_boatfield_cell(row, col, "X")
             target.owner.ships_after_attack([row, col])
@@ -320,6 +322,12 @@ class GameField:
             if target.owner.get_ship_amount() == 0:
                 print(f"Congrats {self.owner.get_player_name()}, YOU WON!")
                 return "win"
+
+            console_helper.clear_console()
+            self.show_fields_side_by_side()
+            print(
+                f"Sir, we hitted an enemy target at {console_helper.BROWN}({row},{col}){console_helper.RESET}!"
+            )
 
             print("You can attack a second time")
             return "hit"

@@ -1,4 +1,6 @@
 """Player Module"""
+import json
+from Library import game_paths
 
 
 class Player:
@@ -15,7 +17,12 @@ class Player:
         else:
             self.__player_name = name
 
-        self.__ships = {"battleship": [], "cruiser": [], "destroyer": [], "uboat": []}
+        self.__botcache = []
+
+        self.__ship_preferences = {}
+        self.load_ship_preferences()
+
+        self.__ships = {key: [] for key in self.__ship_preferences.keys()}
 
     # getter
     def get_bot(self):
@@ -37,6 +44,14 @@ class Player:
             index += len(self.__ships[key])
 
         return index
+
+    def get_botcache(self):
+        """Returns the cache of already attacked Positions"""
+        return self.__botcache
+
+    def get_ship_preferences(self):
+        """Returns the dictionary with all allowed ships and their settings"""
+        return self.__ship_preferences
 
     # setter
     def set_bot(self, value):
@@ -73,3 +88,14 @@ class Player:
     def add_ship(self, element, pos):
         """Sets the ship's dictionary."""
         self.__ships[element].append(pos)
+
+    def set_botcache(self, cache):
+        """Sets the cache of already attacked Positions"""
+        self.__botcache = cache
+
+    def load_ship_preferences(self):
+        """Adding ships with their settings of length, max-amount, etc from json file"""
+        with open(
+            f"{game_paths.GAME_DATA_PATH}/ships.json", "r", encoding="utf-8"
+        ) as file:
+            self.__ship_preferences = json.load(file)
