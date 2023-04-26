@@ -52,6 +52,14 @@ class Game:
         """Returns th players who has the tun"""
         return self.__last_turn_player
 
+    def get_if_botgame(self):
+        """Returns True if only bots will play against each other"""
+
+        for player in self.__players:
+            if not player.owner.get_bot():
+                return False
+        return True
+
     # setter
     def set_players(self, players):
         """Sets the players Variable of the class Game"""

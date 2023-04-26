@@ -212,7 +212,11 @@ def attack_execution(attacker, target):
                 "You finished your Attack! Your final Fields looks like this. Press Enter to Continue!"
             )
         else:
-            input("The Bot finished his attack. Press Enter to Continue!")
+            if game.get_if_botgame():
+                attacker.show_fields_side_by_side()
+            input(
+                f"{attacker.owner.get_player_name()} finished his attack. Press Enter to Continue!"
+            )
 
 
 # Game walkthrough
