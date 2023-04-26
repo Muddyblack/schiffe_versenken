@@ -145,6 +145,7 @@ def place_all_ships(obj):
             print(
                 f"{console_helper.RED}You already placed all your {current_boat_to_place}!{console_helper.RESET}"
             )
+            time.sleep(0.35)
 
         game.save_game()
         console_helper.clear_console()
