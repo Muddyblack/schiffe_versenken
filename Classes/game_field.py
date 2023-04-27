@@ -142,7 +142,7 @@ class GameField:
                     # If the Array is three long, the Number in front might have two digits
                     if len(user_input) == 3:
                         l_row = int(user_input[:2]) - 1
-                        l_col = int(ascii_uppercase.index(user_input[3:].upper()))
+                        l_col = int(ascii_uppercase.index(user_input[2:].upper()))
                     else:
                         l_row = int(user_input[0]) - 1
                         l_col = int(ascii_uppercase.index(user_input[1:].upper()))
