@@ -344,7 +344,7 @@ class GameField:
         # Check if the attack hits a ship or not
         # And if it hits a ship return "hit" so the player gets to attack again
         if target.get_boatfield()[row][col] == 1:
-            self.set_hitfield_cell(row, col, 1)
+            self.set_hitfield_cell(row, col, "X")
             target.set_boatfield_cell(row, col, "X")
             target.owner.ships_after_attack([row, col])
 
