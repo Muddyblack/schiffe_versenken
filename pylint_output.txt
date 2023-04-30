@@ -1,39 +1,14 @@
 ************* Module Schiffe_Versenken
 Schiffe_Versenken/__init__.py:1:0: C0103: Module name "Schiffe_Versenken" doesn't conform to snake_case naming style (invalid-name)
-************* Module Schiffe_Versenken.main
-Schiffe_Versenken/main.py:7:0: E0401: Unable to import 'simpleaudio' (import-error)
-Schiffe_Versenken/main.py:8:0: E0401: Unable to import 'library' (import-error)
-Schiffe_Versenken/main.py:9:0: E0401: Unable to import 'library' (import-error)
-Schiffe_Versenken/main.py:10:0: E0401: Unable to import 'library' (import-error)
-Schiffe_Versenken/main.py:11:0: E0401: Unable to import 'library' (import-error)
-Schiffe_Versenken/main.py:13:0: E0401: Unable to import 'classes.game' (import-error)
-************* Module Schiffe_Versenken.classes.game
-Schiffe_Versenken/classes/game.py:10:0: E0401: Unable to import 'simpleaudio' (import-error)
-Schiffe_Versenken/classes/game.py:13:0: E0401: Unable to import 'library' (import-error)
-Schiffe_Versenken/classes/game.py:14:0: E0401: Unable to import 'library' (import-error)
-Schiffe_Versenken/classes/game.py:15:0: E0401: Unable to import 'library' (import-error)
-Schiffe_Versenken/classes/game.py:17:0: E0401: Unable to import 'classes.player' (import-error)
-Schiffe_Versenken/classes/game.py:18:0: E0401: Unable to import 'classes.game_field' (import-error)
-************* Module Schiffe_Versenken.classes.player
-Schiffe_Versenken/classes/player.py:3:0: E0401: Unable to import 'library' (import-error)
 ************* Module Schiffe_Versenken.classes.game_field
-Schiffe_Versenken/classes/game_field.py:8:0: E0401: Unable to import 'library' (import-error)
-Schiffe_Versenken/classes/game_field.py:9:0: E0401: Unable to import 'library' (import-error)
-************* Module Schiffe_Versenken.unittests.test_player
-Schiffe_Versenken/unittests/test_player.py:12:0: E0401: Unable to import 'classes.player' (import-error)
-************* Module Schiffe_Versenken.unittests.test_game_field
-Schiffe_Versenken/unittests/test_game_field.py:12:0: E0401: Unable to import 'classes.game_field' (import-error)
-Schiffe_Versenken/unittests/test_game_field.py:13:0: E0401: Unable to import 'classes.player' (import-error)
-************* Module Schiffe_Versenken.unittests.test_main
-Schiffe_Versenken/unittests/test_main.py:11:0: E0401: Unable to import 'main' (import-error)
-Schiffe_Versenken/unittests/test_main.py:13:0: E0401: Unable to import 'hypothesis' (import-error)
-Schiffe_Versenken/unittests/test_main.py:14:0: E0401: Unable to import 'hypothesis.strategies' (import-error)
-Schiffe_Versenken/unittests/test_main.py:15:0: E0401: Unable to import 'classes.player' (import-error)
+Schiffe_Versenken/classes/game_field.py:238:0: C0325: Unnecessary parens after '=' keyword (superfluous-parens)
+************* Module Schiffe_Versenken.unittests.test_game
+Schiffe_Versenken/unittests/test_game.py:20:8: E1120: No value for argument 'second' in method call (no-value-for-parameter)
 
 
 Report
 ======
-774 statements analysed.
+808 statements analysed.
 
 Statistics by type
 ------------------
@@ -41,18 +16,18 @@ Statistics by type
 +---------+-------+-----------+-----------+------------+---------+
 |type     |number |old number |difference |%documented |%badname |
 +=========+=======+===========+===========+============+=========+
-|module   |16     |16         |=          |81.25       |6.25     |
+|module   |17     |17         |=          |76.47       |5.88     |
 +---------+-------+-----------+-----------+------------+---------+
-|class    |6      |6          |=          |50.00       |0.00     |
+|class    |7      |7          |=          |42.86       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|method   |69     |69         |=          |76.81       |0.00     |
+|method   |77     |77         |=          |70.13       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
 |function |13     |13         |=          |100.00      |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
 
 
 
-1547 lines have been analyzed
+1588 lines have been analyzed
 
 Raw metrics
 -----------
@@ -60,13 +35,13 @@ Raw metrics
 +----------+-------+------+---------+-----------+
 |type      |number |%     |previous |difference |
 +==========+=======+======+=========+===========+
-|code      |965    |62.38 |965      |=          |
+|code      |998    |62.85 |998      |=          |
 +----------+-------+------+---------+-----------+
-|docstring |209    |13.51 |209      |=          |
+|docstring |203    |12.78 |203      |=          |
 +----------+-------+------+---------+-----------+
-|comment   |98     |6.33  |98       |=          |
+|comment   |101    |6.36  |101      |=          |
 +----------+-------+------+---------+-----------+
-|empty     |275    |17.78 |275      |=          |
+|empty     |286    |18.01 |286      |=          |
 +----------+-------+------+---------+-----------+
 
 
@@ -90,13 +65,13 @@ Messages by category
 +-----------+-------+---------+-----------+
 |type       |number |previous |difference |
 +===========+=======+=========+===========+
-|convention |1      |30       |30         |
+|convention |2      |2        |2          |
 +-----------+-------+---------+-----------+
 |refactor   |0      |0        |0          |
 +-----------+-------+---------+-----------+
-|warning    |0      |0        |0          |
+|warning    |0      |1        |1          |
 +-----------+-------+---------+-----------+
-|error      |22     |22       |22         |
+|error      |1      |1        |1          |
 +-----------+-------+---------+-----------+
 
 
@@ -104,17 +79,19 @@ Messages by category
 Messages
 --------
 
-+-------------+------------+
-|message id   |occurrences |
-+=============+============+
-|import-error |22          |
-+-------------+------------+
-|invalid-name |1           |
-+-------------+------------+
++-----------------------+------------+
+|message id             |occurrences |
++=======================+============+
+|superfluous-parens     |1           |
++-----------------------+------------+
+|no-value-for-parameter |1           |
++-----------------------+------------+
+|invalid-name           |1           |
++-----------------------+------------+
 
 
 
 
 ------------------------------------------------------------------
-Your code has been rated at 8.57/10 (previous run: 8.19/10, +0.37)
+Your code has been rated at 9.91/10 (previous run: 9.90/10, +0.01)
 
