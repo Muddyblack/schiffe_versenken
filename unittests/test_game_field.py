@@ -9,8 +9,8 @@ sys.path.append(
     )
 )
 
-from Classes.game_field import GameField
-from Classes.player import Player
+from classes.game_field import GameField
+from classes.player import Player
 
 
 class TestGameField(unittest.TestCase):

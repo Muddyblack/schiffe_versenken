@@ -1,6 +1,6 @@
 """Player Module"""
 import json
-from Library import game_paths
+from library import game_paths
 
 
 class Player:

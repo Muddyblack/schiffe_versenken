@@ -12,7 +12,7 @@ from main import place_all_ships
 import unittest
 from hypothesis import given
 import hypothesis.strategies as st
-from Classes.player import Player
+from classes.player import Player
 
 
 # @given(st.one_of(st.text() or st.integers(min_value=1, max_value=4)))

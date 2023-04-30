@@ -10,12 +10,12 @@ import gc
 import simpleaudio
 import keyboard
 
-from Library import console_helper
-from Library import keyboard_helper
-from Library import game_paths
+from library import console_helper
+from library import keyboard_helper
+from library import game_paths
 
-from Classes.player import Player
-from Classes.game_field import GameField
+from classes.player import Player
+from classes.game_field import GameField
 
 
 class Game:

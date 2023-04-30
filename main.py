@@ -5,13 +5,13 @@ import time
 import shutil
 import random
 import simpleaudio
-from Library import console_helper
-from Library import keyboard_helper
-from Library import random_helper
-from Library import game_paths
+from library import console_helper
+from library import keyboard_helper
+from library import random_helper
+from library import game_paths
 
 
-from Classes.game import Game
+from classes.game import Game
 
 random.seed(time.time())
 

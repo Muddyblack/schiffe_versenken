@@ -5,8 +5,8 @@ from string import ascii_uppercase
 import time
 import random
 
-from Library import keyboard_helper
-from Library import console_helper
+from library import keyboard_helper
+from library import console_helper
 
 
 class GameField:
