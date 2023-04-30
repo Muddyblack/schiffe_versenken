@@ -363,7 +363,7 @@ class GameField:
                 f"Sir, we hitted an enemy target at {console_helper.BROWN}{ascii_uppercase[col]}{row + 1}{console_helper.RESET}!"
             )
 
-            print("You can attack a second time")
+            print("You can attack again time")
             return "hit"
 
         if target.get_boatfield()[row][col] == ("X" or "o"):
