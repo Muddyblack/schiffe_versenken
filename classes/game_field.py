@@ -357,13 +357,13 @@ class GameField:
             if bot is False:
                 self.show_fields_side_by_side()
             print(
-                f"Sir, we hitted an enemy target at {console_helper.BROWN}({row + 1},{col + 1}){console_helper.RESET}!"
+                f"Sir, we hitted an enemy target at {console_helper.BROWN}{ascii_uppercase[col]}{row + 1}{console_helper.RESET}!"
             )
 
             print("You can attack a second time")
             return "hit"
 
-        if target.get_boatfield()[row][col] == "X" or "o":
+        if target.get_boatfield()[row][col] == ("X" or "o"):
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
