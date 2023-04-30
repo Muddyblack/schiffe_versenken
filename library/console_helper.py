@@ -46,7 +46,7 @@ def clear_console():
 
 def refresh_console_lines(lines):
     """Clears the specified number of lines from the console output."""
-    for i in range(lines):
+    for _ in range(lines):
         sys.stdout.write("\033[F")  # Move the cursor up one line
         sys.stdout.write("\033[K")  # Clear line
 

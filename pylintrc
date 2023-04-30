@@ -1,3 +1,8 @@
 [MASTER]
 max-line-length=160
-init-hook='import sys; sys.path.append("...../")'
+[MESSAGES CONTROL]
+# See Doc, for explanation! (--disable=E0401)
+disable=import-error
+[REPORTS]
+# (--report y)
+reports=yes
