@@ -1,5 +1,5 @@
 ************* Module schiffe_versenken.unittests.test_game
-schiffe_versenken/unittests/test_game.py:20:8: E1120: No value for argument 'second' in method call (no-value-for-parameter)
+unittests/test_game.py:20:8: E1120: No value for argument 'second' in method call (no-value-for-parameter)
 
 
 Report
@@ -20,6 +20,14 @@ Statistics by type
 +---------+-------+-----------+-----------+------------+---------+
 |function |13     |13         |=          |100.00      |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
+
+
+
+External dependencies
+---------------------
+::
+
+    keyboard (schiffe_versenken.classes.game,schiffe_versenken.library.keyboard_helper)
 
 
 
