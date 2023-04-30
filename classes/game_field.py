@@ -246,7 +246,7 @@ class GameField:
             # ask start location
             start_row, start_col = self.__get_row_and_column_input(
                 f"Enter the start position for your {console_helper.BROWN}{ship_type}{console_helper.RESET} (e.g. A1): ",
-                is_bot,
+                is_bot
             )
 
             direction = ""
@@ -363,7 +363,7 @@ class GameField:
             print("You can attack a second time")
             return "hit"
 
-        if target.get_boatfield()[row][col] == "X":
+        if target.get_boatfield()[row][col] == "X" or "o":
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")

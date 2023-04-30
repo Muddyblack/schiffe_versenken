@@ -196,7 +196,7 @@ def attack_execution(attacker, target):
             f"{game_paths.SOUND_PATH}/winning.wav"
         ).play().wait_done()
 
-        ##EXITIING the script
+        # EXITING the script
         sys.exit()
     else:
         # End the function saving and waiting for User to continue
