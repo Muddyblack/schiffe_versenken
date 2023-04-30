@@ -1,14 +1,10 @@
-************* Module Schiffe_Versenken
-Schiffe_Versenken/__init__.py:1:0: C0103: Module name "Schiffe_Versenken" doesn't conform to snake_case naming style (invalid-name)
-************* Module Schiffe_Versenken.classes.game_field
-Schiffe_Versenken/classes/game_field.py:238:0: C0325: Unnecessary parens after '=' keyword (superfluous-parens)
-************* Module Schiffe_Versenken.unittests.test_game
-Schiffe_Versenken/unittests/test_game.py:20:8: E1120: No value for argument 'second' in method call (no-value-for-parameter)
+************* Module schiffe_versenken.unittests.test_game
+schiffe_versenken/unittests/test_game.py:20:8: E1120: No value for argument 'second' in method call (no-value-for-parameter)
 
 
 Report
 ======
-808 statements analysed.
+807 statements analysed.
 
 Statistics by type
 ------------------
@@ -16,7 +12,7 @@ Statistics by type
 +---------+-------+-----------+-----------+------------+---------+
 |type     |number |old number |difference |%documented |%badname |
 +=========+=======+===========+===========+============+=========+
-|module   |17     |17         |=          |76.47       |5.88     |
+|module   |17     |17         |=          |76.47       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
 |class    |7      |7          |=          |42.86       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
@@ -27,7 +23,7 @@ Statistics by type
 
 
 
-1588 lines have been analyzed
+1587 lines have been analyzed
 
 Raw metrics
 -----------
@@ -35,13 +31,13 @@ Raw metrics
 +----------+-------+------+---------+-----------+
 |type      |number |%     |previous |difference |
 +==========+=======+======+=========+===========+
-|code      |998    |62.85 |998      |=          |
+|code      |997    |62.82 |997      |=          |
 +----------+-------+------+---------+-----------+
-|docstring |203    |12.78 |203      |=          |
+|docstring |203    |12.79 |203      |=          |
 +----------+-------+------+---------+-----------+
 |comment   |101    |6.36  |101      |=          |
 +----------+-------+------+---------+-----------+
-|empty     |286    |18.01 |286      |=          |
+|empty     |286    |18.02 |286      |=          |
 +----------+-------+------+---------+-----------+
 
 
@@ -65,11 +61,11 @@ Messages by category
 +-----------+-------+---------+-----------+
 |type       |number |previous |difference |
 +===========+=======+=========+===========+
-|convention |2      |2        |2          |
+|convention |0      |0        |0          |
 +-----------+-------+---------+-----------+
 |refactor   |0      |0        |0          |
 +-----------+-------+---------+-----------+
-|warning    |0      |1        |1          |
+|warning    |0      |0        |0          |
 +-----------+-------+---------+-----------+
 |error      |1      |1        |1          |
 +-----------+-------+---------+-----------+
@@ -82,16 +78,12 @@ Messages
 +-----------------------+------------+
 |message id             |occurrences |
 +=======================+============+
-|superfluous-parens     |1           |
-+-----------------------+------------+
 |no-value-for-parameter |1           |
-+-----------------------+------------+
-|invalid-name           |1           |
 +-----------------------+------------+
 
 
 
 
 ------------------------------------------------------------------
-Your code has been rated at 9.91/10 (previous run: 9.90/10, +0.01)
+Your code has been rated at 9.94/10 (previous run: 9.94/10, +0.00)
 
