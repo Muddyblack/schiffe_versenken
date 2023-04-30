@@ -1,41 +1,39 @@
 ************* Module Schiffe_Versenken
 Schiffe_Versenken/__init__.py:1:0: C0103: Module name "Schiffe_Versenken" doesn't conform to snake_case naming style (invalid-name)
 ************* Module Schiffe_Versenken.main
-Schiffe_Versenken/main.py:10:0: E0401: Unable to import 'Classes.game_field' (import-error)
-Schiffe_Versenken/main.py:11:0: E0401: Unable to import 'Classes.player' (import-error)
-Schiffe_Versenken/main.py:20:0: E0401: Unable to import 'Library.file_helper' (import-error)
-Schiffe_Versenken/main.py:21:0: E0401: Unable to import 'Library.keyboard_helper' (import-error)
-************* Module Schiffe_Versenken..Pylint.pylint_checker
-Schiffe_Versenken/.Pylint/pylint_checker.py:18:0: E0401: Unable to import 'Library.file_helper' (import-error)
-************* Module Schiffe_Versenken..Pylint
-Schiffe_Versenken/.Pylint/__init__.py:1:0: C0103: Module name "Pylint" doesn't conform to snake_case naming style (invalid-name)
-************* Module Schiffe_Versenken.Classes
-Schiffe_Versenken/Classes/__init__.py:1:0: C0103: Module name "Classes" doesn't conform to snake_case naming style (invalid-name)
-************* Module Schiffe_Versenken.Classes.game_field
-Schiffe_Versenken/Classes/game_field.py:13:0: E0401: Unable to import 'Library.keyboard_helper' (import-error)
-Schiffe_Versenken/Classes/game_field.py:14:0: E0401: Unable to import 'Library.print_helper' (import-error)
-Schiffe_Versenken/Classes/game_field.py:301:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
-************* Module Schiffe_Versenken.Unittests.test_player
-Schiffe_Versenken/Unittests/test_player.py:12:0: E0401: Unable to import 'Classes.player' (import-error)
-************* Module Schiffe_Versenken.Unittests.test_game_field
-Schiffe_Versenken/Unittests/test_game_field.py:12:0: E0401: Unable to import 'Classes.game_field' (import-error)
-Schiffe_Versenken/Unittests/test_game_field.py:13:0: E0401: Unable to import 'Classes.player' (import-error)
-************* Module Schiffe_Versenken.Unittests
-Schiffe_Versenken/Unittests/__init__.py:1:0: C0103: Module name "Unittests" doesn't conform to snake_case naming style (invalid-name)
-************* Module Schiffe_Versenken.Unittests.test_main
-Schiffe_Versenken/Unittests/test_main.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-Schiffe_Versenken/Unittests/test_main.py:9:0: E0401: Unable to import 'main' (import-error)
-Schiffe_Versenken/Unittests/test_main.py:11:0: E0401: Unable to import 'hypothesis' (import-error)
-Schiffe_Versenken/Unittests/test_main.py:12:0: E0401: Unable to import 'hypothesis.strategies' (import-error)
-Schiffe_Versenken/Unittests/test_main.py:13:0: E0401: Unable to import 'Classes.player' (import-error)
-Schiffe_Versenken/Unittests/test_main.py:22:0: C0115: Missing class docstring (missing-class-docstring)
-Schiffe_Versenken/Unittests/test_main.py:24:4: C0116: Missing function or method docstring (missing-function-docstring)
-Schiffe_Versenken/Unittests/test_main.py:10:0: C0411: standard import "import unittest" should be placed before "from main import place_all_ships" (wrong-import-order)
+Schiffe_Versenken/main.py:7:0: E0401: Unable to import 'simpleaudio' (import-error)
+Schiffe_Versenken/main.py:8:0: E0401: Unable to import 'library' (import-error)
+Schiffe_Versenken/main.py:9:0: E0401: Unable to import 'library' (import-error)
+Schiffe_Versenken/main.py:10:0: E0401: Unable to import 'library' (import-error)
+Schiffe_Versenken/main.py:11:0: E0401: Unable to import 'library' (import-error)
+Schiffe_Versenken/main.py:13:0: E0401: Unable to import 'classes.game' (import-error)
+************* Module Schiffe_Versenken.classes.game
+Schiffe_Versenken/classes/game.py:10:0: E0401: Unable to import 'simpleaudio' (import-error)
+Schiffe_Versenken/classes/game.py:13:0: E0401: Unable to import 'library' (import-error)
+Schiffe_Versenken/classes/game.py:14:0: E0401: Unable to import 'library' (import-error)
+Schiffe_Versenken/classes/game.py:15:0: E0401: Unable to import 'library' (import-error)
+Schiffe_Versenken/classes/game.py:17:0: E0401: Unable to import 'classes.player' (import-error)
+Schiffe_Versenken/classes/game.py:18:0: E0401: Unable to import 'classes.game_field' (import-error)
+************* Module Schiffe_Versenken.classes.player
+Schiffe_Versenken/classes/player.py:3:0: E0401: Unable to import 'library' (import-error)
+************* Module Schiffe_Versenken.classes.game_field
+Schiffe_Versenken/classes/game_field.py:8:0: E0401: Unable to import 'library' (import-error)
+Schiffe_Versenken/classes/game_field.py:9:0: E0401: Unable to import 'library' (import-error)
+************* Module Schiffe_Versenken.unittests.test_player
+Schiffe_Versenken/unittests/test_player.py:12:0: E0401: Unable to import 'classes.player' (import-error)
+************* Module Schiffe_Versenken.unittests.test_game_field
+Schiffe_Versenken/unittests/test_game_field.py:12:0: E0401: Unable to import 'classes.game_field' (import-error)
+Schiffe_Versenken/unittests/test_game_field.py:13:0: E0401: Unable to import 'classes.player' (import-error)
+************* Module Schiffe_Versenken.unittests.test_main
+Schiffe_Versenken/unittests/test_main.py:11:0: E0401: Unable to import 'main' (import-error)
+Schiffe_Versenken/unittests/test_main.py:13:0: E0401: Unable to import 'hypothesis' (import-error)
+Schiffe_Versenken/unittests/test_main.py:14:0: E0401: Unable to import 'hypothesis.strategies' (import-error)
+Schiffe_Versenken/unittests/test_main.py:15:0: E0401: Unable to import 'classes.player' (import-error)
 
 
 Report
 ======
-628 statements analysed.
+774 statements analysed.
 
 Statistics by type
 ------------------
@@ -43,18 +41,18 @@ Statistics by type
 +---------+-------+-----------+-----------+------------+---------+
 |type     |number |old number |difference |%documented |%badname |
 +=========+=======+===========+===========+============+=========+
-|module   |11     |16         |-5.00      |72.73       |36.36    |
+|module   |16     |16         |=          |81.25       |6.25     |
 +---------+-------+-----------+-----------+------------+---------+
-|class    |5      |5          |=          |40.00       |0.00     |
+|class    |6      |6          |=          |50.00       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|method   |47     |47         |=          |61.70       |0.00     |
+|method   |69     |69         |=          |76.81       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|function |13     |21         |-8.00      |100.00      |0.00     |
+|function |13     |13         |=          |100.00      |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
 
 
 
-1211 lines have been analyzed
+1547 lines have been analyzed
 
 Raw metrics
 -----------
@@ -62,13 +60,13 @@ Raw metrics
 +----------+-------+------+---------+-----------+
 |type      |number |%     |previous |difference |
 +==========+=======+======+=========+===========+
-|code      |811    |66.97 |NC       |NC         |
+|code      |965    |62.38 |965      |=          |
 +----------+-------+------+---------+-----------+
-|docstring |139    |11.48 |NC       |NC         |
+|docstring |209    |13.51 |209      |=          |
 +----------+-------+------+---------+-----------+
-|comment   |65     |5.37  |NC       |NC         |
+|comment   |98     |6.33  |98       |=          |
 +----------+-------+------+---------+-----------+
-|empty     |196    |16.18 |NC       |NC         |
+|empty     |275    |17.78 |275      |=          |
 +----------+-------+------+---------+-----------+
 
 
@@ -92,13 +90,13 @@ Messages by category
 +-----------+-------+---------+-----------+
 |type       |number |previous |difference |
 +===========+=======+=========+===========+
-|convention |8      |20       |20         |
+|convention |1      |30       |30         |
 +-----------+-------+---------+-----------+
-|refactor   |1      |4        |4          |
+|refactor   |0      |0        |0          |
 +-----------+-------+---------+-----------+
-|warning    |0      |3        |3          |
+|warning    |0      |0        |0          |
 +-----------+-------+---------+-----------+
-|error      |14     |15       |15         |
+|error      |22     |22       |22         |
 +-----------+-------+---------+-----------+
 
 
@@ -106,27 +104,17 @@ Messages by category
 Messages
 --------
 
-+---------------------------+------------+
-|message id                 |occurrences |
-+===========================+============+
-|import-error               |14          |
-+---------------------------+------------+
-|invalid-name               |4           |
-+---------------------------+------------+
-|wrong-import-order         |1           |
-+---------------------------+------------+
-|no-else-return             |1           |
-+---------------------------+------------+
-|missing-module-docstring   |1           |
-+---------------------------+------------+
-|missing-function-docstring |1           |
-+---------------------------+------------+
-|missing-class-docstring    |1           |
-+---------------------------+------------+
++-------------+------------+
+|message id   |occurrences |
++=============+============+
+|import-error |22          |
++-------------+------------+
+|invalid-name |1           |
++-------------+------------+
 
 
 
 
 ------------------------------------------------------------------
-Your code has been rated at 8.74/10 (previous run: 8.62/10, +0.12)
+Your code has been rated at 8.57/10 (previous run: 8.19/10, +0.37)
 

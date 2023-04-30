@@ -140,6 +140,7 @@ class GameField:
             user_input = input(f"{message}").strip().replace(" ", "")
 
             try:
+                # Input A1
                 l_row = int(user_input[1:]) - 1
                 l_col = int(ascii_uppercase.index(user_input[0].upper()))
             except ValueError:
@@ -194,19 +195,14 @@ class GameField:
 
         for row in rows_to_check:
             for col in cols_to_check:
-                if (
-                    row < 0
-                    or row >= len(self.__boatfield)
-                    or col < 0
-                    or col >= len(self.__boatfield[0])
-                ):
-                    continue  # Ignore out-of-bounds cells
-                if self.__boatfield[row][col] == 1:
-                    print(
-                        "Not an allowed position. Your wanted boat is too close or crossing another one!"
-                    )
-                    return False
-
+                try:
+                    if self.__boatfield[row][col] == 1:
+                        print(
+                            "Not an allowed position. Your wanted boat is too close or crossing another one!"
+                        )
+                        return False
+                except IndexError:
+                    pass
         return True
 
     def __finish_set_ship(self, orientation, ship_len, ship_type, boat_pos):
