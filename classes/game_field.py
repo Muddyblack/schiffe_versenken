@@ -82,13 +82,16 @@ class GameField:
                 txt += "\b" * (len(str(num)) - 1)
             for row in line:
                 if row == 1:
-                    color = console_helper.BLUE
+                    color = console_helper.DARK_GRAY
+                    row = "■"
                 elif row == "X":
                     color = console_helper.RED
+                    row = "■"
                 elif row == "o":
                     color = console_helper.LIGHT_GREEN
                 else:
-                    color = console_helper.RESET
+                    color = console_helper.BLUE
+                    row = "~"
                 txt += color + str(row) + " "
             txt += console_helper.RESET + "\n"
         txt += console_helper.RESET
