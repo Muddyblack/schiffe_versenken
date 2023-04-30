@@ -9,7 +9,7 @@ sys.path.append(
     )
 )
 
-from Classes.player import Player
+from classes.player import Player
 
 
 class TestPlayer(unittest.TestCase):

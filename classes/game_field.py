@@ -5,8 +5,8 @@ from string import ascii_uppercase
 import time
 import random
 
-from Library import keyboard_helper
-from Library import console_helper
+from library import keyboard_helper
+from library import console_helper
 
 
 class GameField:
@@ -70,12 +70,14 @@ class GameField:
         # Set Uppersite Alphabet
         txt = " " * (len(str(self.__fsize)) + 2)
         for elem in range(self.__fsize):
-            txt += f"{ascii_uppercase[elem]} "
+            txt += (
+                f"{console_helper.BROWN}{ascii_uppercase[elem]}{console_helper.RESET} "
+            )
         txt += "\n"
 
         # Set complete matrix with Linenumbers at the side
         for num, line in enumerate(fieldtype, 1):
-            txt += f"{num}   "
+            txt += f"{console_helper.BROWN}{num}{console_helper.RESET}   "
             if len(str(num)) > 1:
                 txt += "\b" * (len(str(num)) - 1)
             for row in line:
