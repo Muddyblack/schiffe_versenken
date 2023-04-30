@@ -199,6 +199,7 @@ class GameField:
                     if row < 0 or col < 0:
                         continue
                     if self.__boatfield[row][col] == 1:
+                        console_helper.refresh_console_lines(4)
                         print(
                             "Not an allowed position. Your wanted boat is too close or crossing another one!"
                         )
