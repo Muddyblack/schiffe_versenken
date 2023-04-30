@@ -273,7 +273,7 @@ class GameField:
             else:
                 print("Invalid direction!")
                 continue
-            print(direction)
+            # print(direction)
 
             # check if ship fits on the board
 
