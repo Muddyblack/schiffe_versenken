@@ -79,7 +79,7 @@ class Player:
                     self.__ships[key][ship_ind].remove(target_cell)
                     if len(self.__ships[key][ship_ind]) == 0:
                         self.__ships[key] = [x for x in self.__ships[key] if x != []]
-                        print(f"{console_helper.RED}{key} got destroyed{console_helper.RESET}!")
+                        print(f"{console_helper.RED}{key} got destroyed!{console_helper.RESET}")
                 else:
                     continue
                 breaking = True
