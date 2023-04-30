@@ -108,22 +108,14 @@ class Game:
         # collecting data from all instances of GameField class
         for obj in gc.get_objects():
             if isinstance(obj, GameField):
-                player_info = {
-                    "name": obj.owner.get_player_name(),
-                    "bot": obj.owner.get_bot(),
-                    "botcache": obj.owner.get_botcache(),
-                    "ships": obj.owner.get_ships(),
-                    "boatfield": obj.get_boatfield(),
-                    "hitfield": obj.get_hitfield(),
-                }
-                player_list.append(player_info)
+                player_list.append(obj)
 
         # Write to file and create path if not existing
         save_dir = f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}"
         os.makedirs(save_dir, exist_ok=True)
-        with open(f"{save_dir}/players.obj", "wb") as file:
+        with open(f"{save_dir}/players.pkl", "wb") as file:
             pickle.dump(player_list, file)
-        with open(f"{save_dir}/game.info", "wb") as file:
+        with open(f"{save_dir}/game_info.pkl", "wb") as file:
             pickle.dump(game_info, file)
 
     def load_game(self):
@@ -133,11 +125,11 @@ class Game:
 
         # Reading required files
         with open(
-            f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}/players.obj", "rb"
+            f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}/players.pkl", "rb"
         ) as playerpickle:
             player_list = pickle.load(playerpickle)
         with open(
-            f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}/game.info", "rb"
+            f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}/game_info.pkl", "rb"
         ) as playerpickle:
             game_info = pickle.load(playerpickle)
 
@@ -147,14 +139,7 @@ class Game:
 
         # creating objects from save-file
         for obj in player_list:
-            player = Player(name=obj["name"], bot=obj["bot"])
-            player.set_ships(obj["ships"])
-            player.set_botcache(obj["botcache"])
-            field = GameField(player)
-            field.set_boatfield(obj["boatfield"])
-            field.set_hitfield(obj["hitfield"])
-
-            field_list.append(field)
+            field_list.append(obj)
 
         def rotate_array_backwards(arr):
             first_element = arr[0]
@@ -390,7 +375,6 @@ class Game:
         if len(exist_save_games) != 0:
             if self.__yes_no_question("Do you want to load an old save?"):
                 self.__select_savegame(exist_save_games)
-                self.load_game()
+                return self.load_game()
 
-        else:
-            self.__create__new_game(exist_save_games)
+        return self.__create__new_game(exist_save_games)
