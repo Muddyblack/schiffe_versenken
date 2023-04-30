@@ -199,6 +199,7 @@ class GameField:
                     if row < 0 or col < 0:
                         continue
                     if self.__boatfield[row][col] == 1:
+                        console_helper.refresh_console_lines(4)
                         print(
                             "Not an allowed position. Your wanted boat is too close or crossing another one!"
                         )
@@ -245,7 +246,7 @@ class GameField:
             # ask start location
             start_row, start_col = self.__get_row_and_column_input(
                 f"Enter the start position for your {console_helper.BROWN}{ship_type}{console_helper.RESET} (e.g. A1): ",
-                is_bot,
+                is_bot
             )
 
             direction = ""
@@ -344,6 +345,7 @@ class GameField:
         if target.get_boatfield()[row][col] == 1:
             self.set_hitfield_cell(row, col, "X")
             target.set_boatfield_cell(row, col, "X")
+            console_helper.clear_console()
             target.owner.ships_after_attack([row, col])
 
             if target.owner.get_ship_amount() == 0:
@@ -352,17 +354,16 @@ class GameField:
                 )
                 return "win"
 
-            console_helper.clear_console()
             if bot is False:
                 self.show_fields_side_by_side()
             print(
-                f"Sir, we hitted an enemy target at {console_helper.BROWN}({row + 1},{col + 1}){console_helper.RESET}!"
+                f"Sir, we hitted an enemy target at {console_helper.BROWN}{ascii_uppercase[col]}{row + 1}{console_helper.RESET}!"
             )
 
             print("You can attack a second time")
             return "hit"
 
-        if target.get_boatfield()[row][col] == "X":
+        if target.get_boatfield()[row][col] == ("X" or "o"):
             print("We already hit this Part")
         else:
             print("Sir we've hit the bull's eye!")
