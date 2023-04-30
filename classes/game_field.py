@@ -153,9 +153,11 @@ class GameField:
                         l_row = int(user_input[0]) - 1
                         l_col = int(ascii_uppercase.index(user_input[1:].upper()))
                 except (IndexError, InterruptedError, ValueError):
+                    console_helper.refresh_console_lines(2)
                     print("Not a valid Input! Please try again!")
                     continue
             except (IndexError, InterruptedError):
+                console_helper.refresh_console_lines(2)
                 print("Not a valid Input! Please try again!")
                 continue
 
@@ -233,7 +235,8 @@ class GameField:
         directions = ["up", "down", "left", "right"]
 
         # 10*10 Matrix * 4 direction * 1/4 buffer -> 500
-        endless_index = ((self.__fsize * self.__fsize) * len(directions)) * (1 / 4)
+        endless_index = ((self.__fsize * self.__fsize) * len(directions))
+        endless_index += endless_index * (1 / 4)
 
         while True:
             endless_index -= 1
