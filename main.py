@@ -216,6 +216,7 @@ def attack_execution(attacker, target):
 if __name__ == "__main__":
     # Setup the Game
     game = Game()
+    game.start_up()
     players = game.get_players()
 
     # Walking through players and letting place their ships
