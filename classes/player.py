@@ -1,7 +1,7 @@
 """Player Module"""
 import json
 from library import game_paths
-
+from library import console_helper
 
 class Player:
     """
@@ -79,7 +79,7 @@ class Player:
                     self.__ships[key][ship_ind].remove(target_cell)
                     if len(self.__ships[key][ship_ind]) == 0:
                         self.__ships[key] = [x for x in self.__ships[key] if x != []]
-                        print(f"{key} got Destroyed")
+                        print(f"{console_helper.RED}{key} got Destroyed{console_helper.RESET}")
                 else:
                     continue
                 breaking = True
