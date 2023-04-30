@@ -345,6 +345,7 @@ class GameField:
         if target.get_boatfield()[row][col] == 1:
             self.set_hitfield_cell(row, col, "X")
             target.set_boatfield_cell(row, col, "X")
+            console_helper.clear_console()
             target.owner.ships_after_attack([row, col])
 
             if target.owner.get_ship_amount() == 0:
@@ -353,7 +354,6 @@ class GameField:
                 )
                 return "win"
 
-            console_helper.clear_console()
             if bot is False:
                 self.show_fields_side_by_side()
             print(
