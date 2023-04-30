@@ -196,6 +196,8 @@ class GameField:
         for row in rows_to_check:
             for col in cols_to_check:
                 try:
+                    if row < 0 or col < 0:
+                        continue
                     if self.__boatfield[row][col] == 1:
                         print(
                             "Not an allowed position. Your wanted boat is too close or crossing another one!"
@@ -354,7 +356,7 @@ class GameField:
             if bot is False:
                 self.show_fields_side_by_side()
             print(
-                f"Sir, we hitted an enemy target at {console_helper.BROWN}({row},{col}){console_helper.RESET}!"
+                f"Sir, we hitted an enemy target at {console_helper.BROWN}({row + 1},{col + 1}){console_helper.RESET}!"
             )
 
             print("You can attack a second time")
