@@ -30,9 +30,7 @@ class Game:
         self.__players = None
         self.__save_name = None
         self.__current_level = None
-
-        self.start_up()
-        self.__last_turn_player = self.__players[0]
+        self.__last_turn_player = None
         time.sleep(0.3)
 
     # getter
@@ -184,6 +182,7 @@ class Game:
             check_ind += 1
 
         self.__players = field_list
+        self.__last_turn_player = self.__players[0]
 
     def __yes_no_question(self, question):
         """
@@ -237,6 +236,7 @@ class Game:
         # Finish and set Variables
         self.__players = field_list
         self.__current_level = 0
+        self.__last_turn_player = self.__players[0]
 
     def __start_screen(self):
         """Prints a beautiful ASCII-Logo for the game to the console"""
@@ -390,6 +390,7 @@ class Game:
         if len(exist_save_games) != 0:
             if self.__yes_no_question("Do you want to load an old save?"):
                 self.__select_savegame(exist_save_games)
-                return self.load_game()
+                self.load_game()
 
-        return self.__create__new_game(exist_save_games)
+        else:
+            self.__create__new_game(exist_save_games)
