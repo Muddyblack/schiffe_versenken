@@ -322,7 +322,7 @@ class Game:
         """
         selected_save_game_index = 0
         save_games_len = len(exist_save_games)
-        print("Use up and down arrows to navigate\nUse Spacebar to sleect the game")
+        print("Use up and down arrows to navigate\nUse Spacebar to select the game")
 
         self.__display_save_games(exist_save_games, selected_save_game_index)
 
