@@ -12,7 +12,6 @@ from library import keyboard_helper
 from library import random_helper
 from library import game_paths
 
-
 from classes.game import Game
 
 random.seed(time.time())
