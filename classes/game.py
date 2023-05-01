@@ -375,6 +375,9 @@ class Game:
         if len(exist_save_games) != 0:
             if self.__yes_no_question("Do you want to load an old save?"):
                 self.__select_savegame(exist_save_games)
-                return self.load_game()
+                self.load_game()
+                return
 
-        return self.__create__new_game(exist_save_games)
+        self.__create__new_game(exist_save_games)
+        return
+        
