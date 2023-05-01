@@ -222,6 +222,7 @@ class Game:
         self.__players = field_list
         self.__current_level = 0
         self.__last_turn_player = self.__players[0]
+        self.save_game()
 
     def __start_screen(self):
         """Prints a beautiful ASCII-Logo for the game to the console"""
