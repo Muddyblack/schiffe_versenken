@@ -53,11 +53,11 @@ class GameField:
         """Sets the hitfield matrix."""
         self.__hitfield = field
 
-    def set_boatfield_cell(self, row, col, value=0):
+    def set_boatfield_cell(self, row, col, value):
         """Sets the value of a cell in the boatfield matrix."""
         self.__boatfield[row][col] = value
 
-    def set_hitfield_cell(self, row, col, value=1):
+    def set_hitfield_cell(self, row, col, value):
         """Sets the value of a cell in the hitfield matrix."""
         self.__hitfield[row][col] = value
 
