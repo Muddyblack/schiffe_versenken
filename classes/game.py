@@ -167,7 +167,7 @@ class Game:
             check_ind += 1
 
         self.__players = field_list
-        self.__last_turn_player = self.__players[0]
+        self.__last_turn_player = self.__players[0].owner.get_player_name()
 
     def __yes_no_question(self, question):
         """
