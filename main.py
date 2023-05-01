@@ -230,7 +230,6 @@ if __name__ == "__main__":
             else:
                 print(turn_txt)
 
-            game.save_game()
             place_all_ships(player)
 
             if player.owner.get_bot() is False:
