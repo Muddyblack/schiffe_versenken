@@ -290,12 +290,12 @@ class Game:
         keyboard_helper.clear_input()
         console_helper.clear_console()
 
-    def __display_save_games(self, save_games, selected_save_game_index):
+    def __display_save_games(self, save_games, selected_index):
         """Displays the list of save games with the currently selected save game highlighted"""
 
         for i in enumerate(save_games):
             game_name = os.path.basename(save_games[i[0]])
-            if i[0] == selected_save_game_index:
+            if i[0] == selected_index:
                 print(f"{console_helper.CYAN}> {game_name}{console_helper.RESET}")
             else:
                 print(f"  {game_name}")
@@ -305,23 +305,23 @@ class Game:
         - Allows the user to select a saved game from a list of saved game directories displayed on the console.
         - The user uses arrow-keys and the space-key
         """
-        selected_save_game_index = 0
+        selected_index = 0
         save_games_len = len(exist_save_games)
         print("Use up and down arrows to navigate\nUse Spacebar to select the game")
 
-        self.__display_save_games(exist_save_games, selected_save_game_index)
+        self.__display_save_games(exist_save_games, selected_index)
 
         while True:
             # Handle arrow key presses to move the selected save game index up or down
 
-            if keyboard.is_pressed("up") and selected_save_game_index > 0:
+            if keyboard.is_pressed("up") and selected_index > 0:
                 sound_process = simpleaudio.WaveObject.from_wave_file(
                     f"{game_paths.SOUND_PATH}/Menu-Select.wav"
                 ).play()
 
-                selected_save_game_index -= 1
+                selected_index -= 1
                 console_helper.refresh_console_lines(save_games_len)
-                self.__display_save_games(exist_save_games, selected_save_game_index)
+                self.__display_save_games(exist_save_games, selected_index)
 
                 while keyboard.is_pressed("up"):
                     pass
@@ -329,15 +329,15 @@ class Game:
 
             elif (
                 keyboard.is_pressed("down")
-                and selected_save_game_index < len(exist_save_games) - 1
+                and selected_index < len(exist_save_games) - 1
             ):
                 sound_process = simpleaudio.WaveObject.from_wave_file(
                     f"{game_paths.SOUND_PATH}/Menu-Select.wav"
                 ).play()
 
-                selected_save_game_index += 1
+                selected_index += 1
                 console_helper.refresh_console_lines(save_games_len)
-                self.__display_save_games(exist_save_games, selected_save_game_index)
+                self.__display_save_games(exist_save_games, selected_index)
                 while keyboard.is_pressed("down"):
                     pass
                 sound_process.wait_done()
@@ -346,7 +346,7 @@ class Game:
                 break
 
         # Set Variable and exit function with playing start-sound
-        self.__save_name = exist_save_games[selected_save_game_index]
+        self.__save_name = exist_save_games[selected_index]
         print(f"Selected save game: {os.path.basename(self.__save_name)}\n")
 
         simpleaudio.WaveObject.from_wave_file(
