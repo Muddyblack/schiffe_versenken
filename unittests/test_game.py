@@ -63,6 +63,34 @@ class TestGame(unittest.TestCase):
             result = game._Game__ask_name("What's your name?")
             self.assertEqual(result, "Luisa")
 
+    def test__yes_no_question(self):
+        game = Game()
+        #testing multiple inputs
+        with patch('builtins.input', side_effect=['y', 'yes', '' , 'n', 'no']):
+            self.assertTrue(game._Game__yes_no_question("Do you want to continue?"))
+            self.assertTrue(game._Game__yes_no_question("Do you want to continue?"))
+            self.assertTrue(game._Game__yes_no_question("Do you want to continue?"))
+            self.assertFalse(game._Game__yes_no_question("Do you want to continue?"))
+            self.assertFalse(game._Game__yes_no_question("Do you want to continue?"))
+    
+    """
+    def test__display_save_games(self):
+        game = Game()
+        with patch("builtins.print" ) as mock_print:
+            game._Game__display_save_games(["save_game1", "save_game2", "save_game3"], 1)
+            mock_print.assert_called_with("save_game1 >save_game2  save_game3")       
+    """
+
+    def test_start_up(self):
+        game = Game()
+        exist_save_game=[]
+        result=game._Game__start_up(exist_save_game)
+        self.assertEqual(result, self.__create_new_game())
+        
+            
+    
+
+
 
 if __name__ == "__main__":
     unittest.main()
