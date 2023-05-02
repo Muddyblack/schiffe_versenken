@@ -16,6 +16,8 @@ sys.path.append(
 from classes.game_field import GameField
 from classes.player import Player
 
+from library import keyboard_helper
+
 
 class TestGameField(unittest.TestCase):
     def setUp(self):
@@ -92,7 +94,7 @@ class TestGameField(unittest.TestCase):
             3,
             5,
             10,
-        ]  # warum auch immer resetted er die variable expected_text nicht in der Schleife muss and mock stdout liegen
+        ]
 
         for matrix_size in matrix_sizes:
             self.game_field.set_matrix_size(matrix_size)
@@ -117,9 +119,53 @@ class TestGameField(unittest.TestCase):
                 .replace("\x08", ""),
                 expected_text,
             )
+            # RESET
+            mock_stdout.seek(0)
+            mock_stdout.truncate()
 
-    def set_ship(self):
-        pass
+    def test_set_ship(self):
+        # Set the input to (0, 0), which is equivalent to "A1"
+        matrix_max = 9  # 0...9
+        directions = ["right", "left", "up", "down"]
+
+        shiptype = "destroyer"
+        shiplen = 3
+
+        for row in range(matrix_max):
+            for column in range(matrix_max):
+                with patch.object(
+                    GameField,
+                    "_GameField__get_row_and_column_input",
+                    return_value=(row, column),
+                ):
+                    print(row, column)
+                    for direction in directions:
+                        with patch(
+                            "keyboard.is_pressed",
+                            side_effect=lambda key: key == direction,
+                        ):
+                            result = self.game_field.set_ship(
+                                ship_len=shiplen, ship_type=shiptype, is_bot=False
+                            )
+                            the_boolean = True
+
+                            if (
+                                ((row < shiplen - 1) and direction == "up")
+                                or (
+                                    (row > matrix_max - shiplen + 1)
+                                    and direction == "down"
+                                )
+                                or ((column < shiplen - 1) and direction == "left")
+                                or (
+                                    (column > matrix_max - shiplen + 1)
+                                    and direction == "right"
+                                )
+                            ):
+                                the_boolean = False
+
+                            self.assertEqual(result, the_boolean)
+                            # reset field for next check
+                            self.game_field.set_boatfield(self.game_field.init_field())
 
 
 if __name__ == "__main__":
