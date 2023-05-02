@@ -4,8 +4,10 @@ import sys
 import os
 import re
 import io
+from io import StringIO
 from string import ascii_uppercase
 from unittest.mock import patch
+import logging
 
 sys.path.append(
     os.path.abspath(
@@ -16,7 +18,8 @@ sys.path.append(
 from classes.game_field import GameField
 from classes.player import Player
 
-from library import keyboard_helper
+
+ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
 class TestGameField(unittest.TestCase):
@@ -80,7 +83,6 @@ class TestGameField(unittest.TestCase):
                 expected_text += str(x + 1) + "~" * matrix_size + "\n"
                 field.append([0 for i in range(matrix_size)])
 
-            ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
             text = self.game_field._GameField__get_field_text(field)
 
             self.assertEqual(
@@ -123,9 +125,9 @@ class TestGameField(unittest.TestCase):
             mock_stdout.seek(0)
             mock_stdout.truncate()
 
-    def test_set_ship(self):
+    def test_set_ship_borders(self):
         # Set the input to (0, 0), which is equivalent to "A1"
-        matrix_max = 9  # 0...9
+        matrix_max = 9  # 0...9 -> len == 10
         directions = ["right", "left", "up", "down"]
 
         shiptype = "destroyer"
@@ -168,5 +170,105 @@ class TestGameField(unittest.TestCase):
                             self.game_field.set_boatfield(self.game_field.init_field())
 
 
+class TestAttackEnemy(unittest.TestCase):
+    def setUp(self):
+        # Set up some test data
+        self.player1 = Player(name="Chrissi", bot=False)
+        self.player2 = Player(name="Linus", bot=False)
+        self.game_field1 = GameField(self.player1)
+        self.game_field2 = GameField(self.player2)
+
+        def set_testing_ship(
+            field, start_row, start_column, shiplen, shiptype, direction
+        ):
+            with patch.object(
+                GameField,
+                "_GameField__get_row_and_column_input",
+                return_value=(start_row, start_column),
+            ):
+                with patch(
+                    "keyboard.is_pressed",
+                    side_effect=lambda key: key == direction,
+                ):
+                    field.set_ship(ship_len=shiplen, ship_type=shiptype, is_bot=False)
+
+        set_testing_ship(self.game_field1, 0, 0, 3, "destroyer", "right")
+        set_testing_ship(self.game_field2, 3, 2, 3, "destroyer", "down")
+
+    def test_attack_enemy_self(self):
+        # Test that the attack raises a ValueError when the player attacks themselves
+        with self.assertRaises(ValueError):
+            self.game_field1.attack_enemy(self.game_field1)
+
+    def test_attack_enemy_hit(self):
+        # Test that the attack hits the enemy's ship
+        with patch.object(
+            GameField,
+            "_GameField__get_row_and_column_input",
+            return_value=(3, 2),
+        ):
+            self.game_field1.attack_enemy(self.game_field2)
+
+        self.assertEqual(self.game_field2.get_boatfield()[3][2], "X")
+        self.assertEqual(self.game_field1.get_hitfield()[3][2], 1)
+
+    def test_attack_enemy_miss(self):
+        # Test that the attack misses the enemy's ship
+        with patch.object(
+            GameField,
+            "_GameField__get_row_and_column_input",
+            return_value=(0, 0),
+        ):
+            self.game_field1.attack_enemy(self.game_field2)
+        self.assertEqual(self.game_field2.get_boatfield()[0][0], 0)
+        self.assertEqual(self.game_field1.get_hitfield()[0][0], "o")
+
+    def test_attack_enemy_win(self):
+        # Test that the attack results in a win
+        with patch("sys.stdout", new=StringIO()) as fake_stdout:
+            with patch.object(
+                GameField,
+                "_GameField__get_row_and_column_input",
+                return_value=(3, 2),
+            ):
+                self.game_field1.attack_enemy(self.game_field2)
+            with patch.object(
+                GameField,
+                "_GameField__get_row_and_column_input",
+                return_value=(4, 2),
+            ):
+                self.game_field1.attack_enemy(self.game_field2)
+            with patch.object(
+                GameField,
+                "_GameField__get_row_and_column_input",
+                return_value=(5, 2),
+            ):
+                self.game_field1.attack_enemy(self.game_field2)
+        self.assertIn(
+            f"Congrats {self.player1.get_player_name()}, YOU WON!",
+            ansi_escape.sub("", fake_stdout.getvalue()),
+        )
+        # RESET
+        fake_stdout.seek(0)
+        fake_stdout.truncate()
+
+    def test_attack_enemy_bot(self):
+        # Test that the attack works when the player is a bot
+        self.player1.set_bot(True)
+        with patch.object(
+            GameField,
+            "_GameField__get_row_and_column_input",
+            return_value=(3, 2),
+        ):
+            self.game_field1.attack_enemy(self.game_field2)
+        self.assertEqual(self.game_field2.get_boatfield()[3][2], "X")
+
+
 if __name__ == "__main__":
+    with open(
+        f"{os.path.dirname(os.path.abspath(__file__))}/test_game_field.log", "w"
+    ) as f:
+        runner = unittest.TextTestRunner(stream=f, verbosity=2)
+        unittest.main(testRunner=runner)
+
     unittest.main()
