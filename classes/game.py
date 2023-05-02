@@ -47,7 +47,7 @@ class Game:
         return self.__current_level
 
     def get_last_turn_player(self):
-        """Returns th players who has the tun"""
+        """Returns th players who has the turn"""
         return self.__last_turn_player
 
     # setter
@@ -60,7 +60,7 @@ class Game:
         self.__current_level = level
 
     def set_last_turn_player(self, player):
-        """Returns th players who has the tun"""
+        """Returns th players who has the turn"""
         self.__last_turn_player = player
 
     # Class functions
@@ -101,7 +101,7 @@ class Game:
         """Saves the current state of the game in a binary file format."""
         player_list = []
         game_info = {
-            "last_turn_player": self.__last_turn_player.owner.get_player_name(),
+            "last_turn_player": self.__last_turn_player,
             "level": self.__current_level,
         }
 
@@ -221,7 +221,7 @@ class Game:
         # Finish and set Variables
         self.__players = field_list
         self.__current_level = 0
-        self.__last_turn_player = self.__players[0]
+        self.__last_turn_player = self.__players[0].owner.get_player_name()
         self.save_game()
 
     def __start_screen(self):
@@ -381,4 +381,3 @@ class Game:
 
         self.__create__new_game(exist_save_games)
         return
-        
