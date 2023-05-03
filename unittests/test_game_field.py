@@ -330,7 +330,7 @@ class TestAttackEnemy(unittest.TestCase):
             self.game_field1.attack_enemy(self.game_field2)
 
         self.assertEqual(self.game_field2.get_boatfield()[3][2], "X")
-        self.assertEqual(self.game_field1.get_hitfield()[3][2], 1)
+        self.assertEqual(self.game_field1.get_hitfield()[3][2], "X")
 
     def test_attack_enemy_miss(self):
         """Testing when attack on enemy hits water"""
