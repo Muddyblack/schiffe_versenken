@@ -1,13 +1,12 @@
-# pylint: disable=C)
+# pylint: disable=C
 import unittest
 import sys
 import os
 import re
 import io
-from io import StringIO
 from string import ascii_uppercase
 from unittest.mock import patch
-import logging
+import random
 
 sys.path.append(
     os.path.abspath(
@@ -20,6 +19,19 @@ from classes.player import Player
 
 
 ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+
+
+def set_testing_ship(field, start_row, start_column, shiplen, shiptype, direction):
+    with patch.object(
+        GameField,
+        "_GameField__get_row_and_column_input",
+        return_value=(start_row, start_column),
+    ):
+        with patch(
+            "keyboard.is_pressed",
+            side_effect=lambda key: key == direction,
+        ):
+            field.set_ship(ship_len=shiplen, ship_type=shiptype, is_bot=False)
 
 
 class TestGameField(unittest.TestCase):
@@ -90,6 +102,11 @@ class TestGameField(unittest.TestCase):
                 expected_text,
             )
 
+    def test_get_matrix_size(self):
+        size = 2
+        self.game_field.set_matrix_size(size)
+        self.assertEqual(self.game_field.get_matrix_size(), size)
+
     @patch("sys.stdout", new_callable=io.StringIO)
     def test_show_fields(self, mock_stdout):
         matrix_sizes = [
@@ -115,6 +132,17 @@ class TestGameField(unittest.TestCase):
             ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
             self.game_field.show_boatfield()
+            self.assertEqual(
+                ansi_escape.sub("", mock_stdout.getvalue())
+                .replace(" ", "")
+                .replace("\x08", ""),
+                expected_text,
+            )
+            # RESET
+            mock_stdout.seek(0)
+            mock_stdout.truncate()
+
+            self.game_field.show_hitfield()
             self.assertEqual(
                 ansi_escape.sub("", mock_stdout.getvalue())
                 .replace(" ", "")
@@ -169,6 +197,66 @@ class TestGameField(unittest.TestCase):
                             # reset field for next check
                             self.game_field.set_boatfield(self.game_field.init_field())
 
+    def test_user_get_position_input(self):
+        valid_inputs = ["A1", "1A", "B3", "4C"]
+        valid_results = [(0, 0), (0, 0), (2, 1), (3, 2)]
+
+        for index, input_txt in enumerate(valid_inputs):
+            with patch("builtins.input", return_value=input_txt):
+                result = self.game_field._GameField__get_row_and_column_input(
+                    "Enter your position:", False
+                )
+                self.assertEqual(result, valid_results[index])
+
+        invalid_inputs = ["D0", "D20", "Eß", "11", "132"]
+        invalid_result = [
+            "Outside of the Field!",
+            "Outside of the Field!",
+            "Not a valid Input! Please try again!",
+            "Not a valid Input! Please try again!",
+            "Not a valid Input! Please try again!",
+        ]
+
+    @patch("random.randint", side_effect=[2, 3])
+    def test_bot_input(self, mock_randint):
+        random.seed(1)  # set the seed for reproducibility
+
+        # Test bot input
+        row, col = self.game_field._GameField__get_row_and_column_input(
+            "Enter coordinates: ", True
+        )
+        self.assertEqual(row, 2)
+        self.assertEqual(col, 3)
+
+    def test_ship_surrounding_check(self):
+        shiplen = 3
+        set_testing_ship(self.game_field, 0, 0, shiplen, "destroyer", "down")
+        orientations = ["vertical", "horizontal"]
+
+        for orientation in orientations:
+            self.assertEqual(
+                self.game_field._GameField__check_ship_surrounding(
+                    orientation, shiplen, 0, 1
+                ),
+                False,
+            )
+
+        for orientation in orientations:
+            self.assertEqual(
+                self.game_field._GameField__check_ship_surrounding(
+                    orientation, shiplen, 0, 3
+                ),
+                True,
+            )
+
+        for orientation in orientations:
+            self.assertEqual(
+                self.game_field._GameField__check_ship_surrounding(
+                    orientation, shiplen, 4, 1
+                ),
+                True,
+            )
+
 
 class TestAttackEnemy(unittest.TestCase):
     def setUp(self):
@@ -177,20 +265,6 @@ class TestAttackEnemy(unittest.TestCase):
         self.player2 = Player(name="Linus", bot=False)
         self.game_field1 = GameField(self.player1)
         self.game_field2 = GameField(self.player2)
-
-        def set_testing_ship(
-            field, start_row, start_column, shiplen, shiptype, direction
-        ):
-            with patch.object(
-                GameField,
-                "_GameField__get_row_and_column_input",
-                return_value=(start_row, start_column),
-            ):
-                with patch(
-                    "keyboard.is_pressed",
-                    side_effect=lambda key: key == direction,
-                ):
-                    field.set_ship(ship_len=shiplen, ship_type=shiptype, is_bot=False)
 
         set_testing_ship(self.game_field1, 0, 0, 3, "destroyer", "right")
         set_testing_ship(self.game_field2, 3, 2, 3, "destroyer", "down")
@@ -225,7 +299,7 @@ class TestAttackEnemy(unittest.TestCase):
 
     def test_attack_enemy_win(self):
         # Test that the attack results in a win
-        with patch("sys.stdout", new=StringIO()) as fake_stdout:
+        with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
             with patch.object(
                 GameField,
                 "_GameField__get_row_and_column_input",

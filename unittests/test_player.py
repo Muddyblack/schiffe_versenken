@@ -1,4 +1,4 @@
-# pylint: disable=C)
+# pylint: disable=C
 import unittest
 import sys
 import os
