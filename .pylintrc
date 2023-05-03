@@ -1,5 +1,7 @@
 [MASTER]
 max-line-length=160
+ignore = "./venv", "./GameData"
+
 [MESSAGES CONTROL]
 # See Doc, for explanation! (--disable=E0401)
 disable=import-error

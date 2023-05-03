@@ -66,7 +66,7 @@ class TestRandomFunctions(unittest.TestCase):
         start = 1
         end = 10
         exception = [3, 5, 7]
-        for i in range(1000):
+        for _ in range(1000):
             res = random_helper.randint_exc(start, end, *exception)
             self.assertTrue(start <= res <= end)
             self.assertNotIn(res, exception)
@@ -83,7 +83,8 @@ class TestFileHelperFunctions(unittest.TestCase):
 
     def setUp(self):
         """create some tempory files for testing"""
-        self.test_file = tempfile.NamedTemporaryFile(delete=False)
+        with tempfile.NamedTemporaryFile(delete=False) as test_file:
+            self.test_file = test_file
 
         # write test data to the file
         with open(self.test_file.name, "w", encoding="utf8") as file:
@@ -93,7 +94,6 @@ class TestFileHelperFunctions(unittest.TestCase):
 
     def tearDown(self):
         """Deletes created files when testing finished"""
-        self.test_file.close()
         os.remove(self.test_file.name)
 
     def test_read_file(self):
@@ -139,12 +139,4 @@ class TestGetArrowKey(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with open(
-        f"{os.path.dirname(os.path.abspath(__file__))}/logging/test_libraries.log",
-        "w",
-        encoding="utf-8",
-    ) as f:
-        runner = unittest.TextTestRunner(stream=f, verbosity=2)
-        unittest.main(testRunner=runner)
-
     unittest.main()
