@@ -5,8 +5,8 @@ import unittest
 from unittest import mock
 import io
 import sys
+import re
 import os
-import builtins
 from unittest.mock import patch
 
 
@@ -16,41 +16,59 @@ sys.path.append(
     )
 )
 
+from classes.player import Player
+from classes.game_field import GameField
+from classes.game import Game
 
-from game_funcs import left_to_place_ships, place_all_ships, attack_execution
+from main import left_to_place_ships, place_all_ships, attack_execution
+
+
+ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+
+
+def set_testing_ship(field, start_row, start_column, shiplen, shiptype, direction):
+    with patch.object(
+        GameField,
+        "_GameField__get_row_and_column_input",
+        return_value=(start_row, start_column),
+    ):
+        with patch(
+            "keyboard.is_pressed",
+            side_effect=lambda key: key == direction,
+        ):
+            field.set_ship(ship_len=shiplen, ship_type=shiptype, is_bot=False)
 
 
 class TestGameFuncs(unittest.TestCase):
-    @patch("builtins.input", return_value="1")
-    def test_left_to_place_ships(self, mock_input):
-        ship_types = {
-            "Carrier": {"max": "1", "length": "5"},
-            "Battleship": {"max": "1", "length": "4"},
+    def setUp(self):
+        self.ship_types = {
+            "battleship": {"max": "1", "length": "5"},
+            "destroyer": {"max": "1", "length": "3"},
         }
-        ships = {"Carrier": [(1, 1)], "Battleship": []}
 
-        expected_text = "You have\n1: Carrier 0 (5-Long)\n2: Battleship 1 (4-Long)"
-        expected_ships_left = 1
-        expected_placed_ships = [1]
+        self.game = Game()
+        self.player1 = Player(name="Player 1", bot=False)
+        self.player2 = Player(name="Player 2", bot=False)
+        self.game_field1 = GameField(self.player1)
+        self.game_field2 = GameField(self.player2)
 
-        result = left_to_place_ships(ship_types, ships)
-
-        self.assertEqual(result[0], expected_text)
-        self.assertEqual(result[1], expected_ships_left)
-        self.assertEqual(result[2], expected_placed_ships)
-
-    @patch("builtins.input", return_value="1")
-    def test_place_all_ships(self, mock_input):
-        # TODO: write test for place_all_ships function
+    def test_left_to_place_ships(self):
+        # NO IDEA
         pass
 
     def test_attack_execution(self):
-        # TODO: write test for attack_execution function
+        # set_testing_ship(self.game_field1, 0, 0, 3, "destroyer", "down")
+        # set_testing_ship(self.game_field2, 9, 9, 3, "destroyer", "up")
+        # self.game.set_last_turn_player(self.player1.get_player_name())
+
+        # with patch("builtins.input", return_value="J1"):
+        #    attack_execution(self.game_field1, self.game_field2)
+
+        # self.assertEqual(self.game.get_last_turn_player(), self.player2)
+        # self.assertEqual(len(self.game_field2.get_hitfield()), 10)
+        # self.assertEqual(self.player1.get_botcache(), [])
         pass
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 if __name__ == "__main__":
     unittest.main()
