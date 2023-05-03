@@ -1,4 +1,6 @@
 # pylint: disable=C
+# Have to access a protected variable which is supposed to stay private
+# pylint: disable=protected-access
 import unittest
 import sys
 import os
@@ -20,8 +22,10 @@ from classes.player import Player
 ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
-def set_testing_ship(field, start_row, start_column, shiplen, shiptype, direction):
+def set_testing_ship(field, cood, shiplen, shiptype, direction):
     """simplifiying process to set ship while testing"""
+    start_row = cood[0]
+    start_column = cood[1]
     with patch.object(
         GameField,
         "_GameField__get_row_and_column_input",
@@ -38,46 +42,55 @@ class TestGameField(unittest.TestCase):
     """Class to test most of GameFields functions"""
 
     def setUp(self):
-        # Set up the GameField object for testing
+        """Set up a GameField object for testing"""
+
         self.game_field = GameField(Player(name="Player", bot=False))
 
     def test_get_boatfield(self):
-        # Test the get_boatfield() method
+        """testing if boatfield has correct matrix"""
+
         boatfield = self.game_field.get_boatfield()
         self.assertIsInstance(boatfield, list)
         self.assertEqual(len(boatfield), 10)
         self.assertEqual(len(boatfield[0]), 10)
 
     def test_get_hitfield(self):
-        # Test the get_hitfield() method
+        """testing if hitfield has correct matrix"""
+
         hitfield = self.game_field.get_hitfield()
         self.assertIsInstance(hitfield, list)
         self.assertEqual(len(hitfield), 10)
         self.assertEqual(len(hitfield[0]), 10)
 
     def test_set_boatfield(self):
-        # Test the set_boatfield() method
+        """testing if setting boatfield matrix works properly"""
+
         boatfield = [[0 for _ in range(10)] for _ in range(10)]
         self.game_field.set_boatfield(boatfield)
         self.assertEqual(self.game_field.get_boatfield(), boatfield)
 
     def test_set_hitfield(self):
-        # Test the set_hitfield() method
+        """testing if setting hitfield matrix works properly"""
+
         hitfield = [[0 for _ in range(10)] for _ in range(10)]
         self.game_field.set_hitfield(hitfield)
         self.assertEqual(self.game_field.get_hitfield(), hitfield)
 
     def test_set_boatfield_cell(self):
-        # Test the set_boatfield_cell() method
+        """testing if you can set the correct single cell of boatfield"""
+
         self.game_field.set_boatfield_cell(0, 0, 1)
         self.assertEqual(self.game_field.get_boatfield()[0][0], 1)
 
     def test_set_hitfield_cell(self):
-        # Test the set_hitfield_cell() method
+        """testing if you can set the correct single cell of hitfield"""
+
         self.game_field.set_hitfield_cell(0, 0, 1)
         self.assertEqual(self.game_field.get_hitfield()[0][0], 1)
 
     def test_matrix_size(self):
+        """Test if different matrix sizes work"""
+
         test_sizes = [1, 5, 10]
         for size in test_sizes:
             self.game_field.set_matrix_size(size)
@@ -87,6 +100,8 @@ class TestGameField(unittest.TestCase):
                 self.assertEqual(len(matrix[x]), size)
 
     def test_get_field_text(self):
+        """Test if the field text has propper formation at different matrix sizes"""
+
         matrix_sizes = [3, 5, 10]
 
         for matrix_size in matrix_sizes:
@@ -105,12 +120,16 @@ class TestGameField(unittest.TestCase):
             )
 
     def test_get_matrix_size(self):
+        """testing if returning correct matrix size"""
+
         size = 2
         self.game_field.set_matrix_size(size)
         self.assertEqual(self.game_field.get_matrix_size(), size)
 
     @patch("sys.stdout", new_callable=io.StringIO)
     def test_show_fields(self, mock_stdout):
+        """Checking if printing fields have at different matrix sizes still good formation"""
+
         matrix_sizes = [
             3,
             5,
@@ -121,6 +140,7 @@ class TestGameField(unittest.TestCase):
             self.game_field.set_matrix_size(matrix_size)
             field = []
 
+            # Setting uo expected Matrix Text with Alphabet on top and numbers on the left
             expected_text = f"{ascii_uppercase[0:(matrix_size)]}\n"
 
             for x in range(matrix_size):
@@ -131,7 +151,6 @@ class TestGameField(unittest.TestCase):
 
             self.game_field.set_boatfield(field)
             self.game_field.set_hitfield(field)
-            ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
             self.game_field.show_boatfield()
             self.assertEqual(
@@ -156,6 +175,11 @@ class TestGameField(unittest.TestCase):
             mock_stdout.truncate()
 
     def test_set_ship_borders(self):
+        """
+        testing all borders for problems at setting ships
+            - Our favorite issue with this game.... :P
+        """
+
         # Set the input to (0, 0), which is equivalent to "A1"
         matrix_max = 9  # 0...9 -> len == 10
         directions = ["right", "left", "up", "down"]
@@ -174,24 +198,21 @@ class TestGameField(unittest.TestCase):
                     for direction in directions:
                         with patch(
                             "keyboard.is_pressed",
-                            side_effect=lambda key: key == direction,
+                            side_effect=lambda key, direction=direction: key
+                            == direction,
                         ):
                             result = self.game_field.set_ship(
                                 ship_len=shiplen, ship_type=shiptype, is_bot=False
                             )
                             the_boolean = True
 
-                            if (
-                                ((row < shiplen - 1) and direction == "up")
-                                or (
-                                    (row > matrix_max - shiplen + 1)
-                                    and direction == "down"
-                                )
-                                or ((column < shiplen - 1) and direction == "left")
-                                or (
-                                    (column > matrix_max - shiplen + 1)
-                                    and direction == "right"
-                                )
+                            if ((row < shiplen - 1) and direction == "up") or (
+                                (row > matrix_max - shiplen + 1) and direction == "down"
+                            ):
+                                the_boolean = False
+                            elif ((column < shiplen - 1) and direction == "left") or (
+                                (column > matrix_max - shiplen + 1)
+                                and direction == "right"
                             ):
                                 the_boolean = False
 
@@ -200,6 +221,8 @@ class TestGameField(unittest.TestCase):
                             self.game_field.set_boatfield(self.game_field.init_field())
 
     def test_user_get_position_input(self):
+        """Test user Input for Field Positions"""
+
         valid_inputs = ["A1", "1A", "B3", "4C"]
         valid_results = [(0, 0), (0, 0), (2, 1), (3, 2)]
 
@@ -235,17 +258,20 @@ class TestGameField(unittest.TestCase):
                 except StopIteration:
                     pass
 
-    @patch("random.randint", side_effect=[2, 3])
-    def test_bot_input(self, mock_randint):
-        row, col = self.game_field._GameField__get_row_and_column_input(
-            "Enter coordinates: ", True
-        )
-        self.assertEqual(row, 2)
-        self.assertEqual(col, 3)
+    def test_bot_input(self):
+        """Testing the input of the bot"""
+        with patch("random.randint", side_effect=[2, 3]):
+            row, col = self.game_field._GameField__get_row_and_column_input(
+                "Enter coordinates: ", True
+            )
+            self.assertEqual(row, 2)
+            self.assertEqual(col, 3)
 
     def test_ship_surrounding_check(self):
+        """Test the surrounding checking of a Position with an existing ship"""
+
         shiplen = 3
-        set_testing_ship(self.game_field, 0, 0, shiplen, "destroyer", "down")
+        set_testing_ship(self.game_field, (0, 0), shiplen, "destroyer", "down")
         orientations = ["vertical", "horizontal"]
 
         for orientation in orientations:
@@ -277,22 +303,25 @@ class TestAttackEnemy(unittest.TestCase):
     """Extra Class just to test GameFields attacking functionality"""
 
     def setUp(self):
-        # Set up some test data
+        """Setting two player with their fields and setting one ship per player for testing"""
+
         self.player1 = Player(name="Chrissi", bot=False)
         self.player2 = Player(name="Linus", bot=False)
         self.game_field1 = GameField(self.player1)
         self.game_field2 = GameField(self.player2)
 
-        set_testing_ship(self.game_field1, 0, 0, 3, "destroyer", "right")
-        set_testing_ship(self.game_field2, 3, 2, 3, "destroyer", "down")
+        set_testing_ship(self.game_field1, (0, 0), 3, "destroyer", "right")
+        set_testing_ship(self.game_field2, (3, 2), 3, "destroyer", "down")
 
     def test_attack_enemy_self(self):
-        # Test that the attack raises a ValueError when the player attacks themselves
+        """Test if attack raises ValueError when a player attacks himselve"""
+
         with self.assertRaises(ValueError):
             self.game_field1.attack_enemy(self.game_field1)
 
     def test_attack_enemy_hit(self):
-        # Test that the attack hits the enemy's ship
+        """Test attacking an enemy ship"""
+
         with patch.object(
             GameField,
             "_GameField__get_row_and_column_input",
@@ -304,7 +333,8 @@ class TestAttackEnemy(unittest.TestCase):
         self.assertEqual(self.game_field1.get_hitfield()[3][2], 1)
 
     def test_attack_enemy_miss(self):
-        # Test that the attack misses the enemy's ship
+        """Testing when attack on enemy hits water"""
+
         with patch.object(
             GameField,
             "_GameField__get_row_and_column_input",
@@ -315,7 +345,8 @@ class TestAttackEnemy(unittest.TestCase):
         self.assertEqual(self.game_field1.get_hitfield()[0][0], "o")
 
     def test_attack_enemy_win(self):
-        # Test that the attack results in a win
+        """Test a winning player"""
+
         with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
             with patch.object(
                 GameField,
@@ -344,7 +375,8 @@ class TestAttackEnemy(unittest.TestCase):
         fake_stdout.truncate()
 
     def test_attack_enemy_bot(self):
-        # Test that the attack works when the player is a bot
+        """Test attacking when enemy if a bot"""
+
         self.player1.set_bot(True)
         with patch.object(
             GameField,

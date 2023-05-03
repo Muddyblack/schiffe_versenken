@@ -1,13 +1,11 @@
 # pylint: disable=C
 import sys
 import os
-import unittest
-from unittest.mock import patch, MagicMock
 import io
-import sys
 import re
-import os
+import unittest
 from unittest.mock import patch
+from unittest.mock import MagicMock
 
 
 sys.path.append(
@@ -26,8 +24,10 @@ from main import left_to_place_ships, place_all_ships, attack_execution
 ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
-def set_testing_ship(field, start_row, start_column, shiplen, shiptype, direction):
+def set_testing_ship(field, cood, shiplen, shiptype, direction):
     """simplifiying process to set ship while testing"""
+    start_row = cood[0]
+    start_column = cood[1]
     with patch.object(
         GameField,
         "_GameField__get_row_and_column_input",
@@ -121,8 +121,8 @@ class TestGameFuncs(unittest.TestCase):
     def test_attack_execution(self):
         """Testing walkthrough of attacking each other"""
 
-        set_testing_ship(self.game_field1, 0, 0, 3, "submarine", "down")
-        set_testing_ship(self.game_field2, 9, 9, 3, "submarine", "up")
+        set_testing_ship(self.game_field1, (0, 0), 3, "submarine", "down")
+        set_testing_ship(self.game_field2, (9, 9), 3, "submarine", "up")
 
         self.game.set_last_turn_player(self.player1.get_player_name())
 
@@ -195,7 +195,6 @@ class TestGameFuncs(unittest.TestCase):
                 )
                 # RESET
                 fake_stdout.seek(0)
-                fake_stdout.truncate(),
 
                 self.assertEqual(obj.set_ship.call_count, 4)
                 self.assertEqual(mock_clear_console.call_count, 3)

@@ -1,4 +1,6 @@
 # pylint: disable=C
+# Have to access a protected variable which is supposed to stay private
+# pylint: disable=protected-access
 import unittest
 import sys
 import os
