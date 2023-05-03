@@ -112,7 +112,9 @@ class Game:
 
         # Write to file and create path if not existing
         save_dir = f"{game_paths.SAVE_GAMES_PATH}/{self.__save_name}"
-        os.makedirs(save_dir, exist_ok=True)
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+
         with open(f"{save_dir}/players.pkl", "wb") as file:
             pickle.dump(player_list, file)
         with open(f"{save_dir}/game_info.pkl", "wb") as file:

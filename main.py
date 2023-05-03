@@ -1,7 +1,5 @@
-
 """This is the main module where the entire game logic gets merged"""
 import os
-
 import sys
 import time
 import shutil
@@ -15,6 +13,8 @@ from library import game_paths
 from classes.game import Game
 
 random.seed(time.time())
+
+game = Game()
 
 
 # Gameplay funcs
@@ -216,7 +216,6 @@ def attack_execution(attacker, target):
 # Game walkthrough
 if __name__ == "__main__":
     # Setup the Game
-    game = Game()
     game.start_up()
     players = game.get_players()
 
