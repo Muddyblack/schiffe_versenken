@@ -218,7 +218,7 @@ class TestGameField(unittest.TestCase):
         ]
 
         for index, input_txt in enumerate(invalid_inputs):
-            with patch("builtins.input", side_effect=input_txt):
+            with patch("builtins.input", side_effect=lambda: [input_txt]):
                 self.game_field._GameField__get_row_and_column_input(
                     "Enter your position:", False
                 )
@@ -232,9 +232,6 @@ class TestGameField(unittest.TestCase):
 
     @patch("random.randint", side_effect=[2, 3])
     def test_bot_input(self, mock_randint):
-        random.seed(1)  # set the seed for reproducibility
-
-        # Test bot input
         row, col = self.game_field._GameField__get_row_and_column_input(
             "Enter coordinates: ", True
         )
