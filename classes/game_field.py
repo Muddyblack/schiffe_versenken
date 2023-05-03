@@ -77,7 +77,9 @@ class GameField:
 
         # Set complete matrix with Linenumbers at the side
         for num, line in enumerate(fieldtype, 1):
-            txt += f"{console_helper.BROWN}{num}{console_helper.RESET}   "
+            txt += f"{console_helper.BROWN}{num}{console_helper.RESET}" + " " * (
+                len(str(self.__fsize)) + 1
+            )
             if len(str(num)) > 1:
                 txt += "\b" * (len(str(num)) - 1)
             for row in line:
