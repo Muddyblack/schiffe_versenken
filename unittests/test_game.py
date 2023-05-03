@@ -4,9 +4,8 @@ import sys
 import os
 import re
 import io
-import tempfile
 import pickle
-from unittest.mock import mock_open, patch, call, MagicMock
+from unittest.mock import mock_open, patch, call, MagicMock, Mock
 
 sys.path.append(
     os.path.abspath(
@@ -19,6 +18,7 @@ from classes.player import Player
 from classes.game_field import GameField
 
 from library import console_helper
+from library import game_paths
 
 ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
@@ -40,12 +40,10 @@ class TestGame(unittest.TestCase):
 
         self.exist_save_games = ["save1", "save2", "save3"]
 
-    # def test_get_save_path(self):
-    #    expected_path = f"{tempfile.gettempdir()}/savegames/test_save"
-    #    with tempfile.TemporaryDirectory() as temp_dir:
-    #        os.makedirs(expected_path)
-    #        self.game.set_save_name("test_save")
-    #        self.assertEqual(self.game.get_save_path(), expected_path)
+    def test_get_save_path(self):
+        expected_path = f"{game_paths.SAVE_GAMES_PATH}/test_save"
+        self.game._Game__save_name = "test_save"
+        self.assertEqual(self.game.get_save_path(), expected_path)
 
     def test_get_players(self):
         players = self.game.get_players()
@@ -85,13 +83,45 @@ class TestGame(unittest.TestCase):
         ):
             self.assertEqual(self.game._Game__ask_name("Enter your name"), "TestPlayer")
 
-    # def test_save_game(self):
-    #    # Check that save_game creates a valid save file
-    #    with tempfile.TemporaryDirectory() as temp_dir:
-    #        self.game.set("test_save")
-    #        self.game.set_save_path(f"{temp_dir}/savegames/test_save")
+    @patch("builtins.open", create=True)
+    @patch("os.makedirs")
+    @patch("gc.get_objects")
+    def test_save_game(self, mock_get_objects, mock_makedirs, mock_open):
+        player_list = [
+            GameField(Player(name="Peter", bot=False)),
+            GameField(Player(name="Peter1", bot=False)),
+            GameField(Player(name="Peter2", bot=False)),
+        ]
 
-    #        self.game.save_game()
+        game_info = {
+            "last_turn_player": "Peter1",
+            "level": 2,
+        }
+        save_dir = f"{game_paths.PROJECT_PATH}/tests/test_save_game_dir"
+
+        expected_calls = [
+            ((f"{save_dir}/players.pkl", "wb"),),
+            ((f"{save_dir}/game_info.pkl", "wb"),),
+        ]
+        expected_values = [
+            pickle.dumps(player_list),
+            pickle.dumps(game_info),
+        ]
+
+        # Mock the return value of gc.get_objects()
+        mock_get_objects.return_value = player_list
+
+        # Call the method being tested
+        self.game.save_game()
+
+        # Check that the appropriate calls were made to the mocked functions
+        mock_makedirs.assert_called_once_with(save_dir, exist_ok=True)
+        mock_get_objects.assert_called_once()
+        mock_open.assert_has_calls(expected_calls)
+        mock_open().write.assert_has_calls([Mock(data=d) for d in expected_values])
+
+        # Clean up the test directory
+        os.rmdir(save_dir)
 
     def test_load_game(self):
         # missing
@@ -144,7 +174,11 @@ class TestGame(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with open(f"{os.path.dirname(os.path.abspath(__file__))}/test_game.log", "w") as f:
+    with open(
+        f"{os.path.dirname(os.path.abspath(__file__))}/test_game.log",
+        "w",
+        encoding="utf-8",
+    ) as f:
         runner = unittest.TextTestRunner(stream=f, verbosity=2)
         unittest.main(testRunner=runner)
     unittest.main()

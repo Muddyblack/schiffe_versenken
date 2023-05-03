@@ -14,6 +14,8 @@ from classes.game import Game
 
 random.seed(time.time())
 
+game = Game()
+
 
 # Gameplay funcs
 def left_to_place_ships(ship_types, ships):
@@ -214,7 +216,6 @@ def attack_execution(attacker, target):
 # Game walkthrough
 if __name__ == "__main__":
     # Setup the Game
-    game = Game()
     game.start_up()
     players = game.get_players()
 

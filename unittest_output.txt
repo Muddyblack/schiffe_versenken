@@ -1,0 +1,52 @@
+test_attack_enemy_bot (__main__.TestAttackEnemy.test_attack_enemy_bot) ... FAIL
+test_attack_enemy_hit (__main__.TestAttackEnemy.test_attack_enemy_hit) ... FAIL
+test_attack_enemy_miss (__main__.TestAttackEnemy.test_attack_enemy_miss) ... FAIL
+test_attack_enemy_self (__main__.TestAttackEnemy.test_attack_enemy_self) ... ok
+test_attack_enemy_win (__main__.TestAttackEnemy.test_attack_enemy_win) ... FAIL
+test_get_boatfield (__main__.TestGameField.test_get_boatfield) ... ok
+test_get_field_text (__main__.TestGameField.test_get_field_text) ... ok
+test_get_hitfield (__main__.TestGameField.test_get_hitfield) ... ok
+test_matrix_size (__main__.TestGameField.test_matrix_size) ... ok
+test_set_boatfield (__main__.TestGameField.test_set_boatfield) ... ok
+test_set_boatfield_cell (__main__.TestGameField.test_set_boatfield_cell) ... ok
+test_set_hitfield (__main__.TestGameField.test_set_hitfield) ... ok
+test_set_hitfield_cell (__main__.TestGameField.test_set_hitfield_cell) ... ok
+test_set_ship_borders (__main__.TestGameField.test_set_ship_borders) ... ok
+test_show_fields (__main__.TestGameField.test_show_fields) ... ok
+
+======================================================================
+FAIL: test_attack_enemy_bot (__main__.TestAttackEnemy.test_attack_enemy_bot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "c:\Users\Muddyblack\OneDrive - bwedu\12 Studium\01 DHBW\1 Semester\17 Python Kurs\Schiffe_Versenken\unittests\test_game_field.py", line 230, in test_attack_enemy_bot
+    self.assertEqual(self.game_field2.get_boatfield()[0][0], "X")
+AssertionError: 0 != 'X'
+
+======================================================================
+FAIL: test_attack_enemy_hit (__main__.TestAttackEnemy.test_attack_enemy_hit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "c:\Users\Muddyblack\OneDrive - bwedu\12 Studium\01 DHBW\1 Semester\17 Python Kurs\Schiffe_Versenken\unittests\test_game_field.py", line 208, in test_attack_enemy_hit
+    self.assertEqual(self.game_field2.get_boatfield()[3][2], "X")
+AssertionError: 1 != 'X'
+
+======================================================================
+FAIL: test_attack_enemy_miss (__main__.TestAttackEnemy.test_attack_enemy_miss)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "c:\Users\Muddyblack\OneDrive - bwedu\12 Studium\01 DHBW\1 Semester\17 Python Kurs\Schiffe_Versenken\unittests\test_game_field.py", line 215, in test_attack_enemy_miss
+    self.assertEqual(self.game_field1.get_hitfield()[0][0], "o")
+AssertionError: 0 != 'o'
+
+======================================================================
+FAIL: test_attack_enemy_win (__main__.TestAttackEnemy.test_attack_enemy_win)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "c:\Users\Muddyblack\OneDrive - bwedu\12 Studium\01 DHBW\1 Semester\17 Python Kurs\Schiffe_Versenken\unittests\test_game_field.py", line 223, in test_attack_enemy_win
+    self.assertIn("Congrats Alice, YOU WON!", fake_stdout.getvalue())
+AssertionError: 'Congrats Alice, YOU WON!' not found in "Sir we've hit the bull's eye!\nSir we've hit the bull's eye!\nSir we've hit the bull's eye!\n"
+
+----------------------------------------------------------------------
+Ran 15 tests in 6.629s
+
+FAILED (failures=4)

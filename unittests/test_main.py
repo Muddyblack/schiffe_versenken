@@ -42,8 +42,17 @@ def set_testing_ship(field, start_row, start_column, shiplen, shiptype, directio
 class TestGameFuncs(unittest.TestCase):
     def setUp(self):
         self.ship_types = {
-            "battleship": {"max": "1", "length": "5"},
-            "destroyer": {"max": "1", "length": "3"},
+            "battleship": {"length": 5, "max": 1},
+            "destroyer": {"length": 4, "max": 2},
+            "cruiser": {"length": 3, "max": 3},
+            "submarine": {"length": 2, "max": 4},
+        }
+
+        self.ships = {
+            "battleship": [],
+            "destroyer": [],
+            "cruiser": [],
+            "submarine": [],
         }
 
         self.game = Game()
@@ -53,22 +62,76 @@ class TestGameFuncs(unittest.TestCase):
         self.game_field2 = GameField(self.player2)
 
     def test_left_to_place_ships(self):
-        # NO IDEA
-        pass
+        expected_print_text = (
+            "You have\n"
+            "1: battleship 1 (5-Long)\n"
+            "2: destroyer 2 (4-Long)\n"
+            "3: cruiser 3 (3-Long)\n"
+            "4: submarine 4 (2-Long)"
+        )
+        expected_ships_left = 10
+        expected_placed_ships = []
+
+        result = left_to_place_ships(self.ship_types, self.ships)
+
+        self.assertEqual(
+            ansi_escape.sub("", result[0]).replace(" ", ""),
+            (expected_print_text + "\n\nWhich Ship would you like to place?").replace(
+                " ", ""
+            ),
+        )
+        self.assertEqual(result[1], expected_ships_left)
+        self.assertEqual(result[2], expected_placed_ships)
+
+    def test_left_to_place_ships_with_ships_placed(self):
+        self.ships = {
+            "battleship": [[(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)]],
+            "destroyer": [[(0, 6), (0, 7), (0, 8), (0, 9)]],
+            "cruiser": [[(2, 0), (3, 0), (4, 0)]],
+            "submarine": [[(9, 9), (8, 9)]],
+        }
+
+        expected_print_text = (
+            "You have\n"
+            "1: battleship 0 (5-Long)\n"
+            "2: destroyer 1 (4-Long)\n"
+            "3: cruiser 2 (3-Long)\n"
+            "4: submarine 3 (2-Long)"
+        )
+        expected_ships_left = 6
+        expected_placed_ships = [1]
+
+        result = left_to_place_ships(self.ship_types, self.ships)
+
+        self.assertEqual(
+            ansi_escape.sub("", result[0]).replace(" ", ""),
+            (expected_print_text + "\n\nWhich Ship would you like to place?").replace(
+                " ", ""
+            ),
+        )
+        self.assertEqual(result[1], expected_ships_left)
+        self.assertEqual(result[2], expected_placed_ships)
 
     def test_attack_execution(self):
-        # set_testing_ship(self.game_field1, 0, 0, 3, "destroyer", "down")
-        # set_testing_ship(self.game_field2, 9, 9, 3, "destroyer", "up")
-        # self.game.set_last_turn_player(self.player1.get_player_name())
+        set_testing_ship(self.game_field1, 0, 0, 3, "submarine", "down")
+        set_testing_ship(self.game_field2, 9, 9, 3, "submarine", "up")
+        self.game.set_last_turn_player(self.player1.get_player_name())
 
-        # with patch("builtins.input", return_value="J1"):
-        #    attack_execution(self.game_field1, self.game_field2)
+        with patch("builtins.input", side_effect=["J10", "J9", "F1"]):
+            attack_execution(self.game_field1, self.game_field2)
 
-        # self.assertEqual(self.game.get_last_turn_player(), self.player2)
-        # self.assertEqual(len(self.game_field2.get_hitfield()), 10)
-        # self.assertEqual(self.player1.get_botcache(), [])
-        pass
+        self.assertEqual(
+            self.game.get_last_turn_player(), self.player2.get_player_name()
+        )
+        self.assertEqual(self.game_field1.get_hitfield()[0, 9], 1)
 
 
 if __name__ == "__main__":
+    with open(
+        f"{os.path.dirname(os.path.abspath(__file__))}/test_main.log",
+        "w",
+        encoding="utf-8",
+    ) as f:
+        runner = unittest.TextTestRunner(stream=f, verbosity=2)
+        unittest.main(testRunner=runner)
     unittest.main()
