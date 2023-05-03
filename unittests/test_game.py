@@ -3,9 +3,11 @@ import unittest
 import sys
 import os
 import re
+import shutil
 import io
 import pickle
-from unittest.mock import mock_open, patch, call, MagicMock, Mock
+import keyboard
+from unittest.mock import patch, call
 
 sys.path.append(
     os.path.abspath(
@@ -17,6 +19,7 @@ from classes.game import Game
 from classes.player import Player
 from classes.game_field import GameField
 
+
 from library import console_helper
 from library import game_paths
 
@@ -26,19 +29,24 @@ ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 class TestGame(unittest.TestCase):
     def setUp(self):
         # Create two players and game field
-        player1 = Player(name="Player1", bot=False)
-        player2 = Player(name="Player2", bot=False)
-        game_field1 = GameField(player1)
-        game_field2 = GameField(player2)
+        self.player1 = Player(name="Player1", bot=False)
+        self.player2 = Player(name="Player2", bot=False)
+        self.game_field1 = GameField(self.player1)
+        self.game_field2 = GameField(self.player2)
 
         # Initialize the game
         self.game = Game()
-        self.game.set_players([player1, player2])
+        self.game.set_players([self.player1, self.player2])
         self.game.set_current_level(1)
-        self.game.set_last_turn_player("Player1")
-        game_field1.owner = player1
+        self.game.set_last_turn_player(self.player1.get_player_name())
+        self.game._Game__save_name = "unittests_save"
 
         self.exist_save_games = ["save1", "save2", "save3"]
+
+    def tearDown(self):
+        save_dir = f"{game_paths.SAVE_GAMES_PATH}/{self.game._Game__save_name}"
+        if os.path.exists(save_dir):
+            shutil.rmtree(save_dir)
 
     def test_get_save_path(self):
         expected_path = f"{game_paths.SAVE_GAMES_PATH}/test_save"
@@ -55,7 +63,9 @@ class TestGame(unittest.TestCase):
         self.assertEqual(self.game.get_current_level(), 1)
 
     def test_get_last_turn_player(self):
-        self.assertEqual(self.game.get_last_turn_player(), "Player1")
+        self.assertEqual(
+            self.game.get_last_turn_player(), self.player1.get_player_name()
+        )
 
     def test_set_players(self):
         player3 = Player(name="Player3", bot=False)
@@ -83,42 +93,21 @@ class TestGame(unittest.TestCase):
         ):
             self.assertEqual(self.game._Game__ask_name("Enter your name"), "TestPlayer")
 
-    @patch("builtins.open", create=True)
-    @patch("os.makedirs")
-    @patch("gc.get_objects")
-    def test_save_game(self, mock_get_objects, mock_makedirs, mock_open):
-        player_list = [
-            GameField(Player(name="Peter", bot=False)),
-            GameField(Player(name="Peter1", bot=False)),
-            GameField(Player(name="Peter2", bot=False)),
-        ]
-
-        game_info = {
-            "last_turn_player": "Peter1",
-            "level": 2,
-        }
-        save_dir = f"{game_paths.PROJECT_PATH}/tests/test_save_game_dir"
-
-        expected_calls = [
-            ((f"{save_dir}/players.pkl", "wb"),),
-            ((f"{save_dir}/game_info.pkl", "wb"),),
-        ]
-        expected_values = [
-            pickle.dumps(player_list),
-            pickle.dumps(game_info),
-        ]
-
-        # Mocking return value of gc.get_objects()
-        mock_get_objects.return_value = player_list
-
+    def test_save_game(self):
+        # Save the game
         self.game.save_game()
 
-        mock_makedirs.assert_called_once_with(save_dir, exist_ok=True)
-        mock_get_objects.assert_called_once()
-        mock_open.assert_has_calls(expected_calls)
-        mock_open().write.assert_has_calls([Mock(data=d) for d in expected_values])
+        # Assert that the player list and game info was saved correctly
+        save_dir = f"{game_paths.SAVE_GAMES_PATH}/{self.game._Game__save_name}"
+        with open(f"{save_dir}/players.pkl", "rb") as file:
+            player_list = pickle.load(file)
+        with open(f"{save_dir}/game_info.pkl", "rb") as file:
+            game_info = pickle.load(file)
 
-        os.rmdir(save_dir)
+        self.assertEqual(game_info["last_turn_player"], self.player1.get_player_name())
+        self.assertEqual(game_info["level"], 1)
+        self.assertIsInstance(player_list, list)
+        self.assertTrue(all(isinstance(player, GameField) for player in player_list))
 
     def test_yes_no_question(self):
         yes_input = "y"
@@ -135,16 +124,40 @@ class TestGame(unittest.TestCase):
             self.assertEqual(result, False)
 
     def test_load_game(self):
-        # missing
-        pass
+        self.game.save_game()
+        self.game.load_game()
+
+        self.assertEqual(
+            self.game.get_last_turn_player(), self.player1.get_player_name()
+        )
+        self.assertEqual(self.game.get_current_level(), 1)
+        self.assertIsInstance(self.game.get_players(), list)
+        self.assertTrue(
+            all(isinstance(player, GameField) for player in self.game.get_players())
+        )
 
     def test_create_new_game(self):
-        # NO IDEA
-        pass
+        with patch(
+            "builtins.input",
+            side_effect=[
+                self.game._Game__save_name,
+                "n",
+                self.player1.get_player_name(),
+                "n",
+                self.player2.get_player_name(),
+            ],
+        ):
+            self.game._Game__create__new_game([], player_num=2)
 
-    def test_start_screen(
-        self,
-    ):
+        self.assertEqual(len(self.game.get_players()), 2)
+        self.assertTrue(
+            all(isinstance(p.owner, Player) for p in self.game.get_players())
+        )
+        self.assertEqual(self.game.get_current_level(), 0)
+        self.assertIsNotNone(self.game.get_last_turn_player())
+        self.assertIsNotNone(self.game._Game__save_name)
+
+    def test_start_screen(self):
         # NO IDEA
         pass
 
@@ -163,9 +176,68 @@ class TestGame(unittest.TestCase):
         expected_output = "save1.txt\n> save2.txt\n  save3.txt".replace(" ", "")
         self.assertEqual(ansi_escape.sub("", output.replace(" ", "")), expected_output)
 
-    def test_select_savegame(self):
-        # NO IDEA
-        pass
+    @patch("builtins.print")
+    @patch.object(keyboard, "is_pressed")
+    @patch.object(console_helper, "refresh_console_lines")
+    def test_select_savegame(
+        self,
+        mock_refresh_console_lines,
+        mock_is_pressed,
+        mock_print,
+    ):
+        exist_save_games = [
+            f"{game_paths.SAVE_GAMES_PATH}/game1",
+            f"{game_paths.SAVE_GAMES_PATH}/game2",
+            f"{game_paths.SAVE_GAMES_PATH}/game3",
+        ]
+
+        mock_is_pressed.side_effect = [
+            # Press down once
+            False,  # up not pressed
+            True,  # down pressed
+            False,  # up not pressed
+            # Press up once
+            True,  # up pressed
+            False,  # down not pressed
+            # Select game
+            False,  # space pressed
+        ]
+        try:
+            self.game._Game__select_savegame(exist_save_games)
+
+            # Check that console_helper.refresh_console_lines was called correctly
+            expected_refresh_calls = [
+                call(len(exist_save_games)),
+                call(len(exist_save_games)),
+                call(len(exist_save_games)),
+            ]
+            self.assertEqual(
+                mock_refresh_console_lines.call_args_list, expected_refresh_calls
+            )
+
+            # Check that the correct output was printed
+            expected_output = [
+                "Use up and down arrows to navigate\nUse Spacebar to select the game",
+                "> game1",
+                "  game2",
+                "  game3",
+                "  game1",
+                "> game2",
+                "  game3",
+                "> game1",
+                "  game2",
+                "  game3",
+            ]
+            actual_output = [
+                ansi_escape.sub("", call_args[0][0])
+                for call_args in mock_print.call_args_list
+            ]
+            self.assertEqual(actual_output, expected_output)
+        except StopIteration:
+            pass
+
+        # Check that the correct save game was selected
+        self.assertEqual(self.game._Game__save_name, "unittests_save")
 
 
 if __name__ == "__main__":

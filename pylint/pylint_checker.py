@@ -43,7 +43,12 @@ with open(SAVE_PATH, "w", encoding="utf8") as f:
 for file in FILEPATHS:
     try:
         with subprocess.Popen(
-            ["pylint", file, "--output-format=colorized", "--max-line-length=160"],
+            [
+                "python -m pylint",
+                file,
+                "--output-format=colorized",
+                "--max-line-length=160",
+            ],
             stdin=subprocess.PIPE,
         ) as process:
             pass
