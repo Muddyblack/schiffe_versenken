@@ -6,6 +6,7 @@
 - [Format-Helper](https://black.vercel.app/?version=stable&state=_Td6WFoAAATm1rRGAgAhARYAAAB0L-Wj4ABlADtdAD2IimZxl1N_W1ktIvcnCRyz_JxMldeGP3FkYC4l_yCiOWfL-S4QrUMyitkDP-9TiRumVRC_cm_kkqQAAADz8W8IWfenugABV2bVuq1xH7bzfQEAAAAABFla)
 - [Format-Helper VSCode](https://dev.to/adamlombard/how-to-use-the-black-python-code-formatter-in-vscode-3lo0)
 - [UML_Diagramm](https://www.yworks.com/yed-live/)
+
 ## Reminders
 
 - Create requirements.txt:
@@ -25,6 +26,14 @@ cd Environments
 virtualenv NAME
 source NAME/bin/activate
 pip freeze --local
+```
+
+- Coverage:
+
+```python
+python -m coverage run --omit='*/library/*' -m unittest discover -s .
+python -m coverage report -m
+python -m coverage html
 ```
 
 ## Sources

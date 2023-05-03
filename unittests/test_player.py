@@ -14,13 +14,16 @@ from classes.player import Player
 
 class TestPlayer(unittest.TestCase):
     def setUp(self):
-        self.player = Player()
+        self.player = Player(name="Ullrich", bot=False)
 
     def test_get_bot(self):
         self.assertEqual(self.player.get_bot(), False)
 
+    def test_get_bot_cache(self):
+        self.assertEqual(self.player.get_botcache(), [])
+
     def test_get_player_name(self):
-        self.assertEqual(self.player.get_player_name(), "Player")
+        self.assertEqual(self.player.get_player_name(), "Ullrich")
 
     def test_get_ships(self):
         self.assertEqual(

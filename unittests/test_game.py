@@ -6,7 +6,7 @@ import re
 import io
 import tempfile
 import pickle
-from unittest.mock import mock_open, patch, call
+from unittest.mock import mock_open, patch, call, MagicMock
 
 sys.path.append(
     os.path.abspath(
@@ -37,6 +37,8 @@ class TestGame(unittest.TestCase):
         self.game.set_current_level(1)
         self.game.set_last_turn_player("Player1")
         game_field1.owner = player1
+
+        self.exist_save_games = ["save1", "save2", "save3"]
 
     # def test_get_save_path(self):
     #    expected_path = f"{tempfile.gettempdir()}/savegames/test_save"
@@ -137,8 +139,9 @@ class TestGame(unittest.TestCase):
         self.assertEqual(ansi_escape.sub("", output.replace(" ", "")), expected_output)
 
     def test_select_savegame(self):
-        #NO IDEA
+        # NO IDEA
         pass
+
 
 if __name__ == "__main__":
     with open(f"{os.path.dirname(os.path.abspath(__file__))}/test_game.log", "w") as f:
