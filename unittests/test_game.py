@@ -108,40 +108,35 @@ class TestGame(unittest.TestCase):
             pickle.dumps(game_info),
         ]
 
-        # Mock the return value of gc.get_objects()
+        # Mocking return value of gc.get_objects()
         mock_get_objects.return_value = player_list
 
-        # Call the method being tested
         self.game.save_game()
 
-        # Check that the appropriate calls were made to the mocked functions
         mock_makedirs.assert_called_once_with(save_dir, exist_ok=True)
         mock_get_objects.assert_called_once()
         mock_open.assert_has_calls(expected_calls)
         mock_open().write.assert_has_calls([Mock(data=d) for d in expected_values])
 
-        # Clean up the test directory
         os.rmdir(save_dir)
-
-    def test_load_game(self):
-        # missing
-        pass
 
     def test_yes_no_question(self):
         yes_input = "y"
         no_input = "n"
 
         # Test "yes" or "y"
-        with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
-            with patch("builtins.input", return_value=yes_input):
-                result = self.game._Game__yes_no_question("Question")
-                self.assertEqual(result, True)
+        with patch("builtins.input", return_value=yes_input):
+            result = self.game._Game__yes_no_question("Question")
+            self.assertEqual(result, True)
 
         # Test "no" or "n"
-        with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
-            with patch("builtins.input", return_value=no_input):
-                result = self.game._Game__yes_no_question("Question")
-                self.assertEqual(result, False)
+        with patch("builtins.input", return_value=no_input):
+            result = self.game._Game__yes_no_question("Question")
+            self.assertEqual(result, False)
+
+    def test_load_game(self):
+        # missing
+        pass
 
     def test_create_new_game(self):
         # NO IDEA

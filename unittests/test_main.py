@@ -127,28 +127,52 @@ class TestGameFuncs(unittest.TestCase):
             except StopIteration:
                 pass
 
-    @patch("library.random_helper.randint_exc", return_value=2)
+    @patch("builtins.input", side_effect=["1", "8"])
+    @patch("simpleaudio.WaveObject.from_wave_file", return_value=MagicMock())
     @patch("library.console_helper.clear_console", return_value=None)
-    def test_bot_player_places_all_ships(self, mock_clear_console, mock_random):
+    def test_player_places_all_ships(
+        self, mock_clear_console, mock_play_sound, mock_input
+    ):
+        # set up mocks and variables
         obj = MagicMock()
         obj.owner.get_ship_preferences.return_value = {
             "battleship": {"length": 5, "max": 1},
             "destroyer": {"length": 4, "max": 2},
         }
         obj.owner.get_ships.return_value = {"battleship": [], "destroyer": []}
+        obj.show_boatfield.return_value = None
         obj.set_ship.side_effect = [True, True, True]
-        is_bot = True
 
-        # call the function
         try:
             place_all_ships(obj)
+
+            self.assertEqual(obj.set_ship.call_count, 4)
+            self.assertEqual(mock_clear_console.call_count, 3)
+            self.assertEqual(mock_play_sound.call_count, 0)
+            obj.show_boatfield.assert_called_once()
+            self.assertEqual(mock_input.call_count, 1)
         except StopIteration:
             pass
 
-        self.assertEqual(obj.set_ship.call_count, 4)
-        self.assertEqual(mock_clear_console.call_count, 3)
-        self.assertEqual(mock_random.call_count, 4)
-        obj.show_boatfield.assert_not_called()
+        try:
+            with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
+                place_all_ships(obj)
+
+                self.assertEqual(
+                    ansi_escape.sub("", fake_stdout.getvalue()).replace(" ", ""),
+                    "UnknownBoat-Type.",
+                )
+                # RESET
+                fake_stdout.seek(0)
+                fake_stdout.truncate(),
+
+                self.assertEqual(obj.set_ship.call_count, 4)
+                self.assertEqual(mock_clear_console.call_count, 3)
+                self.assertEqual(mock_play_sound.call_count, 0)
+                obj.show_boatfield.assert_called_once()
+                self.assertEqual(mock_input.call_count, 1)
+        except StopIteration:
+            pass
 
 
 if __name__ == "__main__":
