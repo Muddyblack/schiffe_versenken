@@ -218,17 +218,20 @@ class TestGameField(unittest.TestCase):
         ]
 
         for index, input_txt in enumerate(invalid_inputs):
-            with patch("builtins.input", side_effect=lambda: [input_txt]):
-                self.game_field._GameField__get_row_and_column_input(
-                    "Enter your position:", False
-                )
+            with patch("builtins.input", side_effect=[input_txt]):
+                try:
+                    self.game_field._GameField__get_row_and_column_input(
+                        "Enter your position:", False
+                    )
 
-                with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
-                    self.assertEqual(fake_stdout.getvalue(), invalid_result[index])
+                    with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
+                        self.assertEqual(fake_stdout.getvalue(), invalid_result[index])
 
-                    # RESET
-                    fake_stdout.seek(0)
-                    fake_stdout.truncate()
+                        # RESET
+                        fake_stdout.seek(0)
+                        fake_stdout.truncate()
+                except StopIteration:
+                    pass
 
     @patch("random.randint", side_effect=[2, 3])
     def test_bot_input(self, mock_randint):

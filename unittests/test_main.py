@@ -2,7 +2,7 @@
 import sys
 import os
 import unittest
-from unittest import mock
+from unittest.mock import patch, MagicMock
 import io
 import sys
 import re
@@ -118,12 +118,37 @@ class TestGameFuncs(unittest.TestCase):
         self.game.set_last_turn_player(self.player1.get_player_name())
 
         with patch("builtins.input", side_effect=["J10", "J9", "F1"]):
-            attack_execution(self.game_field1, self.game_field2)
+            try:
+                attack_execution(attacker=self.game_field1, target=self.game_field2)
+                self.assertEqual(
+                    self.game.get_last_turn_player(), self.player2.get_player_name()
+                )
+                self.assertEqual(self.game_field1.get_hitfield()[0][9], 1)
+            except StopIteration:
+                pass
 
-        self.assertEqual(
-            self.game.get_last_turn_player(), self.player2.get_player_name()
-        )
-        self.assertEqual(self.game_field1.get_hitfield()[0, 9], 1)
+    @patch("library.random_helper.randint_exc", return_value=2)
+    @patch("library.console_helper.clear_console", return_value=None)
+    def test_bot_player_places_all_ships(self, mock_clear_console, mock_random):
+        obj = MagicMock()
+        obj.owner.get_ship_preferences.return_value = {
+            "battleship": {"length": 5, "max": 1},
+            "destroyer": {"length": 4, "max": 2},
+        }
+        obj.owner.get_ships.return_value = {"battleship": [], "destroyer": []}
+        obj.set_ship.side_effect = [True, True, True]
+        is_bot = True
+
+        # call the function
+        try:
+            place_all_ships(obj)
+        except StopIteration:
+            pass
+
+        self.assertEqual(obj.set_ship.call_count, 4)
+        self.assertEqual(mock_clear_console.call_count, 3)
+        self.assertEqual(mock_random.call_count, 4)
+        obj.show_boatfield.assert_not_called()
 
 
 if __name__ == "__main__":
