@@ -23,18 +23,20 @@ from classes.game_field import GameField
 from library import console_helper
 from library import game_paths
 
+# Allows to remove ansi_escpaes from game output
 ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
 class TestGame(unittest.TestCase):
+    """Class to test most functions of the Class: Game"""
+
     def setUp(self):
-        # Create two players and game field
+        """Setting 2 players with their gamefield and setting up the Game"""
         self.player1 = Player(name="Player1", bot=False)
         self.player2 = Player(name="Player2", bot=False)
         self.game_field1 = GameField(self.player1)
         self.game_field2 = GameField(self.player2)
 
-        # Initialize the game
         self.game = Game()
         self.game.set_players([self.player1, self.player2])
         self.game.set_current_level(1)
@@ -44,30 +46,36 @@ class TestGame(unittest.TestCase):
         self.exist_save_games = ["save1", "save2", "save3"]
 
     def tearDown(self):
+        """Function to delete created save-files after testing"""
         save_dir = f"{game_paths.SAVE_GAMES_PATH}/{self.game._Game__save_name}"
         if os.path.exists(save_dir):
             shutil.rmtree(save_dir)
 
     def test_get_save_path(self):
+        """Check if path gets returned correctly"""
         expected_path = f"{game_paths.SAVE_GAMES_PATH}/test_save"
         self.game._Game__save_name = "test_save"
         self.assertEqual(self.game.get_save_path(), expected_path)
 
     def test_get_players(self):
+        """Check if it returns a correct List of Players"""
         players = self.game.get_players()
         self.assertEqual(len(players), 2)
         self.assertTrue(isinstance(players[0], Player))
         self.assertTrue(isinstance(players[1], Player))
 
     def test_get_current_level(self):
+        """Checking level"""
         self.assertEqual(self.game.get_current_level(), 1)
 
     def test_get_last_turn_player(self):
+        """Checks if the turn of player is correct"""
         self.assertEqual(
             self.game.get_last_turn_player(), self.player1.get_player_name()
         )
 
     def test_set_players(self):
+        """Testing if the set player function adds a player and if you can use him from there"""
         player3 = Player(name="Player3", bot=False)
         self.game.set_players([player3])
         players = self.game.get_players()
@@ -76,10 +84,12 @@ class TestGame(unittest.TestCase):
         self.assertEqual(players[0].get_player_name(), "Player3")
 
     def test_set_current_level(self):
+        """Check if level updating works"""
         self.game.set_current_level(2)
         self.assertEqual(self.game.get_current_level(), 2)
 
     def test_set_last_turn_player(self):
+        """Check if setting player for the turn works"""
         self.game.set_last_turn_player("Player2")
         self.assertEqual(self.game.get_last_turn_player(), "Player2")
 
@@ -94,6 +104,7 @@ class TestGame(unittest.TestCase):
             self.assertEqual(self.game._Game__ask_name("Enter your name"), "TestPlayer")
 
     def test_save_game(self):
+        """Checks if save_game creates a save folder and if the content is usefull"""
         # Save the game
         self.game.save_game()
 
@@ -110,20 +121,36 @@ class TestGame(unittest.TestCase):
         self.assertTrue(all(isinstance(player, GameField) for player in player_list))
 
     def test_yes_no_question(self):
-        yes_input = "y"
-        no_input = "n"
+        """Checks for correct return for yes/no questions"""
+        yes_input = ["y", "yes", "", "           "]
+        no_input = ["n", "no"]
+        invalid_input = ["`?!"]
 
         # Test "yes" or "y"
-        with patch("builtins.input", return_value=yes_input):
-            result = self.game._Game__yes_no_question("Question")
-            self.assertEqual(result, True)
+        for elem in yes_input:
+            with patch("builtins.input", return_value=elem):
+                result = self.game._Game__yes_no_question("Question")
+                self.assertEqual(result, True)
 
         # Test "no" or "n"
-        with patch("builtins.input", return_value=no_input):
-            result = self.game._Game__yes_no_question("Question")
-            self.assertEqual(result, False)
+        for elem in no_input:
+            with patch("builtins.input", return_value=elem):
+                result = self.game._Game__yes_no_question("Question")
+                self.assertEqual(result, False)
+        # Test sth else
+        for elem in invalid_input:
+            with patch("builtins.input", side_effect=elem):
+                with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
+                    try:
+                        result = self.game._Game__yes_no_question("Question")
+                        self.assertEqual(
+                            fake_stdout, "You can only answer with yes or no!"
+                        )
+                    except StopIteration:
+                        pass
 
     def test_load_game(self):
+        """testing if loading a save game works properly and returns userfull data"""
         self.game.save_game()
         self.game.load_game()
 
@@ -137,6 +164,8 @@ class TestGame(unittest.TestCase):
         )
 
     def test_create_new_game(self):
+        """Testing if creating a new Save Game works properly"""
+        # Entering Savename, and two real players with their name
         with patch(
             "builtins.input",
             side_effect=[
@@ -162,16 +191,13 @@ class TestGame(unittest.TestCase):
         pass
 
     def test_display_save_games(self):
+        """Checks if it monitors the save_game files correctly"""
         save_games = ["save1.txt", "save2.txt", "save3.txt"]
         selected_index = 1
 
-        # Redirect stdout to an in-memory buffer for testing
-        stdout = io.StringIO()
-        sys.stdout = stdout
-        self.game._Game__display_save_games(save_games, selected_index)
-
-        output = stdout.getvalue().strip()
-        sys.stdout = sys.__stdout__
+        with patch("sys.stdout", new=io.StringIO()) as fake_stdout:
+            self.game._Game__display_save_games(save_games, selected_index)
+            output = fake_stdout.getvalue().strip()
 
         expected_output = "save1.txt\n> save2.txt\n  save3.txt".replace(" ", "")
         self.assertEqual(ansi_escape.sub("", output.replace(" ", "")), expected_output)
@@ -185,6 +211,10 @@ class TestGame(unittest.TestCase):
         mock_is_pressed,
         mock_print,
     ):
+        """
+        Supposed to check if selecting a Savegame works properly
+            -BUT had not enough time to check if working complete properly!!!
+        """
         exist_save_games = [
             f"{game_paths.SAVE_GAMES_PATH}/game1",
             f"{game_paths.SAVE_GAMES_PATH}/game2",

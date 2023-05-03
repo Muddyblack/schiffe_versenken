@@ -22,11 +22,12 @@ from classes.game import Game
 
 from main import left_to_place_ships, place_all_ships, attack_execution
 
-
+# Allows to remove ansi_escpaes from game output
 ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
 def set_testing_ship(field, start_row, start_column, shiplen, shiptype, direction):
+    """simplifiying process to set ship while testing"""
     with patch.object(
         GameField,
         "_GameField__get_row_and_column_input",
@@ -40,7 +41,10 @@ def set_testing_ship(field, start_row, start_column, shiplen, shiptype, directio
 
 
 class TestGameFuncs(unittest.TestCase):
+    """Class to test a bit the main.py file"""
+
     def setUp(self):
+        """Setting up existing ships and their types and Players with their Field for this Testing"""
         self.ship_types = {
             "battleship": {"length": 5, "max": 1},
             "destroyer": {"length": 4, "max": 2},
@@ -62,6 +66,7 @@ class TestGameFuncs(unittest.TestCase):
         self.game_field2 = GameField(self.player2)
 
     def test_left_to_place_ships(self):
+        """Testing the text creation for remaining ships that need to be placed"""
         expected_print_text = (
             "You have\n"
             "1: battleship 1 (5-Long)\n"
@@ -84,6 +89,7 @@ class TestGameFuncs(unittest.TestCase):
         self.assertEqual(result[2], expected_placed_ships)
 
     def test_left_to_place_ships_with_ships_placed(self):
+        """Also testing the preview-text but this time with some existing ships"""
         self.ships = {
             "battleship": [[(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)]],
             "destroyer": [[(0, 6), (0, 7), (0, 8), (0, 9)]],
@@ -113,18 +119,43 @@ class TestGameFuncs(unittest.TestCase):
         self.assertEqual(result[2], expected_placed_ships)
 
     def test_attack_execution(self):
+        """Testing walkthrough of attacking each other"""
+
         set_testing_ship(self.game_field1, 0, 0, 3, "submarine", "down")
         set_testing_ship(self.game_field2, 9, 9, 3, "submarine", "up")
+
         self.game.set_last_turn_player(self.player1.get_player_name())
 
-        with patch("builtins.input", side_effect=["J10", "J9", "F1"]):
+        with patch("builtins.input", return_value="J10"):
+            attack_execution(attacker=self.game_field1, target=self.game_field2)
+            self.assertEqual(
+                self.game.get_last_turn_player(), self.player1.get_player_name()
+            )
+            self.assertNotEqual(self.game_field1.get_hitfield()[1][1], 1)
+
+        with patch("builtins.input", return_value="J9"):
+            attack_execution(attacker=self.game_field1, target=self.game_field2)
+            self.assertEqual(
+                self.game.get_last_turn_player(), self.player1.get_player_name()
+            )
+            self.assertEqual(self.game_field1.get_hitfield()[9][9], 1)
+        # check water hit
+        with patch("builtins.input", return_value="F1"):
+            attack_execution(attacker=self.game_field1, target=self.game_field2)
+            self.assertEqual(
+                self.game.get_last_turn_player(), self.player1.get_player_name()
+            )
+            self.assertEqual(self.game_field1.get_hitfield()[0][5], "o")
+
+        # check winning
+        with patch("builtins.input", return_value="J8"):
             try:
                 attack_execution(attacker=self.game_field1, target=self.game_field2)
                 self.assertEqual(
                     self.game.get_last_turn_player(), self.player2.get_player_name()
                 )
-                self.assertEqual(self.game_field1.get_hitfield()[0][9], 1)
-            except StopIteration:
+                self.assertEqual(self.game_field1.get_hitfield()[1][1], 1)
+            except SystemExit:
                 pass
 
     @patch("builtins.input", side_effect=["1", "8"])
@@ -133,7 +164,7 @@ class TestGameFuncs(unittest.TestCase):
     def test_player_places_all_ships(
         self, mock_clear_console, mock_play_sound, mock_input
     ):
-        # set up mocks and variables
+        """Trying to place all ships that are indicated below"""
         obj = MagicMock()
         obj.owner.get_ship_preferences.return_value = {
             "battleship": {"length": 5, "max": 1},

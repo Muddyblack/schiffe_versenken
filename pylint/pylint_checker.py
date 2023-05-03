@@ -44,10 +44,9 @@ for file in FILEPATHS:
     try:
         with subprocess.Popen(
             [
-                "python -m pylint",
+                "pylint",
                 file,
                 "--output-format=colorized",
-                "--max-line-length=160",
             ],
             stdin=subprocess.PIPE,
         ) as process:

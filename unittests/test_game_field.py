@@ -6,7 +6,6 @@ import re
 import io
 from string import ascii_uppercase
 from unittest.mock import patch
-import random
 
 sys.path.append(
     os.path.abspath(
@@ -17,11 +16,12 @@ sys.path.append(
 from classes.game_field import GameField
 from classes.player import Player
 
-
+# Allows to remove ansi_escpaes from game output
 ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
 def set_testing_ship(field, start_row, start_column, shiplen, shiptype, direction):
+    """simplifiying process to set ship while testing"""
     with patch.object(
         GameField,
         "_GameField__get_row_and_column_input",
@@ -35,6 +35,8 @@ def set_testing_ship(field, start_row, start_column, shiplen, shiptype, directio
 
 
 class TestGameField(unittest.TestCase):
+    """Class to test most of GameFields functions"""
+
     def setUp(self):
         # Set up the GameField object for testing
         self.game_field = GameField(Player(name="Player", bot=False))
@@ -272,6 +274,8 @@ class TestGameField(unittest.TestCase):
 
 
 class TestAttackEnemy(unittest.TestCase):
+    """Extra Class just to test GameFields attacking functionality"""
+
     def setUp(self):
         # Set up some test data
         self.player1 = Player(name="Chrissi", bot=False)
