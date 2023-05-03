@@ -9,7 +9,8 @@ import shutil
 import io
 import pickle
 import keyboard
-from unittest.mock import patch, call
+from unittest.mock import patch
+from unittest.mock import call
 
 sys.path.append(
     os.path.abspath(
@@ -274,7 +275,7 @@ class TestGame(unittest.TestCase):
 
 if __name__ == "__main__":
     with open(
-        f"{os.path.dirname(os.path.abspath(__file__))}/test_game.log",
+        f"{os.path.dirname(os.path.abspath(__file__))}/logging/test_game.log",
         "w",
         encoding="utf-8",
     ) as f:

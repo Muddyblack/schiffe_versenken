@@ -32,6 +32,7 @@ pip freeze --local
 
 ```python
 python -m coverage run --omit='*/library/*' -m unittest discover -s .
+python -m coverage run -m unittest discover -s .
 python -m coverage report -m
 python -m coverage html
 ```

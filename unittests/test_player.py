@@ -142,7 +142,7 @@ class TestPlayer(unittest.TestCase):
 
 if __name__ == "__main__":
     with open(
-        f"{os.path.dirname(os.path.abspath(__file__))}/test_player.log",
+        f"{os.path.dirname(os.path.abspath(__file__))}/logging/test_player.log",
         "w",
         encoding="utf-8",
     ) as f:
