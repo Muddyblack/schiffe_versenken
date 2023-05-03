@@ -1,10 +1,9 @@
-************* Module schiffe_versenken.unittests.test_game
-unittests/test_game.py:20:8: E1120: No value for argument 'second' in method call (no-value-for-parameter)
+ pylint "C:\Users\Muddyblack\OneDrive - bwedu\12 Studium\01 DHBW\1 Semester\17 Python Kurs\Schiffe_Versenken" --output-format=colorized
 
 
 Report
 ======
-807 statements analysed.
+1225 statements analysed.
 
 Statistics by type
 ------------------
@@ -12,26 +11,18 @@ Statistics by type
 +---------+-------+-----------+-----------+------------+---------+
 |type     |number |old number |difference |%documented |%badname |
 +=========+=======+===========+===========+============+=========+
-|module   |17     |17         |=          |76.47       |0.00     |
+|module   |18     |18         |=          |72.22       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|class    |7      |7          |=          |42.86       |0.00     |
+|class    |12     |12         |=          |100.00      |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|method   |77     |77         |=          |70.13       |0.00     |
+|method   |117    |117        |=          |98.29       |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
-|function |13     |13         |=          |100.00      |0.00     |
+|function |14     |14         |=          |100.00      |0.00     |
 +---------+-------+-----------+-----------+------------+---------+
 
 
 
-External dependencies
----------------------
-::
-
-    keyboard (schiffe_versenken.classes.game,schiffe_versenken.library.keyboard_helper)
-
-
-
-1587 lines have been analyzed
+2503 lines have been analyzed
 
 Raw metrics
 -----------
@@ -39,13 +30,13 @@ Raw metrics
 +----------+-------+------+---------+-----------+
 |type      |number |%     |previous |difference |
 +==========+=======+======+=========+===========+
-|code      |997    |62.82 |997      |=          |
+|code      |1582   |63.20 |1582     |=          |
 +----------+-------+------+---------+-----------+
-|docstring |203    |12.79 |203      |=          |
+|docstring |360    |14.38 |360      |=          |
 +----------+-------+------+---------+-----------+
-|comment   |101    |6.36  |101      |=          |
+|comment   |123    |4.91  |123      |=          |
 +----------+-------+------+---------+-----------+
-|empty     |286    |18.02 |286      |=          |
+|empty     |438    |17.50 |438      |=          |
 +----------+-------+------+---------+-----------+
 
 
@@ -75,7 +66,7 @@ Messages by category
 +-----------+-------+---------+-----------+
 |warning    |0      |0        |0          |
 +-----------+-------+---------+-----------+
-|error      |1      |1        |1          |
+|error      |0      |0        |0          |
 +-----------+-------+---------+-----------+
 
 
@@ -83,15 +74,12 @@ Messages by category
 Messages
 --------
 
-+-----------------------+------------+
-|message id             |occurrences |
-+=======================+============+
-|no-value-for-parameter |1           |
-+-----------------------+------------+
++-----------+------------+
+|message id |occurrences |
++===========+============+
 
 
 
 
-------------------------------------------------------------------
-Your code has been rated at 9.94/10 (previous run: 9.94/10, +0.00)
-
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)

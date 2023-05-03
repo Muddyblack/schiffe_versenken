@@ -23,21 +23,7 @@ from main import left_to_place_ships, place_all_ships, attack_execution
 # Allows to remove ansi_escpaes from game output
 ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
-
-def set_testing_ship(field, cood, shiplen, shiptype, direction):
-    """simplifiying process to set ship while testing"""
-    start_row = cood[0]
-    start_column = cood[1]
-    with patch.object(
-        GameField,
-        "_GameField__get_row_and_column_input",
-        return_value=(start_row, start_column),
-    ):
-        with patch(
-            "keyboard.is_pressed",
-            side_effect=lambda key: key == direction,
-        ):
-            field.set_ship(ship_len=shiplen, ship_type=shiptype, is_bot=False)
+from test_game_field import set_testing_ship
 
 
 class TestGameFuncs(unittest.TestCase):
@@ -131,14 +117,14 @@ class TestGameFuncs(unittest.TestCase):
             self.assertEqual(
                 self.game.get_last_turn_player(), self.player1.get_player_name()
             )
-            self.assertNotEqual(self.game_field1.get_hitfield()[1][1], 1)
+            self.assertNotEqual(self.game_field1.get_hitfield()[1][1], "X")
 
         with patch("builtins.input", return_value="J9"):
             attack_execution(attacker=self.game_field1, target=self.game_field2)
             self.assertEqual(
                 self.game.get_last_turn_player(), self.player1.get_player_name()
             )
-            self.assertEqual(self.game_field1.get_hitfield()[9][9], 1)
+            self.assertEqual(self.game_field1.get_hitfield()[9][9], "X")
         # check water hit
         with patch("builtins.input", return_value="F1"):
             attack_execution(attacker=self.game_field1, target=self.game_field2)
@@ -206,11 +192,4 @@ class TestGameFuncs(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with open(
-        f"{os.path.dirname(os.path.abspath(__file__))}/logging/test_main.log",
-        "w",
-        encoding="utf-8",
-    ) as f:
-        runner = unittest.TextTestRunner(stream=f, verbosity=2)
-        unittest.main(testRunner=runner)
     unittest.main()

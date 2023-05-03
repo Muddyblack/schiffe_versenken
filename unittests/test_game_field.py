@@ -388,12 +388,4 @@ class TestAttackEnemy(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with open(
-        f"{os.path.dirname(os.path.abspath(__file__))}/logging/test_game_field.log",
-        "w",
-        encoding="utf-8",
-    ) as f:
-        runner = unittest.TextTestRunner(stream=f, verbosity=2)
-        unittest.main(testRunner=runner)
-
     unittest.main()
